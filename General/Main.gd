@@ -204,3 +204,4 @@ func exit():
 	if save_object_status:
 		save_objects()
 	queue_free()
+	#test
