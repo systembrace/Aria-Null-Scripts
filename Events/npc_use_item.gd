@@ -42,11 +42,11 @@ func activate():
 		get_tree().create_timer(delay_time+.05,false).timeout.connect(complete)
 
 func complete():
-	actor.target=temp_target
+	if !skipped:
+		actor.target=temp_target
+		if using_gun:
+			shoot_state.equip_gun(temp_equip)
 	super.complete()
-	if !using_gun:
-		return #items not implemented yet
-	shoot_state.equip_gun(temp_equip)
 
 func retract_harpoon():
 	shoot_state.guns[item_name].use()
