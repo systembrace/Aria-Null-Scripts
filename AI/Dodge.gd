@@ -22,7 +22,7 @@ func _ready():
 	iframes_timer.timeout.connect(hurtbox.enable_hurtbox)
 
 func can_dodge():
-	if body.target is Waypoint or !is_instance_valid(body.target.control.combo) or dashing:
+	if body.target is Event or !is_instance_valid(body.target.control.combo) or dashing:
 		return false
 	return timer.is_stopped() and combo.is_done_attacking() and ((body.target.control.combo.is_damaging() and body.to_local(body.target.global_position).length()<dodge_dist) or (searchfield and searchfield.nearby_count()>3))
 

@@ -1,6 +1,7 @@
 extends Entity
 class_name Ally
 
+@export var actor=false
 @export var max_speed: float
 @export var accel: float
 @export var target: Node2D
@@ -13,6 +14,8 @@ var ammo=60.0
 func _ready():
 	min_speed=max_speed/2
 	main=get_tree().get_root().get_node("Main")
+	if actor:
+		main.npcs[name]=self
 	super._ready()
 
 func interact(_interacted=null):

@@ -86,7 +86,7 @@ func _process(_delta):
 	if body.target!=null and !is_instance_valid(body.target):
 		body.target=null
 	if current_state and not stunned:
-		out_of_combat=(!is_instance_valid(body.target) or body.target is Waypoint) and (!combo or combo.is_done_attacking())
+		out_of_combat=(!is_instance_valid(body.target) or body.target is Event) and (!combo or combo.is_done_attacking())
 		if searchfield and (not body.target or (can_retarget and timer.is_stopped() and (!combo or combo.is_done_attacking()))):
 			if can_retarget:
 				timer.start()
@@ -103,7 +103,8 @@ func _process(_delta):
 		elif body.target and randf()<dodge and $Dodge.can_dodge():
 			force_transition("dodge")
 		#if !paused:
-		current_state.update()
+		if !body.jumping:
+			current_state.update()
 	elif (stunned or dying) and combo:
 		combo.enable_attack()
 

@@ -120,16 +120,16 @@ func pause():
 	body.velocity=dir
 
 func prevent_attack():
-	combo.disable_hitbox()
+	combo.enable_attack()
 
 func prevent_movement():
 	dir=Vector2.ZERO
-	body.velocity=body.velocity.move_toward(Vector2.ZERO,accel)
+	body.velocity=body.velocity.move_toward(Vector2.ZERO,accel/2)
 
 func _process(delta):
 	if paused:
 		prevent_movement()
-		prevent_attack()
+		#prevent_attack()
 		return
 	if stunned:
 		prevent_movement()

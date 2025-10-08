@@ -12,6 +12,7 @@ class_name RangedState
 @export var spread_time=1.0
 @export var shoot_close=false
 @export var never_hide=false
+var guns: Dictionary[String, Gun] = {}
 var spread=false
 var angle_step=0
 var tempbuffer=0
@@ -21,19 +22,25 @@ var lock:Timer=null
 var ready_sfx: SoundPlayer
 
 func _ready():
-	if find_child("Gun"):
-		gun=$Gun
+	for child in get_children():
+		if child is Gun:
+			guns[child.name]=child
+			if child.name=="Gun":
+				gun=child
 	spread_angle=spread_angle/360.0*2*PI
-	if delay_time>0.0:
+	if find_child("DelayTimer"):
 		delay=$DelayTimer
-		delay.wait_time=delay_time
 		delay.timeout.connect(shoot)
+	if delay_time>0.0:
+		delay.wait_time=delay_time
 		ready_sfx=$Ready
 		
-	if lock_time>0.0:
+	if find_child("LockTimer"):
 		lock=$LockTimer
-		lock.wait_time=lock_time
+		lock.wait_time=0.0001
 		lock.timeout.connect(lock_on)
+	if lock_time>0.0:
+		lock.wait_time=lock_time
 	if hitstun:
 		hitstun.stunned.connect(reload)
 		hitstun.stunned.connect(gun.cancel_shot)
@@ -52,24 +59,38 @@ func enter():
 		if is_instance_valid(target):
 			lock_pos=target.global_position
 
+func equip_gun(gun_name):
+	if !gun_name in guns:
+		return
+	gun=guns[gun_name]
+	gun.equip(body)
+	reset_target()
+
+func set_delay(time):
+	delay_time=time
+	if delay_time>0:
+		delay.wait_time=delay_time
+
 func lock_on():
 	lock_pos=target.global_position
 
 func try_shoot():
-	if !shoot_close and targetdist<=64 and delay and !delay.is_stopped():
+	if !shoot_close and targetdist<=64 and delay_time>0 and !delay.is_stopped():
 		delay.stop()
 		gun.cancel_shot()
 		if !never_hide:
 			gun.always_show=false
 		gun.readying=false
 	
-	if gun.can_use() and targetdist>64 and can_see_target() and body.ammo>=60.0/gun.numshots and (!delay or delay.is_stopped()):
-		if delay:
+	if gun.can_use() and targetdist>64 and can_see_target() and body.ammo>=60.0/gun.numshots and (delay_time==0 or delay.is_stopped()):
+		if delay_time>0:
 			if body.ammo==60.0:
 				delay.wait_time=delay_time
-				lock.wait_time=lock_time
+				if lock_time>0:
+					lock.wait_time=lock_time
 				gun.readying=true
-				ready_sfx.play()
+				if ready_sfx:
+					ready_sfx.play()
 			else:
 				delay.wait_time=gun.buffertime
 				lock.wait_time=0.001
@@ -102,9 +123,7 @@ func reload():
 
 func update():
 	if target!=body.target:
-		target=body.target
-		reset_dest()
-		direction=Vector2.ZERO
+		reset_target()
 	if !is_instance_valid(target) or target.control.health.hp<=0:
 		transition.emit(self,"Wander")
 		return
@@ -119,7 +138,7 @@ func update():
 	
 	super.update()
 	
-	if delay and !delay.is_stopped():
+	if delay_time>0 and !delay.is_stopped():
 		direction=Vector2.ZERO
 
 func physics_update():

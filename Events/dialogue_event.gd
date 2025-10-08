@@ -4,7 +4,7 @@ class_name DialogueEvent
 @export var pause_player=true
 
 func activate():
-	if branch or (ignore_when_event_skipped and ignore_when_event_skipped.branched_here):
+	if branch or (ignore_when_event_completed and ignore_when_event_completed.branched_here):
 		active=true
 		complete()
 		return

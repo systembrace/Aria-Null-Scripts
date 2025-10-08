@@ -35,6 +35,12 @@ func reset_dest():
 	nextdist=dist
 	nextpivot=pivot
 
+func reset_target():
+	target=body.target
+	if is_instance_valid(target):
+		reset_dest()
+	direction=Vector2.ZERO
+
 func next_dest():
 	if !can_see_target():
 		nextdist=0

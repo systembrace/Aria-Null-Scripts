@@ -3,11 +3,12 @@ class_name Event
 
 @export var prerequisite: Event
 @export var coroutine=false
+@export var early_skip=false
 @export var should_branch=false
 @export var interrupt_waypoint_when_branched=false
 @export var only_branch_here_backwards=false
 @export var branch_when_skipped: Event
-@export var ignore_when_event_skipped: Event
+@export var ignore_when_event_completed: Event
 signal activated
 signal just_completed
 signal task_finished
@@ -46,7 +47,7 @@ func _ready():
 func activate():
 	if active or completed:
 		return
-	if branch or (ignore_when_event_skipped and ignore_when_event_skipped.completed):
+	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed):
 		active=true
 		complete()
 		return
@@ -65,6 +66,9 @@ func finish_waiting():
 		complete()
 
 func complete():
+	if early_skip and !prev.completed:
+		skip()
+		return
 	if branch and branch_when_skipped and !prev.completed:
 		branch=false
 		skip()
@@ -85,6 +89,9 @@ func complete():
 		sequence_finished.emit()
 
 func finish_task():
+	if !prev.completed and early_skip:
+		skip()
+		return
 	task_finished.emit()
 	coroutine_done=true
 
@@ -94,7 +101,7 @@ func catch_up():
 func branch_here(branched_from=null):
 	if only_branch_here_backwards and !completed and !skipped:
 		return
-	if !branched_from and ignore_when_event_skipped and ignore_when_event_skipped.completed:
+	if !branched_from and ignore_when_event_completed and ignore_when_event_completed.completed:
 		return
 	print("branched to "+name)
 	if prev!=branched_from:
@@ -108,6 +115,8 @@ func branch_here(branched_from=null):
 	activate()
 	
 func skip(trueskip=false):
+	if early_skip:
+		early_skip=false
 	if dont_skip:
 		activate()
 		dont_skip=false
@@ -125,6 +134,7 @@ func skip(trueskip=false):
 		catch_up()
 	waiting=false
 	skipped=true
+	active=true
 	complete()
 	completed=true
 	just_completed.emit()

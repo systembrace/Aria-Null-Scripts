@@ -22,7 +22,7 @@ func _ready():
 			prev_child.just_completed.connect(iter_ended)
 
 func activate():
-	if branch or (ignore_when_event_skipped and ignore_when_event_skipped.completed):
+	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed):
 		active=true
 		complete()
 		return

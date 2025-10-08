@@ -18,13 +18,14 @@ func _ready():
 	buffer.timeout.connect(hide_sprite)
 	pull_timer.wait_time=5
 	length=sprite.sprite_frames.get_frame_texture("empty",0).get_width()
+	sprite.offset=offset
 
 func updatesprite():
 	if !retracting:
 		dir=target_dir()
 	else:
 		dir=to_local(harpoon.global_position).normalized()
-	
+			
 	var state="full"
 	if deployed:
 		state="empty"
@@ -54,6 +55,7 @@ func updatesprite():
 		else:
 			sprite.position.x=3
 	sprite.visible=true
+	shooting=true
 
 func use():
 	if !deployed:
@@ -116,14 +118,13 @@ func hide_sprite():
 	if cloak:
 		$Cloak.visible=false
 	if is_instance_valid(targetparent):
-		tether.points[0]=to_local(targetparent.global_position)+Vector2.UP*17
+		tether.points[0]=tether.to_local(targetparent.global_position)+Vector2.UP*17
 
 func _process(delta):
 	super._process(delta)
 	queue_redraw()
-	if !is_instance_valid(target) or !target:
+	if (!is_instance_valid(target) or !target) and sprite.visible:
 		hide_sprite()
-		return
 	if not deployed and firing:
 		updatesprite()
 	if !is_instance_valid(harpoon):

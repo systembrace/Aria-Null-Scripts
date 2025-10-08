@@ -99,7 +99,7 @@ func _process(delta):
 		if len(text)>0 and text[0]!=" " and !Engine.is_editor_hint():
 			var speaker="cherry"
 			if current_data.has_section_key(current_section,str(index)+"speaker"):
-				speaker=current_data.get_value(current_section,str(index)+"speaker")
+				speaker=current_data.get_value(current_section,str(index)+"speaker").to_lower()
 			find_child("Talk_"+speaker).play()
 		step=0
 	if !control or do_timer:

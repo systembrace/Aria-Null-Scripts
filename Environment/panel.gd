@@ -15,16 +15,20 @@ func _ready():
 	area_entered.connect(turn_on)
 	area_exited.connect(turn_off)
 
+func press():
+	pressed.emit()
+	if one_time:
+		disable()
+
 func interact(_node = null):
 	if !node:
+		press()
 		return
 	if param:
 		node.call(function, param)
 	else:
 		node.call(function)
-	pressed.emit()
-	if one_time:
-		disable()
+	press()
 	
 func turn_on(_area=null):
 	$Popup.visible=true

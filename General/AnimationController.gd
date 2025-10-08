@@ -11,7 +11,7 @@ class_name AnimationController
 @export var dash: Node
 @export var hurtbox: Hurtbox
 @export var control: PlayerControl
-@export var gun: Secondary
+@export var shoot_state: RangedState
 @export var gun_anims=false
 @export var hastarget=false
 @export var haschargedattack=false
@@ -33,6 +33,7 @@ class_name AnimationController
 @export var out_of_combat_anims=false
 @export var flicker_iframes=false
 @export var footsteps=-1
+var gun: Secondary
 var vel_threshold=.02
 var direction=Vector2.DOWN
 var anim="idle"
@@ -106,6 +107,12 @@ func _process(_delta):
 	
 	if control and control.inventory and (control.inventory.secondary is Gun or control.inventory.secondary is Grapple):
 		gun=control.inventory.secondary
+	elif shoot_state and gun!=shoot_state.gun and (!gun is Grapple or !gun.pulling):
+		gun=shoot_state.gun
+	
+	if gun is Grapple and gun.pulling:
+		anim=dashname
+		curr_anim_name=dashname
 	
 	if hitstun and hitstun.stunning:
 		anim=stunname
@@ -140,10 +147,10 @@ func _process(_delta):
 			if gun and !vertical_sprites_enabled and ("_up" in gun.sprite.animation or "_down" in gun.sprite.animation):
 				gun.sprite.flip_v=true
 	
-	if out_of_combat_anims and body.control.out_of_combat and combo.can_move() and curr_anim_name!=stunname:
-		curr_anim_name="ooc_"+curr_anim_name
-	elif gun_anims and (gun.shooting or gun.readying) and (curr_anim_name==runname or curr_anim_name==walkname or curr_anim_name==idlename):
+	if gun_anims and (gun.shooting or gun.readying) and (curr_anim_name==runname or curr_anim_name==walkname or curr_anim_name==idlename):
 		curr_anim_name="gun_"+curr_anim_name
+	elif out_of_combat_anims and body.control.out_of_combat and combo.can_move() and curr_anim_name!=stunname:
+		curr_anim_name="ooc_"+curr_anim_name
 	
 	if runspeed>0 and anim==runname:
 		sprite.speed_scale=min(1,body.velocity.length()/body.max_speed*runspeed)

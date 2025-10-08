@@ -11,6 +11,7 @@ var config_name
 var checkpoint_config_name
 var scene_name=""
 var player: Player
+var npcs: Dictionary[String, Entity] = {}
 var current_waypoint: Waypoint
 var transition:FadeTransition
 var canvasmod:CanvasModulate
@@ -204,4 +205,3 @@ func exit():
 	if save_object_status:
 		save_objects()
 	queue_free()
-	#test
