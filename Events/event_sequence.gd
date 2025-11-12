@@ -15,7 +15,8 @@ func _ready():
 			if prev:
 				prev.next=child
 			prev=child
-			child.activated.connect(currently_active)
+			if !child.only_branch_here_backwards:
+				child.activated.connect(currently_active)
 			child.sequence_finished.connect(currently_active.bind("None"))
 			if child is Waypoint:
 				last_waypoint=child
@@ -35,7 +36,7 @@ func set_active(loaded_name):
 		events[len(events)-1].skip(true)
 		active="None"
 		return
-	var event=find_child(loaded_name)
+	var event: Event = find_child(loaded_name)
 	if !event:
 		print("could not find event to load")
 		return

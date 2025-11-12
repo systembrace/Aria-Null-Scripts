@@ -15,7 +15,7 @@ func activate():
 	if !main.is_node_ready():
 		await main.ready
 	if pause_player:
-		main.player.control.pause()
+		main.player.control.call_deferred("pause")
 
 func _process(_delta):
 	if active:

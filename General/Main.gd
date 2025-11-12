@@ -115,6 +115,8 @@ func save_objects(checkpoint=false):
 			if current_waypoint:
 				waypoint_name=current_waypoint.name
 			config.set_value(scene_name,"current waypoint",waypoint_name)
+		elif obj is RepeatingEvent:
+			config.set_value(scene_name,obj.name,obj.current)
 		else:
 			print("idk how to save this "+obj.name)
 	config.set_value(scene_name,"Visited",true)
@@ -132,31 +134,29 @@ func load_objects():
 			if not obj.name in config.get_section_keys(scene_name):
 				if obj is Enemy or obj is FadeTransition or obj is Box or obj is BreakableWall:
 					obj.queue_free()
-					continue
 			elif obj.name in config.get_section_keys(scene_name):
 				if obj is Enemy or obj is FadeTransition:
 					continue
 				elif obj is Ally:
 					obj.global_position=str_to_var(config.get_value(scene_name,obj.name))
 					obj.find_child("AnimationController").direction=str_to_var(config.get_value(scene_name,obj.name+"_dir"))
-					continue
 				elif obj is EventSequence:
 					obj.set_active(config.get_value(scene_name,obj.name))
 					var waypoint_name=config.get_value(scene_name,"current waypoint","none")
 					if waypoint_name!="none":
 						current_waypoint=find_child(waypoint_name)
-					continue
 				elif obj is Door:
 					obj.snap_to_init(config.get_value(scene_name,obj.name))
-					continue
 				elif obj is InteractPanel:
 					if config.get_value(scene_name,obj.name):
 						obj.disable()
 					else:
 						obj.turn_on()
 						obj.turn_off()
-					continue
-			print("idk how to load this "+obj.name)
+				elif obj is RepeatingEvent:
+					obj.current=config.get_value(scene_name,obj.name)
+			else:
+				print("idk how to load this "+obj.name)
 	else:
 		if !DirAccess.dir_exists_absolute("user://area_data"):
 			DirAccess.make_dir_absolute("user://area_data")

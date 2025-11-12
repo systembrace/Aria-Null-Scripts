@@ -99,7 +99,7 @@ func catch_up():
 	pass
 	
 func branch_here(branched_from=null):
-	if only_branch_here_backwards and !completed and !skipped:
+	if only_branch_here_backwards and !completed:
 		return
 	if !branched_from and ignore_when_event_completed and ignore_when_event_completed.completed:
 		return
