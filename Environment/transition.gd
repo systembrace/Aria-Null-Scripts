@@ -76,7 +76,7 @@ func change_scene(_body=null):
 	node_children_recursive(main,previous)
 	set_main(player)
 	set_main(inventory)
-	inventory.hud.dialogue_box.exit(true)
+	#inventory.hud.dialogue_box.exit(true)
 	scene.player=player
 	inventory.update_camera()
 	player.call_deferred("make_scarf")
