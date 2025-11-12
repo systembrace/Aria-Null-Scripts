@@ -47,6 +47,7 @@ func take_damage(_area=null, _parry=false):
 	pass
 
 func death_throes():
+	body.death_throes.emit()
 	body.set_collision_mask_value(18,false)
 	dying=true
 	if hitstun:

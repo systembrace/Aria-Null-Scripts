@@ -8,6 +8,9 @@ uniform float no_normal : hint_range(0.0,1.0) = 1.0;
 void fragment() {
     vec4 texture_color = texture(TEXTURE, UV);
     COLOR = mix(texture_color, flash_color, flash_value);
+	if (flash_value==1.0){
+		COLOR*=100.0;
+	}
     COLOR.a = texture_color.a;
 	if (flash_value==0.0){
 		COLOR.a*=alpha;

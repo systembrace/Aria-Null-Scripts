@@ -7,6 +7,7 @@ class_name Enemy
 @export var target: Node2D
 @export var chase_radius = 256
 @export var scrap=5
+signal death_throes
 var min_speed=0
 var spawn: Vector2
 var ammo=60.0
