@@ -8,6 +8,7 @@ class_name Entity
 @export var grappleable=false
 signal started_falling
 signal fell
+var initial_fall_buffer=true
 var status_effects=[]
 var prev_location=global_position
 var floor_checker
@@ -27,6 +28,7 @@ func _ready():
 	if find_child("Hurtbox"):
 		hurtbox=$Hurtbox
 	body_sprite=find_child("AnimatedSprite2D")
+	get_tree().create_timer(0.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
 	coyote=Timer.new()
 	coyote.name="CoyoteTimer"
 	coyote.one_shot=true
@@ -53,8 +55,6 @@ func _ready():
 	floor_checker.position=Vector2.ZERO
 	floor_checker.body_entered.connect(reentered_floor.unbind(1))
 	floor_checker.body_exited.connect(left_floor.unbind(1))
-	if !floor_checker.has_overlapping_bodies():
-		on_floor=false
 		
 	if can_jump:
 		landing_checker=Area2D.new()
@@ -132,6 +132,8 @@ func end_fall():
 		land()
 
 func _physics_process(delta):
+	if initial_fall_buffer:
+		return
 	var shadow_sprite=find_child("Shadow")
 	if is_instance_valid(floor_checker) and floor_checker.has_overlapping_bodies():
 		if coyote.is_stopped() and !on_floor:
