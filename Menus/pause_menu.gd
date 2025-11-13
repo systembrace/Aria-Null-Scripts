@@ -92,6 +92,7 @@ func resume():
 
 func quit():
 	if visible:
+		Music.eject()
 		if main.can_save():
 			main.save_data()
 		main.fade_out(true)

@@ -20,6 +20,7 @@ var wind_step=PI
 var wind_speed_step=0
 var wind_speed=1
 var num_particles=0
+var in_combat=false
 var items_list=["Grenades","Earthshaker"]
 var guns_list=["Shield","Pistol","Shotgun","Harpoon"]
 var revives_list=["none","roly_poly","elite"]
@@ -158,6 +159,7 @@ func revert_area_data():
 func reset_to_checkpoint():
 	player_dead=true
 	load_game=true
+	Music.eject()
 	if endless:
 		return
 	revert_save("checkpoint_flags","last_flags")
@@ -168,6 +170,7 @@ func reset_to_checkpoint():
 
 func reset_game():
 	get_tree().paused=false
+	#Music.eject()
 	var main=get_tree().get_root().get_node("Main")
 	get_tree().get_root().call_deferred("remove_child",main)
 	get_tree().call_deferred("change_scene_to_packed",load("res://Scenes/General/game_start.tscn"))

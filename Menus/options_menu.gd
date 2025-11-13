@@ -52,8 +52,8 @@ func _ready():
 	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.value=db_to_linear(Global.load_config("audio","music")+2.4987)*100
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/SFX.drag_started.connect(sfx_confirm.play)
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/SFX.drag_ended.connect(sfx_confirm.play.unbind(1))
-	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.drag_started.connect($MusicPlayer.play)
-	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.drag_ended.connect($MusicPlayer.play.unbind(1))
+	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.drag_started.connect($MusicTest.play)
+	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.drag_ended.connect($MusicTest.play.unbind(1))
 	if !pause_menu:
 		var worldenv=WorldEnvironment.new()
 		worldenv.environment=Global.environment
