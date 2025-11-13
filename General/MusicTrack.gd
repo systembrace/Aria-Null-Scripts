@@ -4,9 +4,14 @@ class_name MusicTrack
 @export var autoplay=true
 @export var loop=true
 @export var init_db=0.0
+@export var autoplay_if_flag:String
+@export var flag_is_value=1.0
+signal stopped
+var loaded=false
 var db=0.0
 var pause_offset=0.0
 var fading=false
+var fade_speed=1
 var calm_db=0.0
 var combat_db=-64.0
 var base: AudioStreamPlayer
@@ -18,12 +23,18 @@ func _ready():
 	base=find_child("Base")
 	calm=find_child("Calm")
 	combat=find_child("Combat")
-	if loop:
+	if loop and base:
 		base.finished.connect(play)
 	if autoplay:
+		call_deferred("try_autoplay")
+
+func try_autoplay():
+	if !autoplay_if_flag or Global.get_flag(autoplay_if_flag)==flag_is_value:
 		call_deferred("load_track")
 
 func update_volume():
+	if !base:
+		return
 	db=init_db+Global.load_config("audio","music")
 	base.volume_db=db+pause_offset
 	if calm:
@@ -32,9 +43,16 @@ func update_volume():
 		combat.volume_db=db+combat_db+pause_offset
 
 func load_track():
-	Music.insert(self)
+	if loaded:
+		return
+	loaded=true
+	if base:
+		Music.insert(self)
+	else:
+		Music.eject()
 
 func play():
+	print("Playing "+name)
 	db=init_db+Global.load_config("audio","music")
 	update_volume()
 	base.play()
@@ -43,10 +61,12 @@ func play():
 	if combat:
 		combat.play()
 
-func fade_out():
+func fade_out(speed):
 	fading=true
+	fade_speed=speed
 
 func stop():
+	stopped.emit()
 	base.stop()
 	if calm:
 		calm.stop()
@@ -55,15 +75,17 @@ func stop():
 
 func _process(delta):
 	if fading:
-		init_db=move_toward(init_db,-64,60*delta)
-	if init_db<=-32:
+		init_db=move_toward(init_db,-64,60*delta/fade_speed)
+	if init_db<=-16:
 		stop()
 		queue_free()
 	
 	if get_tree().paused and pause_offset==0.0 and not get_parent() is OptionsMenu:
 		pause_offset=-7.0
+		update_volume()
 	elif !get_tree().paused and pause_offset!=0.0:
 		pause_offset=0.0
+		update_volume()
 
 	if Global.in_combat and (combat_db<0 or calm_db>-64):
 		combat_db=move_toward(combat_db,0,3*60*delta)

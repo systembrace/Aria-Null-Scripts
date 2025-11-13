@@ -11,8 +11,6 @@ func _ready():
 	var prev_child=get_children()[0]
 	if end_when_completed:
 		end_when_completed.just_completed.connect(end_repeats)
-	if len(start_events)==1:
-		prev_child.just_completed.connect(iter_ended)
 	for i in range(1,len(get_children())):
 		var child=get_children()[i]
 		if not child in start_events:
@@ -20,6 +18,7 @@ func _ready():
 		else:
 			prev_child.just_completed.connect(iter_ended)
 		prev_child=child
+	prev_child.just_completed.connect(iter_ended)
 
 func activate():
 	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed):
@@ -51,7 +50,6 @@ func end_repeats():
 		child.complete()
 
 func branch_here(branched_from=null):
-	print(current)
 	if current>=len(start_events):
 		return
 	super.branch_here(branched_from)

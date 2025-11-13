@@ -10,14 +10,18 @@ func _ready():
 func insert(track):
 	if song and track.name==song.name:
 		return
-	track.reparent(self)
+	print("Inserting "+track.name)
+	track.call_deferred("reparent",self) 
 	if song:
-		eject()
+		song.stopped.connect(track.play)
+		eject(4)
+	else:
+		track.play()
 	song=track
-	song.play()
 
-func eject():
+func eject(speed=1):
 	if !is_instance_valid(song):
 		return
-	song.fade_out()
+	print("ejecting "+song.name)
+	song.fade_out(speed)
 	song=null

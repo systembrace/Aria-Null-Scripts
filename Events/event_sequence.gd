@@ -7,6 +7,7 @@ var last_waypoint=Waypoint
 var npc_endings=[]
 
 func _ready():
+	add_to_group("objs_to_load")
 	var prev=null
 	for child in get_children():
 		if child is Event:
@@ -22,6 +23,7 @@ func _ready():
 				last_waypoint=child
 			if child is EndNPCEvent:
 				npc_endings.append(child)
+	await get_parent().ready
 	events[0].activate()
 
 func currently_active(eventname):
