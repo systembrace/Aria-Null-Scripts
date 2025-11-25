@@ -35,7 +35,6 @@ func _ready():
 			get_tree().create_timer(.75,false).timeout.connect(stop_revive)
 			control.pause()
 	else:
-		control.pause()
 		$Hurtbox.disable_hurtbox()
 		$Hurtbox.timer.start()
 		$Hologram.play()
@@ -70,7 +69,6 @@ func create_tessa(rand_position=true):
 
 func stop_revive():
 	revive=false
-	control.paused=false
 
 func create_dummy():
 	if !main:
