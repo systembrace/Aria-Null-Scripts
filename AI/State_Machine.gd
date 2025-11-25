@@ -80,7 +80,7 @@ func recover():
 
 func _process(_delta):
 	out_of_combat=false
-	if dead:
+	if dead or paused:
 		return
 	if dying:
 		hurtbox.disable_hurtbox()
@@ -103,7 +103,7 @@ func _process(_delta):
 					force_transition("follow")
 		elif body.target and randf()<dodge and $Dodge.can_dodge():
 			force_transition("dodge")
-		if !body.jumping or body.on_floor:
+		if !body.jumping or body.on_floor or current_state.name.to_lower()=="dodge":
 			current_state.update()
 	elif (stunned or dying) and combo:
 		combo.enable_attack()

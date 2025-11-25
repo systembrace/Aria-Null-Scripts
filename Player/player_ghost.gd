@@ -4,17 +4,26 @@ class_name PlayerGhost
 var target
 var main
 var inventory: Inventory
+var tessa
 var maxhp=5
 var firstdeath=true
 var canrevive=false
 @onready var timer = $DeathTimer
-@onready var revive=$CanvasLayer/Revive
-@onready var gameover=$CanvasLayer/GameOver
+@onready var revive=$CanvasLayer/ReviveMenu/MarginContainer/VBoxContainer/Revive
+@onready var gameover=$CanvasLayer/ReviveMenu/MarginContainer/VBoxContainer/Dead
 
 func _ready():
 	main=get_tree().get_root().get_node("Main")
 	timer.wait_time=2
-	if firstdeath and inventory.revival!="none":
+	var has_revives=false
+	for button in $CanvasLayer/ReviveMenu/MarginContainer/VBoxContainer/Revive/ReviveOptions.get_children():
+		button.pressed.connect(revive_as.bind(button.name.to_lower()))
+		if Global.get_flag(button.name.to_lower()):
+			button.show()
+			has_revives=true
+		else:
+			button.hide()
+	if firstdeath and has_revives and main.num_enemies()>0:
 		timer.timeout.connect(allowrevive)
 	else:
 		Global.player_dead=true
@@ -22,12 +31,13 @@ func _ready():
 			main.save_data()
 		Global.reset_to_checkpoint()
 		gameover.visible=true
+		timer.wait_time=3
 		timer.timeout.connect(start_fade)
 	timer.start()
 	$Health.maxhp=maxhp
 	$Health.hp=0
 	$Health.prevhp=0
-	revive.text=Global.load_config("bindings","attack")+": Revive as "+inventory.revivenames[inventory.revival]+"\n"+Global.load_config("bindings","secondary")+": Restart"
+	#revive.text=Global.load_config("bindings","attack")+": Revive as "+inventory.revivenames[inventory.revival]+"\n"+Global.load_config("bindings","secondary")+": Restart"
 
 func allowrevive():
 	revive.visible=true
@@ -54,6 +64,23 @@ func switch_to_dead():
 	timer.timeout.connect(start_fade)
 	timer.start()
 
+func revive_as(button_name):
+	if !main:
+		return
+	Global.slow_down_to_zero=false
+	var scene=load("res://Scenes/Allies/"+button_name+"_controlled.tscn")
+	inventory.revival=button_name
+	if scene==null:
+		scene=load("res://Scenes/Allies/roly_poly_controlled.tscn")
+		inventory.revival="roly_poly"
+	var player=scene.instantiate()
+	player.global_position=tessa.global_position
+	tessa.queue_free()
+	player.original_player=false
+	main.add_child(player)
+	main.player=player
+	queue_free()
+
 func _process(_delta):
 	if !gameover.visible:
 		if get_tree().paused:
@@ -62,32 +89,7 @@ func _process(_delta):
 			revive.visible=true
 	if !revive.visible or !canrevive:
 		return
-	revive.text=Global.load_config("bindings","attack")+": Revive as "+inventory.revivenames[inventory.revival]+"\n"+Global.load_config("bindings","secondary")+": Restart"
-	if Input.is_action_just_released("secondary"):
-		switch_to_dead()
-		return
-	if Input.is_action_just_released("attack"):
-		if !main:
-			return
-		if inventory.revival=="none":
-			switch_to_dead()
-			return
-		var scene=load("res://Scenes/Non-enemies/"+inventory.revival+"_controlled.tscn")
-		if scene==null:
-			scene=load("res://Scenes/Non-enemies/enemy_controlled.tscn")
-		var player=scene.instantiate()
-		player.global_position=global_position
-		player.original_player=false
-		main.add_child(player)
-		main.player=player
-		$CustomParticleSpawner.spawn()
-		var sparks=$Sparks.duplicate()
-		sparks.global_position=global_position
-		sparks.finished.connect(sparks.queue_free)
-		main.add_child(sparks)
-		sparks.process_material.direction=Vector3(0,-2,0)
-		sparks.emitting=true
-		queue_free()
+	#revive.text=Global.load_config("bindings","attack")+": Revive as "+inventory.revivenames[inventory.revival]+"\n"+Global.load_config("bindings","secondary")+": Restart"
 
 func save_data():
 	var data = {

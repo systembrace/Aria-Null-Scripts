@@ -16,19 +16,23 @@ var shoulders
 var do_timer=false
 var step=0
 var dialogue_queue=[]
+var currently_interruptable=true
 @onready var portrait=$PanelContainer/MarginContainer/HBoxContainer/Portrait
 @onready var label=$PanelContainer/MarginContainer/HBoxContainer/Dialogue
 @onready var timer=$Timer
 
-func enter(data,section,t=false,node=null):
+func enter(data,section,t=false,node=null,interrupt=false,interruptable=true):
 	if current_section!="":
-		if !node:
-			dialogue_queue.append([data,section,t,node])
+		if (!node and !interrupt) or !currently_interruptable:
+			if !currently_interruptable and interrupt:
+				dialogue_queue.clear()
+			dialogue_queue.append([data,section,t,node,interruptable])
 			return
 		exit()
 	if node:
 		control=node
 		control.call_deferred("pause")
+	currently_interruptable=interruptable
 	do_timer=t
 	if do_timer and !timer.timeout.is_connected(next):
 		timer.timeout.connect(next)
@@ -54,7 +58,7 @@ func exit(clear_queue=false):
 		dialogue_queue.clear()
 	if len(dialogue_queue)>0:
 		var next_dialogue=dialogue_queue[0]
-		enter(next_dialogue[0],next_dialogue[1],next_dialogue[2],next_dialogue[3])
+		enter(next_dialogue[0],next_dialogue[1],next_dialogue[2],next_dialogue[3],next_dialogue[4])
 		dialogue_queue.remove_at(0)
 
 func display(data:ConfigFile,section):
@@ -73,6 +77,7 @@ func display(data:ConfigFile,section):
 	portrait.draw_portrait(current_data,current_section,index)
 
 func next():
+	$PanelContainer/MarginContainer/HBoxContainer/Next.hide()
 	index+=1
 	if !current_data.has_section_key(current_section,str(index)):
 		exit()
@@ -102,9 +107,11 @@ func _process(delta):
 				speaker=current_data.get_value(current_section,str(index)+"speaker").to_lower()
 			find_child("Talk_"+speaker).play()
 		step=0
-	if !control or do_timer:
+	if do_timer:
+		$PanelContainer/MarginContainer/HBoxContainer/Next.hide()
 		return
 	if len(text)<=0:
+		$PanelContainer/MarginContainer/HBoxContainer/Next.show()
 		if Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack"):
 			next()
 		return

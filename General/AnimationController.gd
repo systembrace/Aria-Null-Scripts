@@ -4,7 +4,6 @@ class_name AnimationController
 @onready var sprite=$AnimatedSprite2D
 @onready var flash_anim=$AnimatedSprite2D/Flash
 @onready var flicker:Timer
-@onready var body:CharacterBody2D=get_parent()
 @export var combo: Combo
 @export var hitstun: Hitstun
 @export var health: Health
@@ -29,17 +28,23 @@ class_name AnimationController
 @export var fallname="fall"
 @export var healname="heal"
 @export var randomidle:float=-1
+@export var long_idle=0
 @export var has_vertical_sprites=false
 @export var out_of_combat_anims=false
 @export var flicker_iframes=false
 @export var footsteps=-1
+var body
 var gun: Secondary
 var vel_threshold=.02
 var direction=Vector2.DOWN
 var anim="idle"
+var idle_time=0.0
 signal step
 
 func _ready():
+	body=get_parent()
+	while not body is CharacterBody2D:
+		body=body.get_parent()
 	if health and flash_anim:
 		health.hplost.connect(hitflash)
 	if flicker_iframes and hurtbox:
@@ -49,6 +54,15 @@ func _ready():
 	flicker=$Flicker
 	flicker.timeout.connect(hitflash)
 	flicker.wait_time=.15
+	var start_anim=idlename
+	if has_vertical_sprites:
+		if direction.y<0:
+			start_anim+="_up"
+		elif direction.y>0:
+			start_anim+="_down"
+	sprite.animation=start_anim
+	if randomidle>=0:
+		sprite.stop()
 
 func update_fall():
 	sprite.animation=stunname
@@ -62,7 +76,7 @@ func hitflash(dead=false):
 	if flicker_iframes or dead:
 		flicker.start()
 
-func _process(_delta):
+func _process(delta):
 	var curr_anim_name=idlename
 	var curr_frame=sprite.get_frame()
 	var curr_prog=sprite.get_frame_progress()
@@ -78,6 +92,13 @@ func _process(_delta):
 			curr_anim_name=runname
 	else:
 		anim=idlename
+	
+	if long_idle and anim==idlename and sprite.animation.begins_with(idlename):
+		idle_time+=delta
+		if idle_time>long_idle:
+			curr_anim_name+="_long"
+	elif idle_time>0:
+		idle_time=0
 	
 	if combo:
 		if combo.is_damaging():
@@ -117,6 +138,16 @@ func _process(_delta):
 	if hitstun and hitstun.stunning:
 		anim=stunname
 		curr_anim_name=stunname
+		vertical_sprites_enabled=false
+	
+	if body is Ally and body.kneeling:
+		anim="kneeling"
+		curr_anim_name="kneeling"
+		vertical_sprites_enabled=false
+	
+	if body is Player and body.revive:
+		anim="revive"
+		curr_anim_name="revive"
 		vertical_sprites_enabled=false
 	
 	if (anim==attackname or anim==readyattackname or anim==recovername) and combo and combo.current_attack.unique_anim:
@@ -164,7 +195,8 @@ func _process(_delta):
 		
 		if prevanim==anim:
 			sprite.set_frame_and_progress(curr_frame,curr_prog)
-		if anim==idlename and randf()>randomidle/60:
+		
+		if anim==idlename and randomidle>=0 and randf()>randomidle/60:
 			sprite.stop()
 		else:
 			sprite.play(curr_anim_name)

@@ -14,12 +14,12 @@ func insert(track):
 	track.call_deferred("reparent",self) 
 	if song:
 		song.stopped.connect(track.play)
-		eject(4)
+		eject(5)
 	else:
 		track.play()
 	song=track
 
-func eject(speed=1):
+func eject(speed=5):
 	if !is_instance_valid(song):
 		return
 	print("ejecting "+song.name)

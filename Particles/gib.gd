@@ -34,7 +34,7 @@ func _process(delta):
 		dh-=gravity*60*delta
 		if h+dh<0 and on_floor:
 			dh*=-1*bounce
-		h+=dh
+		h+=dh*60*delta
 	elif h!=0 and on_floor:
 		h=move_toward(h,0,gravity*60*delta)
 		dh=0

@@ -1,15 +1,20 @@
 extends CharacterBody2D
 class_name Box
 
-var dead=false
+var broken=false
 
 func _ready():
 	$Area2D.area_entered.connect(die)
 
+func set_broken():
+	broken=true
+	for child in get_children():
+		child.queue_free()
+
 func die(area):
-	if dead:
+	if broken:
 		return
-	dead=true
+	broken=true
 	if area.targetparent is Bullet:
 		area.targetparent.hit()
 	
@@ -18,4 +23,5 @@ func die(area):
 	$Die.reparent(get_parent())
 	$DustPuff.emitting=true
 	$DustPuff.reparent(get_parent())
-	queue_free()
+	for child in get_children():
+		child.queue_free()

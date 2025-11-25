@@ -6,6 +6,7 @@ extends Node2D
 var dh=0
 var gravity=15
 var disabled_hurtbox=false
+var init_collision
 @onready var body: Player=get_parent()
 
 func _ready():
@@ -15,6 +16,9 @@ func _ready():
 	body.control.combo.ended_attack.connect(enable_hurtbox)
 	combo.started_attack.connect(body.jump)
 	combo.ended_attack.connect(body.land)
+	init_collision=body.collision_mask
+	body.set_collision_mask_value(9,false)
+	hurtbox.hurtboxenabled.connect(set_collision)
 
 func disable_hurtbox():
 	if hurtbox.monitor:
@@ -25,6 +29,10 @@ func enable_hurtbox():
 	if disabled_hurtbox:
 		disabled_hurtbox=false
 		hurtbox.enable_hurtbox()
+
+func set_collision():
+	body.collision_mask=init_collision
+	hurtbox.hurtboxenabled.disconnect(set_collision)
 
 func bounce(coll):
 	if body.velocity.length()<128:

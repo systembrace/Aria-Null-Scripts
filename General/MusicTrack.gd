@@ -14,6 +14,8 @@ var fading=false
 var fade_speed=1
 var calm_db=0.0
 var combat_db=-64.0
+var time_scale=1.0
+var pitch_scale=1.0
 var base: AudioStreamPlayer
 var calm: AudioStreamPlayer
 var combat: AudioStreamPlayer
@@ -74,12 +76,28 @@ func stop():
 		combat.stop()
 
 func _process(delta):
+	if !base:
+		return
+	
 	if fading:
 		init_db=move_toward(init_db,-64,60*delta/fade_speed)
 	if init_db<=-16:
 		stop()
 		queue_free()
 	
+	if time_scale!=Engine.time_scale:
+		var diff=(Engine.time_scale-time_scale)/2
+		pitch_scale+=diff
+		time_scale=Engine.time_scale
+		for child in get_children():
+			child.pitch_scale=pitch_scale
+	#elif time_scale==1.0 and base.pitch_scale!=1.0:
+	#	base.pitch_scale=1.0
+	#	if calm:
+	#		calm.pitch_scale=1.0
+	#	if combat:
+	#		combat.pitch_scale=1.0
+		
 	if get_tree().paused and pause_offset==0.0 and not get_parent() is OptionsMenu:
 		pause_offset=-7.0
 		update_volume()

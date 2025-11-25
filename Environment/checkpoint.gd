@@ -46,7 +46,7 @@ func interact(player):
 		$CanvasLayer/Shop.player=player
 		$CanvasLayer/Shop.set_deferred("visible",true)
 	else:
-		var new_player=load("res://Scenes/Non-enemies/player.tscn").instantiate()
+		var new_player=load("res://Scenes/Allies/player.tscn").instantiate()
 		main.add_child(new_player)
 		new_player.global_position=player.global_position
 		player.free()

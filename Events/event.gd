@@ -89,7 +89,7 @@ func complete():
 		sequence_finished.emit()
 
 func finish_task():
-	if !prev.completed and early_skip:
+	if early_skip and !prev.completed:
 		skip()
 		return
 	task_finished.emit()

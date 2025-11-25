@@ -34,7 +34,7 @@ func num_enemies(active=false, all_waves=false):
 		return res
 	return num_enemies_in_wave(wave,active)
 
-func _process(delta):
+func _process(_delta):
 	#if check_combat_over:
 		#check_combat_over=false
 		#if num_enemies(false,true)==0:
@@ -51,6 +51,6 @@ func _process(delta):
 	if wave<num_waves-1 and (enemy_count==0 or (wave>=0 and enemy_count==waves[wave].enemies_left_to_next_wave)):
 		wave+=1
 		waves[wave].enable()
-	elif wave==num_waves-1 and enemy_count==0:
+	elif wave==num_waves-1 and num_enemies(false,true)==0:
 		wave+=1
 		combat_over.emit()

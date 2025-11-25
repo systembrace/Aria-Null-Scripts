@@ -34,7 +34,7 @@ func open_shop():
 		$CanvasLayer/Control.visible=true
 		play_with_cherry=Global.load_config("game","arena_with_cherry")
 		if play_with_cherry:
-			var cherry=load("res://Scenes/Non-enemies/cherry.tscn").instantiate()
+			var cherry=load("res://Scenes/Allies/cherry.tscn").instantiate()
 			add_child(cherry)
 			cherry.global_position=Vector2(248,192)
 		next_wave()
@@ -140,7 +140,7 @@ func save_data(_checkpoint=false,autosave=false,reset=false):
 	if Global.player_dead or wave<1 or reset:
 		data+=JSON.stringify({"name":"Endless","wave":0})
 		if Global.player_dead or reset:
-			data+="\n"+JSON.stringify({"health":5.0,"name":"Player","path":"res://Scenes/Non-enemies/player.tscn","pos_x":192,"pos_y":816,"prevhp":5.0})
+			data+="\n"+JSON.stringify({"health":5.0,"name":"Player","path":"res://Scenes/Allies/player.tscn","pos_x":192,"pos_y":816,"prevhp":5.0})
 		inventorydata["scrap"]=0
 		inventorydata["grenades"]=0
 		inventorydata["grenadesmax"]=0

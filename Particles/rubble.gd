@@ -15,8 +15,8 @@ func _ready():
 	
 func _process(delta):
 	super._process(delta)
-	step2+=1
-	if step2%4==0 and timer.is_stopped() and not shrink:
+	step2+=delta*60
+	if int(step2)%4==0 and timer.is_stopped() and not shrink and delta>1/240:
 		sprite.rotation=randf_range(0,2*PI)
 	if shrink:
 		$Shadow.scale=Vector2(.75,.75)*clamp(sprite.scale.length(),0,1)

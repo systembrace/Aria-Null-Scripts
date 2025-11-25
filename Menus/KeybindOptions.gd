@@ -13,13 +13,14 @@ var actions={
 	"dash":"Dodge",
 	"heal":"Heal",
 	"use item":"Use equipped item",
-	"aim":"Aim (for no mouse)",
-	"next gun":"Next alt",
-	"next item":"Next item",
+	"hologram":"Control Tessa",
 	"interact":"Interact",
 	"inventory":"Open inventory",
 	"back":"Back",
-	"pause":"Pause game"
+	"pause":"Pause game",
+	"next gun":"Next alt",
+	"next item":"Next item",
+	"aim":"Aim (for no mouse)",
 }
 var default_binds={
 	"left":"A",
@@ -37,7 +38,8 @@ var default_binds={
 	"interact":"E",
 	"inventory":"Tab",
 	"back":"Escape",
-	"pause":"Escape"
+	"pause":"Escape",
+	"hologram":"R"
 }
 var previous_binds
 var current_binds

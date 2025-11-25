@@ -29,8 +29,8 @@ func _ready():
 			invfile.close()
 		var lastfile = FileAccess.open("user://last_data.dat", FileAccess.WRITE)
 		var cpfile = FileAccess.open("user://checkpoint_data.dat", FileAccess.WRITE)
-		var save_data = {"path":"res://Scenes/Non-enemies/player.tscn","name":"Player","pos_x":0,"pos_y":8,"health":5,"original":true}
-		#var save_data = {"path":"Scenes/Non-enemies/player.tscn","name":"Player","pos_x":192,"pos_y":816,"health":5,"original":true}
+		var save_data = {"path":"res://Scenes/Allies/player.tscn","name":"Player","pos_x":0,"pos_y":8,"health":5,"original":true,"revives":1}
+		#var save_data = {"path":"Scenes/Allies/player.tscn","name":"Player","pos_x":192,"pos_y":816,"health":5,"original":true}
 		var json_string = JSON.stringify(save_data)
 		cpfile.store_line(json_string)
 		lastfile.store_line(json_string)

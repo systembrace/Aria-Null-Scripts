@@ -11,10 +11,13 @@ var config_name
 var checkpoint_config_name
 var scene_name=""
 var player: Player
+var inventory: Inventory
+var player_corpse: PlayerCorpse
 var npcs: Dictionary[String, Entity] = {}
 var current_waypoint: Waypoint
 var transition:FadeTransition
 var canvasmod:CanvasModulate
+var worldenv:WorldEnvironment
 
 func _ready():
 	#seed(23017031)
@@ -37,7 +40,7 @@ func _ready():
 		config_name="user://area_data/last_"+area+".ini"
 		checkpoint_config_name="user://area_data/checkpoint_"+area+".ini"
 		load_objects()
-	var worldenv=WorldEnvironment.new()
+	worldenv=WorldEnvironment.new()
 	worldenv.environment=Global.environment
 	add_child(worldenv)
 	Global.environment_updated.connect(worldenv.set_deferred.bind("environment",Global.environment))
@@ -100,7 +103,8 @@ func save_objects(checkpoint=false):
 			config.set_value(scene_name,obj.name,var_to_str(obj.global_position))
 			config.set_value(scene_name,obj.name+"_dir",var_to_str(obj.find_child("AnimationController").direction))
 		elif obj is Box:
-			config.set_value(scene_name,obj.name,"unbroken")
+			if obj.broken:
+				config.set_value(scene_name,obj.name,"broken")
 		elif obj is BreakableWall:
 			config.set_value(scene_name,obj.name,"unbroken")
 		elif obj is FadeTransition:
@@ -132,7 +136,7 @@ func load_objects():
 			return
 		for obj in get_tree().get_nodes_in_group("objs_to_load"):
 			if not obj.name in config.get_section_keys(scene_name):
-				if obj is Enemy or obj is FadeTransition or obj is Box or obj is BreakableWall:
+				if obj is Enemy or obj is FadeTransition or obj is BreakableWall:
 					obj.queue_free()
 			elif obj.name in config.get_section_keys(scene_name):
 				if obj is Enemy or obj is FadeTransition:
@@ -153,6 +157,8 @@ func load_objects():
 					else:
 						obj.turn_on()
 						obj.turn_off()
+				elif obj is Box and config.get_value(scene_name,obj.name)=="broken":
+					obj.set_broken()
 				elif obj is RepeatingEvent:
 					obj.current=config.get_value(scene_name,obj.name)
 			else:
@@ -185,7 +191,10 @@ func save_data(checkpoint=false, autosave=false):
 			scrap+=1
 			child.queue_free()
 	var data=""
+	data+=JSON.stringify(player.save_data())+"\n"
 	for node in get_tree().get_nodes_in_group("to_save"):
+		if node is Player:
+			continue
 		if node is Inventory:
 			node.scrap+=scrap
 		var node_data = node.save_data()
@@ -202,6 +211,7 @@ func fade_out(total_fade=false):
 	transition.reverse_fade()
 
 func exit():
-	if save_object_status:
-		save_objects()
+	#now saved in transition.gd
+	#if save_object_status:
+	#	save_objects()
 	queue_free()

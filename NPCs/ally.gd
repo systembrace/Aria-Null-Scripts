@@ -6,9 +6,11 @@ class_name Ally
 @export var accel: float
 @export var target: Node2D
 @export var can_speak_to=false
+@export var tessa=false
 var main
 var min_speed
 var ammo=60.0
+var kneeling=false
 @onready var control=$AI
 
 func _ready():
@@ -16,6 +18,8 @@ func _ready():
 	main=get_tree().get_root().get_node("Main")
 	if actor:
 		main.npcs[name]=self
+	if tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
+		global_position=main.npcs["Cherry"].global_position
 	super._ready()
 
 func interact(_interacted=null):

@@ -48,13 +48,15 @@ func get_hit():
 	if has_hitbuffer:
 		hitbuffer.stop()
 
-func fall():
+func take_non_attack_damage(hitbox_type="Fall"):
 	attack=null
 	if parent_combo:
 		parent_combo.disable_hitbox()
-	var fall_hitbox=Hitbox.new()
-	fall_hitbox.targetparent=self
-	take_hit.emit(fall_hitbox)
+	var new_hitbox=Hitbox.new()
+	new_hitbox.name=hitbox_type
+	new_hitbox.targetparent=self
+	take_hit.emit(new_hitbox)
+	new_hitbox.free()
 	if invincibility_time!=0:
 		disable_hurtbox()
 		timer.start()

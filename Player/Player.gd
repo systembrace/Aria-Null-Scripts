@@ -8,37 +8,86 @@ class_name Player
 @export var speed_falloff_time=10
 @export var secondary:Node2D
 @export var original_player=true
+@export var mask: Sprite2D
 signal collision
 var speed=min_speed
 var inventory: Inventory
 var dir=Vector2.DOWN
 var veldir=Vector2.DOWN
 var aiming=false
+var main: Main
+var tessa
+var has_tessa=true
+var revive=false
 signal healing
 @onready var control=$Control
 
 func _ready():
 	super._ready()
+	main=get_tree().get_root().get_node("Main")
 	if original_player:
 		make_scarf()
 		fell.connect(make_scarf)
+		if has_tessa and !revive and !tessa:
+			call_deferred("create_tessa")
+		if revive:
+			$Revive.play()
+			get_tree().create_timer(.75,false).timeout.connect(stop_revive)
+			control.pause()
 	else:
+		control.pause()
 		$Hurtbox.disable_hurtbox()
 		$Hurtbox.timer.start()
+		$Hologram.play()
 
 func make_scarf():
 	if !original_player:
 		return
-	var main=get_tree().get_root().get_node("Main")
 	var scarf=Node2D.new()
 	scarf.set_script(ScarfStart)
 	scarf.parent=self
 	scarf.global_position=round(global_position+Vector2.UP)
 	main.call_deferred("add_child",scarf)
 
-func _process(_delta):
+func create_tessa(rand_position=true):
+	tessa=load("res://Scenes/Allies/Tessa.tscn").instantiate()
+	var positions=[Vector2.ZERO]
+	if rand_position:
+		positions.clear()
+		var ray=RayCast2D.new()
+		add_child(ray)
+		ray.set_collision_mask_value(1,false)
+		ray.set_collision_mask_value(10,true)
+		ray.position=Vector2.ZERO
+		for i in range(0,8):
+			ray.target_position=Vector2(24,0).rotated(PI/4*i)
+			ray.force_raycast_update()
+			if !ray.is_colliding():
+				positions.append(ray.target_position)
+	main.call_deferred("add_child",tessa)
+	tessa.global_position=global_position+positions.pick_random().normalized()*16
+	tessa.prev_location=global_position
+
+func stop_revive():
+	revive=false
+	control.paused=false
+
+func create_dummy():
+	if !main:
+		return
+	var player_dummy:PlayerDummy=load("res://Scenes/Allies/player_dummy.tscn").instantiate()
+	player_dummy.find_child("AnimationController").direction=find_child("AnimationController").direction
+	player_dummy.start_hp=control.health.hp
+	player_dummy.start_prevhp=control.health.prevhp
+	player_dummy.max_hp=control.health.maxhp
+	main.add_child(player_dummy)
+	player_dummy.global_position=global_position
+	inventory.dummy=player_dummy
+
+func _process(delta):
 	if name!="Player":
 		name="Player"
+	
 	aiming=Input.is_action_pressed("aim")
 	var inputdir=Input.get_vector("left","right","up","down")
 	var newdir=velocity
@@ -48,6 +97,18 @@ func _process(_delta):
 		dir=inputdir
 	elif not aiming:
 		dir=veldir
+	
+	if !original_player and mask.offset.y!=-32:
+		mask.offset.y=move_toward(mask.offset.y,-32,64*delta)
+		if mask.offset.y==-32:
+			control.paused=false
+	
+	if !Global.endless and !original_player and inventory.can_revive and main.player_corpse and main.num_enemies()==0:
+		create_tessa(false)
+		main.player_corpse.revive(tessa)
+		name="GONE"
+		inventory.can_revive=false
+		free()
 
 func _physics_process(delta):
 	super._physics_process(delta)
@@ -64,7 +125,7 @@ func save_data():
 		"pos_y":prev_location.y,
 		"health":$Health.hp,
 		"prevhp":$Health.prevhp,
-		"dir":var_to_str($AnimationController.direction),
+		"dir":var_to_str(find_child("AnimationController").direction),
 	}
 	return data
 

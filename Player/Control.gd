@@ -54,18 +54,45 @@ func death_throes():
 
 func die():
 	var main=get_tree().get_root().get_node("Main")
-	if main:
+	var die_sfx=$Die.duplicate()
+	main.add_child(die_sfx)
+	die_sfx.play()
+	die_sfx.global_position=global_position
+	if !main:
+		return
+	if body.original_player:
+		var playercorpse=load("res://Scenes/Allies/player_corpse.tscn").instantiate()
+		playercorpse.global_position=body.global_position
+		main.add_child(playercorpse)
+	else:
+		body.create_tessa()
+	if body.original_player or main.player_corpse:
+		var playerghost=load("res://Scenes/Allies/player_ghost.tscn").instantiate()
+		playerghost.tessa=body.tessa
 		if body.original_player:
-			var playercorpse=load("res://Scenes/Non-enemies/player_corpse.tscn").instantiate()
-			playercorpse.global_position=body.global_position
-			main.add_child(playercorpse)
-		var playerghost=load("res://Scenes/Non-enemies/player_ghost.tscn").instantiate()
-		playerghost.global_position=body.global_position
+			playerghost.global_position=body.global_position
+		else:
+			playerghost.global_position=main.player_corpse.global_position
 		playerghost.inventory=inventory
 		playerghost.maxhp=health.maxhp
-		playerghost.firstdeath=body.original_player
+		playerghost.firstdeath=inventory.can_revive
+		#inventory.can_revive=false
 		main.add_child(playerghost)
+	elif !body.original_player and !main.player_corpse:
+		undo_dummy()
+		main.player.hurtbox.take_non_attack_damage("HoloDied")
 	body.queue_free()
+	#inventory.call_deferred("set","can_revive",false)
+	if inventory.can_revive and body.original_player:
+		Global.slow_down_to_zero=true
+
+func undo_dummy():
+	var main=get_tree().get_root().get_node("Main")
+	inventory.dummy.create_player(body.tessa)
+	inventory.dummy=null
+	body.queue_free()
+	$DeHologram.play()
+	$DeHologram.reparent(main)
 
 func speed_boost(bypass=false):
 	if bypass or speed>max_speed:
@@ -155,12 +182,21 @@ func _process(delta):
 		#if Input.is_action_pressed("use item") and inventory.item and inventory.item.num>0:
 		#	prevent_movement()
 		#	return
-
-		if ((not combo.is_charging() and not Input.is_action_pressed("attack") and ((dash and not dash.dashing) or not dash)) or (inventory.secondary is Grapple and inventory.secondary.harpoon and inventory.secondary.harpoon.stuck_in_enemy)) and (((inventory.secondary is Gun or inventory.secondary is Shield) and not inventory.secondary is Grapple and Input.is_action_pressed("secondary")) or ((not inventory.secondary is Gun or inventory.secondary is Grapple) and Input.is_action_just_released("secondary"))) and (!inventory.secondary is Shield or combo.can_attack()):
+		
+		if ((not combo.is_charging() and not Input.is_action_pressed("attack") and (!dash or not dash.dashing)) or (inventory.secondary is Grapple and inventory.secondary.harpoon and inventory.secondary.harpoon.stuck_in_enemy)) and (((inventory.secondary is Gun or inventory.secondary is Shield) and not inventory.secondary is Grapple and Input.is_action_pressed("secondary")) or ((not inventory.secondary is Gun or inventory.secondary is Grapple) and Input.is_action_just_released("secondary"))) and (!inventory.secondary is Shield or combo.can_attack()):
 			inventory.use_secondary()
 		
 		if (inventory.secondary is Gun or inventory.secondary is Shield) and inventory.secondary.cant_move and not combo.is_attacking():
 			prevent_movement()
+		
+		if not combo.is_charging() and (!dash or not dash.dashing) and Input.is_action_just_released("hologram"):
+			if body.original_player and inventory.revival!="none":
+				inventory.revive()
+				body.create_dummy()
+				body.queue_free()
+			elif !body.original_player and inventory.dummy:
+				body.create_tessa(false)
+				undo_dummy()
 	
 	if Input.is_action_just_pressed("attack") or input_buffer=="attack":
 		if not combo.is_done_attacking():

@@ -12,7 +12,8 @@ var bounce=.5
 var shrink=false
 var parry=false
 var collectable=false
-var player: Player
+var player
+var corpse=false
 var direction=Vector2.ZERO
 var speed=256
 var accel=24
@@ -49,7 +50,10 @@ func timerup():
 func _process(delta):
 	if parry:
 		if not is_instance_valid(player):
-			player=get_parent().find_child("Player",true,false)
+			if corpse:
+				player=corpse
+			else:
+				player=get_parent().find_child("Player",true,false)
 			velocity=velocity.move_toward(Vector2.ZERO,accel*60*delta)
 			direction=Vector2(randf_range(-1,1),randf_range(-1,1)).normalized()*speed/2
 			$CollisionShape2D.disabled=true
@@ -60,6 +64,9 @@ func _process(delta):
 				for area in collect_area.get_overlapping_bodies():
 					if area is Player:
 						area.control.rally()
+						free()
+						return
+					if area is PlayerCorpse:
 						free()
 						return
 			direction=direction.move_toward(to_local(player.global_position).normalized(),accel*30*delta)

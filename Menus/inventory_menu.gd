@@ -2,9 +2,9 @@ extends Control
 class_name InventoryMenu
 
 var inventory: Inventory
-@onready var guns=$PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/Guns
-@onready var items=$PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/Items
-@onready var revive=$PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/Revive
+@onready var guns=$PanelContainer/MarginContainer/VBoxContainer/GunsContainer/Guns
+@onready var items=$PanelContainer/MarginContainer/VBoxContainer/ItemsContainer/Items
+@onready var revive=$PanelContainer/MarginContainer/VBoxContainer/ReviveContainer/Revive
 
 func _ready():
 	guns.item_selected.connect(equip_gun)
@@ -31,13 +31,29 @@ func reset():
 	var id=0
 	for enemy in Global.revives_list:
 		if enemy=="none":
-			revive.add_icon_item(load("res://Assets/Art/HUD/inventory/"+enemy+".png"),inventory.revivenames[enemy],id)
-			id+=1
+			#revive.add_icon_item(load("res://Assets/Art/HUD/inventory/"+enemy+".png"),inventory.revivenames[enemy],id)
+			#id+=1
 			continue
 		if Global.get_flag(enemy):
 			revive.add_icon_item(load("res://Assets/Art/HUD/inventory/"+enemy+".png"),inventory.revivenames[enemy],id)
 			id+=1
-	revive.selected=Global.revives_list.find(inventory.revival)
+	if inventory.revival!="none":
+		revive.selected=Global.revives_list.find(inventory.revival)
+	else:
+		revive.selected=0
+		inventory.revival=Global.revives_list[0]
+	if guns.item_count==0:
+		$PanelContainer/MarginContainer/VBoxContainer/GunsContainer.hide()
+	else:
+		$PanelContainer/MarginContainer/VBoxContainer/GunsContainer.show()
+	if items.item_count==0:
+		$PanelContainer/MarginContainer/VBoxContainer/ItemsContainer.hide()
+	else:
+		$PanelContainer/MarginContainer/VBoxContainer/ItemsContainer.show()
+	if revive.item_count==0:
+		$PanelContainer/MarginContainer/VBoxContainer/ReviveContainer.hide()
+	else:
+		$PanelContainer/MarginContainer/VBoxContainer/ReviveContainer.show()
 
 func equip_gun(index):
 	var sec_name=guns.get_item_text(index)

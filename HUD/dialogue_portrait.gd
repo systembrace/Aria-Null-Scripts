@@ -62,6 +62,10 @@ func draw_portrait(current_data=null,current_section=null,index=1):
 			mouth_index=current_data.get_value(current_section,str(index)+"mouth")
 		if current_data.has_section_key(current_section,str(index)+"shoulders"):
 			shoulders_index=current_data.get_value(current_section,str(index)+"shoulders")
+		if current_data.has_section_key(current_section,str(index)+"digital"):
+			material.set_shader_parameter("enabled",true)
+		else:
+			material.set_shader_parameter("enabled",false)
 	shoulders=null
 	mouth=null
 	eyebrows=null

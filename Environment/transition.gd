@@ -14,6 +14,7 @@ func _ready():
 	set_collision_layer_value(1,false)
 	set_collision_mask_value(1,false)
 	set_collision_mask_value(17,true)
+	set_collision_mask_value(21,true)
 	body_entered.connect(on_body_entered)
 	body_exited.connect(change_scene)
 	main=get_tree().get_root().get_node("Main")
@@ -50,12 +51,18 @@ func node_children_recursive(node,previous):
 		else:
 			node_children_recursive(child,previous)
 
-func change_scene(_body=null):
-	if !player:
+func change_scene(body=null):
+	if body is Ally:
+		body.find_child("Lamp").hide()
+	if !player or body!=player:
 		return
 	player.set_process_input(false)
 	main.hide()
 	main.name="old_main"
+	if main.save_object_status:
+		main.save_objects()
+	for node in get_tree().get_nodes_in_group("objs_to_load"):
+		node.remove_from_group("objs_to_load")
 	main.call_deferred("exit")
 	scene=load("res://maps/"+scene_name+".tscn").instantiate()
 	scene.scene_name=scene_name.substr(scene_name.find("/")+1)
@@ -78,6 +85,8 @@ func change_scene(_body=null):
 	set_main(inventory)
 	#inventory.hud.dialogue_box.exit(true)
 	scene.player=player
+	scene.inventory=inventory
 	inventory.update_camera()
 	player.call_deferred("make_scarf")
+	player.call_deferred("create_tessa")
 	Global.num_particles=0

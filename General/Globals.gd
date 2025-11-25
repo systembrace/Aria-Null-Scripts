@@ -11,6 +11,7 @@ var config=ConfigFile.new()
 var shaketime:SceneTreeTimer
 var shakeamt=1
 var can_hitstop=true
+var slow_down_to_zero=false
 var load_game=true
 var endless=false
 var checkpoint_scene
@@ -23,7 +24,7 @@ var num_particles=0
 var in_combat=false
 var items_list=["Grenades","Earthshaker"]
 var guns_list=["Shield","Pistol","Shotgun","Harpoon"]
-var revives_list=["none","roly_poly","elite"]
+var revives_list=["roly_poly","elite","none"]
 
 var defaults={
 	"max_particles":1000,
@@ -41,6 +42,7 @@ var defaults={
 	"dash":"Shift",
 	"heal":"Q",
 	"use item":"Space",
+	"hologram":"R",
 	"aim":"P",
 	"next item":"Alt",
 	"next gun":"Ctrl",
@@ -96,6 +98,7 @@ func _ready():
 		load_config("bindings","inventory")
 		load_config("bindings","back")
 		load_config("bindings","pause")
+		load_config("bindings","hologram")
 		load_config("audio","sfx")
 		load_config("audio","music")
 		load_config("video","brightness")
@@ -159,7 +162,7 @@ func revert_area_data():
 func reset_to_checkpoint():
 	player_dead=true
 	load_game=true
-	Music.eject()
+	#Music.eject()
 	if endless:
 		return
 	revert_save("checkpoint_flags","last_flags")
@@ -169,6 +172,8 @@ func reset_to_checkpoint():
 	load_flags()
 
 func reset_game():
+	Engine.time_scale=1.0
+	Global.slow_down_to_zero=false
 	get_tree().paused=false
 	#Music.eject()
 	var main=get_tree().get_root().get_node("Main")
@@ -297,9 +302,10 @@ func enable_hitstop():
 
 func slowdown(duration, time_scale=0.05):
 	Engine.time_scale=time_scale
-	var timer = get_tree().create_timer(duration*time_scale)
-	await timer.timeout
-	Engine.time_scale = 1
+	if duration>0:
+		var timer = get_tree().create_timer(duration*time_scale)
+		await timer.timeout
+		Engine.time_scale = 1
 	
 func screenshake(time=.1,amount=1):
 	shaketime=get_tree().create_timer(time,true,false,false)
@@ -329,6 +335,11 @@ func change_window_mode():
 		viewport.position=(DisplayServer.screen_get_size()-viewport.size)/2
 
 func _process(delta):
+	if slow_down_to_zero and Engine.time_scale>0:
+		Engine.time_scale=move_toward(Engine.time_scale,0,.000001/delta*90/(Engine.time_scale+1))
+	elif !slow_down_to_zero and Engine.time_scale<1.0:
+		Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60)
+	
 	if wind_dir!=0:
 		wind_speed_step+=delta*.7
 		if wind_speed_step>2*PI:

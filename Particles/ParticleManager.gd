@@ -28,6 +28,8 @@ var curr_step=1
 
 func _ready():
 	main=get_tree().get_root().get_node("Main")
+	if body is Enemy:
+		body.death_throes.connect(partspawner.heal_corpse)
 	if hurtbox:
 		sfx_hit=find_child("Hit")
 		sparks=find_child("Sparks")

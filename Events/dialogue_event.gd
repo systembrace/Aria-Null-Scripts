@@ -2,6 +2,8 @@ extends Event
 class_name DialogueEvent
 
 @export var pause_player=true
+@export var interrupt=false
+@export var interruptable=true
 
 func activate():
 	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed and not ignore_when_event_completed.skipped):
@@ -14,7 +16,7 @@ func activate():
 		await main.ready
 	print("playing dialogue "+name)
 	super.activate()
-	main.player.inventory.hud.dialogue(main.scene_name,name,coroutine,pause_player)
+	main.inventory.hud.dialogue(main.scene_name,name,coroutine,pause_player,interrupt,interruptable)
 	Global.dialogue_ended.connect(dialogue_ended)
 
 func dialogue_ended():

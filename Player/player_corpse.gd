@@ -1,20 +1,27 @@
-extends Interactable
+extends CharacterBody2D
 class_name PlayerCorpse
+
+var main
+@onready var sprite=$AnimatedSprite2D
 
 func _ready():
 	if randf()>.5:
 		sprite.flip_h=true
 	$Smoke.emitting=true
+	main=get_tree().get_root().get_node("Main")
+	main.player_corpse=self
 
-func revive():
-	#var main=get_tree().get_root().get_node("Main")
-	#var scene=load("res://Scenes/Non-enemies/player.tscn")
-	#var player: Node2D =scene.instantiate()
-	#player.global_position=global_position
-	#player.original_player=true
-	#main.add_child(player)
-	#queue_free()
-	pass
+func revive(tessa):
+	var scene=load("res://Scenes/Allies/player.tscn")
+	var player: Node2D =scene.instantiate()
+	player.global_position=global_position
+	player.original_player=true
+	player.revive=true
+	player.tessa=tessa
+	main.add_child(player)
+	main.player=player
+	main.player_corpse=null
+	queue_free()
 
 func save_data():
 	var data = {

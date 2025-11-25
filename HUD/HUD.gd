@@ -57,7 +57,14 @@ func _process(_delta):
 		else:
 			healorb.position=Vector2.ZERO
 		
-	if is_instance_valid(inventory):
+	if is_instance_valid(inventory) and is_instance_valid(inventory.player) and inventory.player is Player:
+		if inventory.player.original_player and inventory.can_revive and portrait.animation!="default":
+			portrait.animation="default"
+		elif inventory.player.original_player and !inventory.can_revive and portrait.animation!="norevive":
+			portrait.animation="norevive"
+		elif !inventory.player.original_player and portrait.animation!=inventory.revival:
+			portrait.animation=inventory.revival
+		
 		var text=scraplabel.text
 		if int(text)!=inventory.scrap and "#" not in text and "@" not in text:
 			scrapicon.show()
@@ -120,10 +127,10 @@ func _process(_delta):
 		else:
 			$VBoxContainer/Control.visible=false
 
-func dialogue(scene_name,section,do_timer,pause_player):
+func dialogue(scene_name,section,do_timer,pause_player,interrupt,interruptable):
 	var data=ConfigFile.new()
 	data.load("res://dialogue/"+scene_name+".ini")
 	if pause_player:
-		dialogue_box.enter(data,section,do_timer,inventory.player.control)
+		dialogue_box.enter(data,section,do_timer,inventory.player.control,interrupt,interruptable)
 	else:
-		dialogue_box.enter(data,section,do_timer)
+		dialogue_box.enter(data,section,do_timer,null,interrupt,interruptable)

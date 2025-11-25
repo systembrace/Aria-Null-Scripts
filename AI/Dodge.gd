@@ -18,6 +18,8 @@ var go_to="attack"
 
 func _ready():
 	timer.wait_time=buffer
+	if !hurtbox:
+		return
 	iframes_timer.wait_time=iframes
 	iframes_timer.timeout.connect(hurtbox.enable_hurtbox)
 
@@ -32,21 +34,23 @@ func enter():
 	accel=body.accel
 	target=body.target
 	if target is Waypoint:
-		body.velocity=body.to_local(target.global_position).normalized()*280
+		body.velocity=body.to_local(target.global_position).normalized()*speed
 		if body.can_jump:
 			body.jump()
 	else:
 		body.velocity=target.to_local(body.global_position).normalized()*speed
 		if body.can_jump and can_fall:
 			body.jump()
-	hurtbox.disable_hurtbox()
+	if hurtbox:
+		hurtbox.disable_hurtbox()
 	dashing=true
 	if find_child("SFX"):
 		$SFX.play()
 
 func update():
 	if body.velocity.length()<=20:
-		combo.enable_attack()
+		if combo:
+			combo.enable_attack()
 		if body.jumping:
 			body.land()
 		transition.emit(self,go_to)

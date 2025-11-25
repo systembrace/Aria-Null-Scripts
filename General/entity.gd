@@ -3,6 +3,7 @@ class_name Entity
 
 @export var heavy=false
 @export var player_hurtbox:Hurtbox
+@export var respawn_on_fall=false
 @export var can_jump=false
 @export var size=1.0
 @export var grappleable=false
@@ -25,10 +26,9 @@ var enable_edges=false
 var hurtbox:Hurtbox
 
 func _ready():
-	if find_child("Hurtbox"):
-		hurtbox=$Hurtbox
+	hurtbox=find_child("Hurtbox")
 	body_sprite=find_child("AnimatedSprite2D")
-	get_tree().create_timer(0.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
+	get_tree().create_timer(.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
 	coyote=Timer.new()
 	coyote.name="CoyoteTimer"
 	coyote.one_shot=true
@@ -115,7 +115,7 @@ func fall():
 		started_falling.emit()
 
 func end_fall():
-	if !player_hurtbox:
+	if !respawn_on_fall:
 		queue_free()
 		return
 	on_floor=true
@@ -123,15 +123,19 @@ func end_fall():
 	fell.emit()
 	body_dh=0
 	global_position=prev_location
-	player_hurtbox.call_deferred("fall")
+	if player_hurtbox:
+		player_hurtbox.call_deferred("take_non_attack_damage")
 	if body_sprite:
 		body_sprite.offset.y=body_sprite_y_offset
 	z_index=0
-	player_hurtbox.get_parent().control.paused=false
+	if "control" in self:
+		self.control.paused=false
 	if can_jump:
 		land()
 
 func _physics_process(delta):
+	if !is_node_ready():
+		await ready
 	if initial_fall_buffer:
 		return
 	var shadow_sprite=find_child("Shadow")
@@ -139,7 +143,7 @@ func _physics_process(delta):
 		if coyote.is_stopped() and !on_floor:
 			reentered_floor()
 		if !jumping and on_floor:
-			prev_location=floor_checker.global_position-velocity.normalized()*8
+			prev_location=floor_checker.global_position-velocity.normalized()*4
 		if shadow_sprite:
 			shadow_sprite.visible=true
 	elif is_instance_valid(floor_checker):
@@ -156,8 +160,8 @@ func _physics_process(delta):
 		z_index=0
 		if body_sprite:
 			body_sprite.offset.y=body_sprite_y_offset
-		if player_hurtbox:
-			player_hurtbox.get_parent().control.paused=false
+		if "control" in self:
+			self.control.paused=false
 		return
 	
 	if falling:
@@ -165,5 +169,5 @@ func _physics_process(delta):
 		if body_sprite:
 			body_dh+=delta*10 
 			body_sprite.offset.y+=body_dh
-		if player_hurtbox:
-			player_hurtbox.get_parent().control.paused=true
+		if "control" in self:
+			self.control.paused=true

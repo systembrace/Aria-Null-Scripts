@@ -4,6 +4,8 @@ uniform vec4 flash_color : source_color;
 uniform float alpha = 1.0;
 uniform float flash_value : hint_range(0.0, 1.0, 0.1) = 0;
 uniform float no_normal : hint_range(0.0,1.0) = 1.0;
+uniform vec4 tint_color : source_color;
+uniform float tint_amt : hint_range(0.0, 1.0, 0.1) = 0;
 
 void fragment() {
     vec4 texture_color = texture(TEXTURE, UV);
@@ -14,6 +16,9 @@ void fragment() {
     COLOR.a = texture_color.a;
 	if (flash_value==0.0){
 		COLOR.a*=alpha;
+		if (COLOR.a>0.0){
+			COLOR = mix(COLOR, tint_color, tint_amt);
+		}
 		NORMAL=vec3(0.0,0.0,1.0);
 	}
 	else{

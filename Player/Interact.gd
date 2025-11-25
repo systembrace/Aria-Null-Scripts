@@ -7,7 +7,7 @@ func _process(_delta):
 		var interacted=false
 		if has_overlapping_areas():
 			for area in get_overlapping_areas():
-				if area is Interactable and not area is PlayerCorpse and area.can_interact:
+				if area is Interactable and area.can_interact:
 					area.interact(get_parent())
 					interacted=true
 					break

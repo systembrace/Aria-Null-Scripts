@@ -11,6 +11,8 @@ signal finished
 var sounds=[]
 var fade=false
 var timer: Timer
+var time_scale=1.0
+var pitch_scale=1.0
 @onready var global_volume=Global.load_config("audio","music")
 
 func _ready():
@@ -67,6 +69,16 @@ func finish():
 		queue_free()
 
 func _process(delta):
+	if time_scale!=Engine.time_scale:
+		var diff=(Engine.time_scale-time_scale)/2
+		pitch_scale+=diff
+		time_scale=Engine.time_scale
+		for sound in sounds:
+			sound.pitch_scale=pitch_scale
+	#elif time_scale==1.0 and sounds[0].pitch_scale!=1.0:
+	#	for sound in sounds:
+	#		sound.pitch_scale=1.0
+	
 	if fade and db>-60:
 		db-=delta*12
 		setVolume()

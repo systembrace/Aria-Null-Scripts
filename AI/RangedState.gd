@@ -72,7 +72,8 @@ func set_delay(time):
 		delay.wait_time=delay_time
 
 func lock_on():
-	lock_pos=target.global_position
+	if is_instance_valid(target):
+		lock_pos=target.global_position
 
 func try_shoot():
 	if !shoot_close and targetdist<=64 and delay_time>0 and !delay.is_stopped():

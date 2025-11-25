@@ -13,9 +13,11 @@ var item:Node2D
 var charge=0
 
 var player: CharacterBody2D
+var dummy: PlayerDummy
 var main
-var revivenames={"none":"None","roly_poly":"Roly poly","enemy":"Infected","elite":"Elite Guard"}
-var revival="roly_poly"
+var revivenames={"none":"None","roly_poly":"Roly Poly","enemy":"Infected","elite":"Elite Guard"}
+var revival="none"
+var can_revive=true
 var maxheals: int = 0
 var heals: int = 0
 var scrap: int = 0
@@ -28,6 +30,9 @@ var just_unpaused=false
 func _ready():
 	$Camera2D/MouseLayer.layer=1025
 	main=get_tree().get_root().get_node("Main")
+	main.inventory=self
+	if !main.is_node_ready():
+		await main.ready
 	update_camera()
 	pausemenu.resume_game.connect(resume)
 	pausemenu.open_inv.connect(open_inventory_menu)
@@ -45,8 +50,6 @@ func _ready():
 	inventorymenu.inventory=self
 	inventorymenu.reset()
 	equip_item()
-	if !main.is_node_ready():
-		await main.ready
 	player=main.player
 	assign_player()
 
@@ -70,6 +73,13 @@ func open_pause_menu():
 	$Camera2D/CanvasLayer/PauseMenu/SFXConfirm.play()
 
 func open_inventory_menu():
+	var has_revives=false
+	for revive_name in revivenames:
+		if revive_name!="none" and Global.get_flag(revive_name):
+			has_revives=true
+			break
+	if secondaryindex==-1 and itemindex==-1 and !has_revives:
+		return
 	pause()
 	hud.visible=false
 	inventorymenu.reset()
@@ -137,6 +147,7 @@ func drop_shield():
 
 func refill_items():
 	heals=maxheals
+	can_revive=true
 	for node in items:
 		node.num=node.max_amt
 
@@ -168,6 +179,23 @@ func assign_player():
 			player.secondary=secondary
 		if secondary:
 			numshots=secondary.numshots
+
+func revive(revive_name=revival):
+	if !main:
+		return
+	var scene=load("res://Scenes/Allies/"+revive_name+"_controlled.tscn")
+	revival=revive_name
+	if scene==null:
+		scene=load("res://Scenes/Allies/roly_poly_controlled.tscn")
+		revival="roly_poly"
+	var new_player=scene.instantiate()
+	new_player.global_position=player.tessa.global_position
+	player.tessa.queue_free()
+	new_player.original_player=false
+	main.add_child(new_player)
+	main.player=new_player
+	player=new_player
+	assign_player()
 
 func _process(delta):
 	if main.dark and !$Lamp.enabled:
@@ -232,6 +260,7 @@ func save_data():
 		"maxheals":maxheals,
 		"scrap":scrap,
 		"revival":revival,
+		"canrevive":can_revive,
 		"grenades":$Grenades.num,
 		"grenadesmax":$Grenades.max_amt,
 		"earthshaker":$Earthshaker.num,
@@ -254,6 +283,8 @@ func load_data(data):
 		scrap=data["scrap"]
 	if "revival" in data.keys():
 		revival=data["revival"]
+	if "canrevive" in data.keys():
+		can_revive=data["canrevive"]
 	if "grenades" in data.keys():
 		$Grenades.num=data["grenades"]
 	if "grenadesmax" in data.keys():
