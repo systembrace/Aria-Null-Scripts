@@ -46,11 +46,11 @@ func setVolume(vol=0):
 	for sound in sounds:
 		sound.volume_db=db+vol+Global.load_config("audio","sfx")
 
-func play(playback_position=0):
+func play(playback_position=0, temp_db=0):
 	if time_between_plays==0 or timer.is_stopped():
 		var sound=sounds[randi_range(0,len(sounds)-1)]
-		sound.pitch_scale=randf_range(-amt,amt)+pitchlevel
-		sound.volume_db=db+Global.load_config("audio","sfx")
+		sound.pitch_scale=(randf_range(-amt,amt)+pitchlevel)*pitch_scale
+		sound.volume_db=db+Global.load_config("audio","sfx")+temp_db
 		if playback_position==-1:
 			sound.play(randf_range(0,get_length()))
 		else:
@@ -73,8 +73,6 @@ func _process(delta):
 		var diff=(Engine.time_scale-time_scale)/2
 		pitch_scale+=diff
 		time_scale=Engine.time_scale
-		for sound in sounds:
-			sound.pitch_scale=pitch_scale
 	#elif time_scale==1.0 and sounds[0].pitch_scale!=1.0:
 	#	for sound in sounds:
 	#		sound.pitch_scale=1.0

@@ -1,7 +1,7 @@
 extends CharacterBody2D
 class_name BreakableWall
 
-@export var hp=5
+@export var hp=3
 signal broke
 @onready var health=$Health
 @onready var tilemap=$TileMap

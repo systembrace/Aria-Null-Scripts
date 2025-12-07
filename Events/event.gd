@@ -9,6 +9,7 @@ class_name Event
 @export var only_branch_here_backwards=false
 @export var branch_when_skipped: Event
 @export var ignore_when_event_completed: Event
+@export var save_when_completed=false
 signal activated
 signal just_completed
 signal task_finished
@@ -43,6 +44,8 @@ func _ready():
 	if prerequisite:
 		waiting=true
 		prerequisite.task_finished.connect(finish_waiting)
+	if save_when_completed:
+		just_completed.connect(main.save_data.bind(true))
 
 func activate():
 	if active or completed:
@@ -115,6 +118,8 @@ func branch_here(branched_from=null):
 	activate()
 	
 func skip(trueskip=false):
+	if save_when_completed:
+		just_completed.disconnect(main.save_data)
 	if early_skip:
 		early_skip=false
 	if dont_skip:

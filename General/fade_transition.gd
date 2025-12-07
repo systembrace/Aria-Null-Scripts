@@ -7,7 +7,7 @@ signal finished
 signal faded_out
 var fade=false
 var lerp_to=0.0
-var speed=4
+var speed=.25
 var finished_emitted=false
 
 func _ready():
@@ -24,11 +24,11 @@ func _ready():
 		area.body_entered.connect(fade_out.unbind(1))
 		area.body_entered.connect(play_discover.unbind(1))
 	
-func fade_out():
+func fade_out(seconds=.25):
+	speed=seconds
 	fade=true
 	finished_emitted=false
 	lerp_to=0.0
-	speed=4
 	
 func play_discover():
 	var main=get_tree().get_root().get_node("Main")
@@ -38,11 +38,11 @@ func play_discover():
 	sfx.reparent(main)
 	sfx.play()
 
-func reverse_fade():
+func reverse_fade(seconds=.1):
+	speed=seconds
 	fade=true
 	finished_emitted=false
 	lerp_to=1.0
-	speed=10
 
 func _process(delta):
 	if !fade:
@@ -58,4 +58,4 @@ func _process(delta):
 		if lerp_to==1.0:
 			faded_out.emit()
 		return
-	modulate.a=lerpf(modulate.a,lerp_to,speed*delta)
+	modulate.a=move_toward(modulate.a,lerp_to,delta/speed)

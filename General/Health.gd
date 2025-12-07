@@ -49,7 +49,7 @@ func rally():
 		hpchanged.emit()
 
 func take_damage(attack, parry=false):
-	if hp<=0:
+	if hp<=0 or (attack.name=="Fall" and hp<=1):
 		return
 	prevhp=hp
 	hp-=attack.damage

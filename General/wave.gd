@@ -25,5 +25,6 @@ func start():
 	if get_child_count()==0:
 		return
 	process_mode=Node.PROCESS_MODE_INHERIT
+	enabled=true
 	visible=true
 	wave_started.emit()

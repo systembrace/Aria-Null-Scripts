@@ -48,6 +48,8 @@ func _process(_delta):
 	else:
 		Global.in_combat=false
 	
+	if len(waves)==0:
+		return
 	if wave<num_waves-1 and (enemy_count==0 or (wave>=0 and enemy_count==waves[wave].enemies_left_to_next_wave)):
 		wave+=1
 		waves[wave].enable()

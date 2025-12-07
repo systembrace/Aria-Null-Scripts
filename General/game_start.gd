@@ -43,8 +43,14 @@ func _ready():
 		Global.set_flag("version",Global.version)
 		Global.save_flags(true)
 	
-	Global.player_dead=false
 	var scene
+	if Global.get_permanent_data("global","player_dead") and Global.get_permanent_data("global","deaths") in [1,2,3,5,10]:
+		Music.eject(.1)
+		scene=load("res://Maps/Death_zone.tscn")
+		get_tree().call_deferred("change_scene_to_packed",scene)
+		return
+	
+	Global.set_permanent_data("global","player_dead",false)
 	if !Global.endless:
 		var file = FileAccess.open("user://checkpoint_scene.dat",FileAccess.READ)
 		Global.checkpoint_scene=file.get_as_text()

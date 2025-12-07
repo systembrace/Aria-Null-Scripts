@@ -29,6 +29,10 @@ func _ready():
 	$VBoxContainer/Control2/ScrapIcon/Timer.timeout.connect(scrapicon.hide)
 	$VBoxContainer/Control2/ScrapIcon/Timer.start()
 
+func hide_all():
+	for child in get_children():
+		child.hide()
+
 func show_save():
 	$SaveIcon.visible=true
 	if timer.is_inside_tree():
@@ -40,6 +44,7 @@ func hide_save():
 func reset():
 	if health and hpbar:
 		hpbar.health=health
+		#if not hpbar.updatepip in health.hpchanged.get_connections():
 		health.hpchanged.connect(hpbar.updatepip)
 		hpbar.hpcountupdated(health.maxhp)
 		hpbar.updatepip()
@@ -127,10 +132,10 @@ func _process(_delta):
 		else:
 			$VBoxContainer/Control.visible=false
 
-func dialogue(scene_name,section,do_timer,pause_player,interrupt,interruptable):
+func dialogue(scene_name,section,do_timer,pause_player,interrupt,interruptable,change_on_death):
 	var data=ConfigFile.new()
 	data.load("res://dialogue/"+scene_name+".ini")
 	if pause_player:
-		dialogue_box.enter(data,section,do_timer,inventory.player.control,interrupt,interruptable)
+		dialogue_box.enter(data,section,do_timer,inventory.player.control,interrupt,interruptable,change_on_death)
 	else:
-		dialogue_box.enter(data,section,do_timer,null,interrupt,interruptable)
+		dialogue_box.enter(data,section,do_timer,null,interrupt,interruptable,change_on_death)

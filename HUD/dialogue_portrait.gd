@@ -50,8 +50,10 @@ func draw_portrait(current_data=null,current_section=null,index=1):
 		eyebrows_index=1
 		mouth_index=1
 		shoulders_index=1
-	var speaker="cherry"
+	var speaker="player"
 	if current_data:
+		if current_data.has_section("Info"):
+			speaker=current_data.get_value("Info","speaker")
 		if current_data.has_section_key(current_section,str(index)+"speaker"):
 			speaker=current_data.get_value(current_section,str(index)+"speaker")
 		if current_data.has_section_key(current_section,str(index)+"eyebrows"):
@@ -62,10 +64,15 @@ func draw_portrait(current_data=null,current_section=null,index=1):
 			mouth_index=current_data.get_value(current_section,str(index)+"mouth")
 		if current_data.has_section_key(current_section,str(index)+"shoulders"):
 			shoulders_index=current_data.get_value(current_section,str(index)+"shoulders")
-		if current_data.has_section_key(current_section,str(index)+"digital"):
+		
+		if current_data.has_section_key(current_section,str(index)+"digital") and !material.get_shader_parameter("enabled"):
 			material.set_shader_parameter("enabled",true)
-		else:
+		elif !current_data.has_section_key(current_section,str(index)+"digital"):
 			material.set_shader_parameter("enabled",false)
+		if current_data.has_section_key(current_section,str(index)+"glitch") and material.get_shader_parameter("glitch")==-1.0:
+			material.set_shader_parameter("glitch",1.0)
+		elif !current_data.has_section_key(current_section,str(index)+"glitch"):
+			material.set_shader_parameter("glitch",-1.0)
 	shoulders=null
 	mouth=null
 	eyebrows=null

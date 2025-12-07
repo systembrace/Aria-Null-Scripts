@@ -52,8 +52,16 @@ func _ready():
 	equip_item()
 	player=main.player
 	assign_player()
+	if Global.death_cutscene:
+		Global.death_cutscene=false
+		player.control.pause()
+		await get_tree().create_timer(1,false).timeout
+		player.control.paused=false
+		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true,true,false)
 
 func update_camera():
+	if !main.tilemap:
+		return
 	var map_limits=main.tilemap.get_used_rect()
 	var camera=$Camera2D
 	camera.limit_left=min(map_limits.position.x*16,16*(map_limits.end.x+map_limits.position.x)/2-240)

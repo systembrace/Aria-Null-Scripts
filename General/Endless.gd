@@ -119,7 +119,7 @@ func save_data(_checkpoint=false,autosave=false,reset=false):
 	var data=""
 	var inventorydata
 	if !reset:
-		reset=Global.player_dead
+		reset=Global.get_permanent_data("global","player_dead")
 	for node in get_tree().get_nodes_in_group("to_save"):
 		if not node is Inventory and not node is Player:
 			continue
@@ -137,9 +137,9 @@ func save_data(_checkpoint=false,autosave=false,reset=false):
 			if node.revival=="none":
 				node.revival="roly_poly"
 			inventorydata = node.save_data()
-	if Global.player_dead or wave<1 or reset:
+	if Global.get_permanent_data("global","player_dead") or wave<1 or reset:
 		data+=JSON.stringify({"name":"Endless","wave":0})
-		if Global.player_dead or reset:
+		if Global.get_permanent_data("global","player_dead") or reset:
 			data+="\n"+JSON.stringify({"health":5.0,"name":"Player","path":"res://Scenes/Allies/player.tscn","pos_x":192,"pos_y":816,"prevhp":5.0})
 		inventorydata["scrap"]=0
 		inventorydata["grenades"]=0

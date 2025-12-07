@@ -4,6 +4,7 @@ class_name MusicTrack
 @export var autoplay=true
 @export var loop=true
 @export var init_db=0.0
+@export var replace_current=false
 @export var autoplay_if_flag:String
 @export var flag_is_value=1.0
 signal stopped

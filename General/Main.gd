@@ -178,7 +178,7 @@ func num_enemies(active=false):
 	return res
 
 func can_save():
-	return num_enemies(true)==0 and not Global.player_dead
+	return num_enemies(true)==0 and not Global.get_permanent_data("global","player_dead")
 
 func save_data(checkpoint=false, autosave=false):
 	Global.save_flags(checkpoint,autosave)
@@ -205,10 +205,10 @@ func save_data(checkpoint=false, autosave=false):
 	if save_object_status:
 		save_objects(checkpoint)
 
-func fade_out(total_fade=false):
+func fade_out(total_fade=false,speed=.1):
 	if total_fade:
 		transition.get_parent().layer=1026
-	transition.reverse_fade()
+	transition.reverse_fade(speed)
 
 func exit():
 	#now saved in transition.gd

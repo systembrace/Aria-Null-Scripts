@@ -17,11 +17,12 @@ var do_timer=false
 var step=0
 var dialogue_queue=[]
 var currently_interruptable=true
+var death_change=1
 @onready var portrait=$PanelContainer/MarginContainer/HBoxContainer/Portrait
 @onready var label=$PanelContainer/MarginContainer/HBoxContainer/Dialogue
 @onready var timer=$Timer
 
-func enter(data,section,t=false,node=null,interrupt=false,interruptable=true):
+func enter(data,section,t=false,node=null,interrupt=false,interruptable=true,change_on_death=-1):
 	if current_section!="":
 		if (!node and !interrupt) or !currently_interruptable:
 			if !currently_interruptable and interrupt:
@@ -32,6 +33,7 @@ func enter(data,section,t=false,node=null,interrupt=false,interruptable=true):
 	if node:
 		control=node
 		control.call_deferred("pause")
+	death_change=change_on_death
 	currently_interruptable=interruptable
 	do_timer=t
 	if do_timer and !timer.timeout.is_connected(next):
@@ -41,6 +43,14 @@ func enter(data,section,t=false,node=null,interrupt=false,interruptable=true):
 
 func exit(clear_queue=false):
 	hide()
+	if death_change>=0:
+		var heard_name=current_data.get_value("Info","room")+"_"+current_section
+		if heard_name[-1].is_valid_int():
+			heard_name=heard_name.substr(0,len(heard_name)-1)
+		var play_number=Global.get_permanent_data("heard_dialogue",heard_name)
+		print(heard_name)
+		if play_number and play_number==death_change:
+			Global.set_permanent_data("heard_dialogue",heard_name,play_number+1)
 	if control:
 		control.set_deferred("paused",false)
 	if do_timer:
@@ -58,8 +68,8 @@ func exit(clear_queue=false):
 		dialogue_queue.clear()
 	if len(dialogue_queue)>0:
 		var next_dialogue=dialogue_queue[0]
-		enter(next_dialogue[0],next_dialogue[1],next_dialogue[2],next_dialogue[3],next_dialogue[4])
 		dialogue_queue.remove_at(0)
+		enter(next_dialogue[0],next_dialogue[1],next_dialogue[2],next_dialogue[3],next_dialogue[4])
 
 func display(data:ConfigFile,section):
 	label.text=""
@@ -96,16 +106,21 @@ func _process(delta):
 	if !visible or !current_data:
 		return
 	step+=delta*50*speed
+	var speaker="player"
+	if current_data.has_section("Info"):
+		speaker=current_data.get_value("Info","speaker")
+	if current_data.has_section_key(current_section,str(index)+"speaker"):
+		speaker=current_data.get_value(current_section,str(index)+"speaker").to_lower()
 	if step>1:
 		while step>0:
 			if step>1:
 				reveal_text()
 			step-=1
 		if len(text)>0 and text[0]!=" " and !Engine.is_editor_hint():
-			var speaker="cherry"
-			if current_data.has_section_key(current_section,str(index)+"speaker"):
-				speaker=current_data.get_value(current_section,str(index)+"speaker").to_lower()
-			find_child("Talk_"+speaker).play()
+			var db=0
+			if current_data.has_section_key(current_section,str(index)+"volume"):
+				db=current_data.get_value(current_section,str(index)+"volume")
+			find_child("Talk_"+speaker).play(0,db)
 		step=0
 	if do_timer:
 		$PanelContainer/MarginContainer/HBoxContainer/Next.hide()
@@ -115,7 +130,7 @@ func _process(delta):
 		if Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack"):
 			next()
 		return
-	if Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack"):
+	if speaker!="eigon" and (Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack")):
 		speed=4
 		if !timer.is_stopped():
 			timer.wait_time=timer.time_left/2.0

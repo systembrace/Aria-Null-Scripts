@@ -26,9 +26,11 @@ func _ready():
 	if firstdeath and has_revives and main.num_enemies()>0:
 		timer.timeout.connect(allowrevive)
 	else:
-		Global.player_dead=true
+		Global.set_permanent_data("global","player_dead",true)
 		if Global.endless:
 			main.save_data()
+		else:
+			Global.set_permanent_data("global","deaths",Global.get_permanent_data("global","deaths")+1)
 		Global.reset_to_checkpoint()
 		gameover.visible=true
 		timer.wait_time=3
@@ -54,9 +56,11 @@ func restart():
 	Global.reset_game()
 
 func switch_to_dead():
-	Global.player_dead=true
+	Global.set_permanent_data("global","player_dead",true)
 	if Global.endless:
 		main.save_data()
+	else:
+		Global.set_permanent_data("global","deaths",Global.get_permanent_data("global","deaths")+1)
 	Global.reset_to_checkpoint()
 	revive.visible=false
 	gameover.visible=true

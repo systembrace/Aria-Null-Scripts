@@ -7,8 +7,9 @@ class_name Transition
 @export var exit_direction=Vector2.UP
 var player:Player
 var inventory:Inventory
-var main
+var main :Main
 var scene
+@onready var rigidbody=$RigidBody2D
 
 func _ready():
 	set_collision_layer_value(1,false)
@@ -52,7 +53,7 @@ func node_children_recursive(node,previous):
 			node_children_recursive(child,previous)
 
 func change_scene(body=null):
-	if body is Ally:
+	if body is Ally and to_local(body.position).normalized().distance_to(walk_direction)<1.4:
 		body.find_child("Lamp").hide()
 	if !player or body!=player:
 		return

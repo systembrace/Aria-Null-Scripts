@@ -5,9 +5,10 @@ signal saving
 signal environment_updated
 signal dialogue_ended
 var version=2
-var player_dead=false
+var death_cutscene=false
 var flags = {}
 var config=ConfigFile.new()
+var permanent_data=ConfigFile.new()
 var shaketime:SceneTreeTimer
 var shakeamt=1
 var can_hitstop=true
@@ -107,6 +108,11 @@ func _ready():
 		load_config("video","window_mode")
 	else:
 		config.load("user://config.ini")
+	if !FileAccess.file_exists("user://permanent_data.ini"):
+		set_permanent_data("global","deaths",0)
+		set_permanent_data("global","player_dead",false)
+	else:
+		permanent_data.load("user://permanent_data.ini")
 	set_input_map(load_keybinds())
 	change_window_mode()
 	environment=Environment.new()
@@ -135,6 +141,8 @@ func delete_all_save_data():
 		DirAccess.remove_absolute("user://area_data")
 	flags={"endlesshs":hs,"version":version}
 	save_flags(true)
+	permanent_data=ConfigFile.new()
+	set_permanent_data("global","deaths",0)
 	
 func revert_save(cp,last):
 	if !FileAccess.file_exists("user://"+cp+".dat"):
@@ -160,7 +168,7 @@ func revert_area_data():
 			data.save("user://area_data/last_"+file.substr(11))
 
 func reset_to_checkpoint():
-	player_dead=true
+	#set_permanent_data("global","player_dead",true)
 	load_game=true
 	#Music.eject()
 	if endless:
@@ -245,6 +253,15 @@ func save_data(data,scene_path,checkpoint=false,autosave=false):
 	file = FileAccess.open("user://checkpoint_scene.dat", FileAccess.WRITE)
 	file.store_string(scene_path)
 	file.close()
+
+func set_permanent_data(section,field,value):
+	permanent_data.set_value(section,field,value)
+	permanent_data.save("user://permanent_data.ini")
+
+func get_permanent_data(section,field):
+	if !permanent_data.has_section_key(section,field):
+		return null
+	return permanent_data.get_value(section,field)
 
 func save_options(autosave=false):
 	if !autosave:

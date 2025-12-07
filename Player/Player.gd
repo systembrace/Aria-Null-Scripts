@@ -8,6 +8,7 @@ class_name Player
 @export var speed_falloff_time=10
 @export var secondary:Node2D
 @export var original_player=true
+@export var virtual=false
 @export var mask: Sprite2D
 signal collision
 var speed=min_speed
@@ -25,6 +26,8 @@ signal healing
 func _ready():
 	super._ready()
 	main=get_tree().get_root().get_node("Main")
+	if virtual:
+		return
 	if original_player:
 		make_scarf()
 		fell.connect(make_scarf)
@@ -57,6 +60,7 @@ func create_tessa(rand_position=true):
 		add_child(ray)
 		ray.set_collision_mask_value(1,false)
 		ray.set_collision_mask_value(10,true)
+		ray.set_collision_mask_value(18,true)
 		ray.position=Vector2.ZERO
 		for i in range(0,8):
 			ray.target_position=Vector2(24,0).rotated(PI/4*i)
@@ -110,6 +114,10 @@ func _process(delta):
 
 func _physics_process(delta):
 	super._physics_process(delta)
+	if main.num_enemies(true)>0 and !get_collision_mask_value(23):
+		set_collision_mask_value(23,true)
+	elif main.num_enemies(true)==0 and get_collision_mask_value(23):
+		set_collision_mask_value(23,false)
 	var coll = move_and_collide(velocity*delta,true)
 	if coll:
 		collision.emit(coll)
