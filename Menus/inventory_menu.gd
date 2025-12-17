@@ -41,7 +41,7 @@ func reset():
 		revive.selected=Global.revives_list.find(inventory.revival)
 	else:
 		revive.selected=0
-		inventory.revival=Global.revives_list[0]
+		#inventory.revival=Global.revives_list[0]
 	if guns.item_count==0:
 		$PanelContainer/MarginContainer/VBoxContainer/GunsContainer.hide()
 	else:

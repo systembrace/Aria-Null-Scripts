@@ -24,6 +24,7 @@ var dead=false
 var inventory: Inventory
 var healing=false
 var paused=false
+var parry_moment=false
 @onready var healtimer=$HealTimer
 
 func _ready():
@@ -44,8 +45,13 @@ func _ready():
 		health.dead.connect(death_throes)
 	if combo:
 		combo.parry.connect(speed_boost)
+		combo.parry.connect(parried.unbind(1))
 	healtimer.wait_time=1
 	healtimer.timeout.connect(stop_heal)
+
+func parried():
+	if !Global.get_permanent_data("global","has_parried"):
+		Global.set_permanent_data("global","has_parried",true)
 
 func death_throes():
 	dead=true
@@ -164,6 +170,11 @@ func _process(delta):
 		if not dead and Input.is_action_just_pressed("attack"):
 			parry_checker.try_parry()
 		return
+	if parry_moment:
+		prevent_movement()
+		if !Input.is_action_just_pressed("attack"):
+			return
+		parry_moment=false
 	
 	dir=Input.get_vector("left","right","up","down")
 	

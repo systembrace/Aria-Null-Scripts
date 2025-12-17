@@ -10,6 +10,7 @@ var bounce=.5
 var accel=24
 var direction
 var shrink=false
+var settled=false
 var step=0
 
 func _ready():
@@ -30,6 +31,20 @@ func startshrink():
 	shrink=true
 
 func _process(delta):
+	if shrink:
+		step+=1*60*delta
+		if step>=6:
+			step=0
+			sprite.scale=sprite.scale.move_toward(Vector2.ZERO,.25*60*delta)
+			sprite.rotation=randf_range(0,2*PI)
+	if sprite.scale.length()<=.1:
+		Global.num_particles-=1
+		queue_free()
+	if settled:
+		return
+	if not falling and not on_floor and h<=0:
+		fall()
+		shrink=true
 	if abs(dh)>1 or h>2 or !on_floor:
 		dh-=gravity*60*delta
 		if h+dh<0 and on_floor:
@@ -43,23 +58,14 @@ func _process(delta):
 	if not shrink and h==0 and timer.is_stopped() and on_floor and velocity==Vector2.ZERO:
 		timer.start()
 		sprite.position.y=0
+		settled=true
 		floor_checker.body_exited.disconnect(left_floor)
 		floor_checker.queue_free()
 		global_position=global_position.round()
-	if shrink:
-		step+=1*60*delta
-		if step>=6:
-			step=0
-			sprite.scale=sprite.scale.move_toward(Vector2.ZERO,.25*60*delta)
-			sprite.rotation=randf_range(0,2*PI)
-	if sprite.scale.length()<=.1:
-		Global.num_particles-=1
-		queue_free()
-	if not falling and not on_floor and h<=0:
-		fall()
-		shrink=true
 
 func _physics_process(delta):
+	if settled:
+		return
 	super._physics_process(delta)
 	if velocity!=Vector2.ZERO:
 		var coll = move_and_collide(velocity*delta)

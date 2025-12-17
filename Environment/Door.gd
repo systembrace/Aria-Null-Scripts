@@ -15,6 +15,10 @@ class_name Door
 @onready var side1=$Side1
 @onready var side2=$Side2
 var state=""
+var closed_1=Vector2(-width/2.0,4)
+var open_1=Vector2(-width,4)
+var closed_2=Vector2(0,4)
+var open_2=Vector2(width/2.0,4)
 
 func _ready():
 	if get_parent() is Main and get_parent().dark:
@@ -36,31 +40,40 @@ func _ready():
 		toggle_area.area_entered.connect(open)
 		toggle_area.area_exited.connect(close)
 	
-	side1.position.x=-width/2.0
-	side1.position.y=0
-	side2.position.x=0
-	side2.position.y=0
+	if open_direction!="vertical":
+		$PointLight2D.energy=0
+		collision.rotation=PI/2
+		clipping_check.rotation=PI/2
+		$RigidBody2D.rotation=PI/2
+		side1.texture=CanvasTexture.new()
+		side1.texture.diffuse_texture=load("res://Assets/Art/environment/door_horizontal.png")
+		side1.texture.normal_texture=load("res://Assets/Art/environment/door_horizontal_normal.png")
+		side2.texture=side1.texture
+		closed_1=Vector2(closed_1.y-height/2-4,closed_1.x+width/2)
+		open_1=Vector2(open_1.y-height/2-4,open_1.x+width/2)
+		closed_2=Vector2(closed_2.y-height/2-4,closed_2.x+width/2)
+		open_2=Vector2(open_2.y-height/2-4,open_2.x+width/2)
+	
+	side1.position=closed_1
+	side2.position=closed_2
 	
 	if opened:
-		side1.position.x=-width
-		side2.position.x=width/2.0
+		side1.position=open_1
+		side2.position=open_2
 		collision.set_deferred("disabled",true)
 		opened=true
 		$PointLight2D.visible=false
 	
-	if open_direction!="vertical":
-		side2.flip_h=false
-	
 func snap_to_init(op):
 	if op:
-		side1.position.x=-width
-		side2.position.x=width/2.0
+		side1.position=open_1
+		side2.position=open_2
 		collision.set_deferred("disabled",true)
 		opened=true
 		$PointLight2D.visible=false
 	else:
-		side1.position.x=-width/2.0
-		side2.position.x=0
+		side1.position=closed_1
+		side2.position=closed_2
 		collision.set_deferred("disabled",false)
 		opened=false
 		$PointLight2D.visible=true
@@ -91,21 +104,19 @@ func _process(_delta):
 			opened=false
 			collision.set_deferred("disabled",false)
 			clipping_check.monitoring=false
-		if open_direction=="vertical":
-			if side2.position.x==0:
-				state=""
-				$PointLight2D.visible=true
-				return
-			side1.position.x=move_toward(side1.position.x,-width/2.0,speed)
-			side2.position.x=move_toward(side2.position.x,0,speed)
+		if side2.position==closed_2:
+			state=""
+			$PointLight2D.visible=true
+			return
+		side1.position=side1.position.move_toward(closed_1,speed)
+		side2.position=side2.position.move_toward(closed_2,speed)
 	elif state=="opening":
-		if open_direction=="vertical":
-			if not opened and side2.position.x>6:
-				opened=true
-				clipping_check.monitoring=true
-				collision.set_deferred("disabled",true)
-			if side2.position.x==width/2.0:
-				state=""
-				return
-			side1.position.x=move_toward(side1.position.x,-width,speed)
-			side2.position.x=move_toward(side2.position.x,width/2.0,speed)
+		if not opened and (side2.position-open_2).length()>(closed_2-open_2).length()*.375:
+			opened=true
+			clipping_check.monitoring=true
+			collision.set_deferred("disabled",true)
+		if side2.position==open_2:
+			state=""
+			return
+		side1.position=side1.position.move_toward(open_1,speed)
+		side2.position=side2.position.move_toward(open_2,speed)

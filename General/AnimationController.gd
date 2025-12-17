@@ -36,7 +36,7 @@ class_name AnimationController
 var body
 var gun: Secondary
 var vel_threshold=.02
-var direction=Vector2.DOWN
+var direction=Vector2.UP
 var anim="idle"
 var idle_time=0.0
 signal step

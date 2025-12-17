@@ -2,6 +2,7 @@ extends Area2D
 class_name Interactable
 
 @export var can_interact=true
+signal interacted
 var near_interactor=false
 @onready var sprite=$AnimatedSprite2D
 
@@ -12,6 +13,9 @@ func _ready():
 		activate()
 	else:
 		deactivate()
+
+func interact(node):
+	interacted.emit(node)
 
 func activate():
 	can_interact=true

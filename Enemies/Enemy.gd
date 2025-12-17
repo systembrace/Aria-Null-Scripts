@@ -11,10 +11,12 @@ signal death_throes
 var min_speed=0
 var spawn: Vector2
 var ammo=60.0
+var dont_notice=false
 @onready var control=$AI
 
 func _ready():
 	super._ready()
+	control.dont_notice=dont_notice
 	started_falling.connect(control.death_throes)
 	min_speed=max_speed-accel*8
 	spawn=global_position

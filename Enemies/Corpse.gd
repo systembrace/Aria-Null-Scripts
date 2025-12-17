@@ -1,9 +1,9 @@
 extends CharacterBody2D
 class_name Corpse
 
+@export var type="deco_enemy"
 var spawn: Vector2
 var target=null
-var type="enemy"
 var main
 var shrinking=false
 var step=0
@@ -19,12 +19,16 @@ func _ready():
 		sprite.flip_h=true
 	if sprite.sprite_frames.has_animation(type):
 		sprite.animation=type
+		#sprite.frame=randi_range(0,sprite.sprite_frames.get_frame_count())
+	$Hurtbox.take_hit.connect(die)
+	if type.begins_with("deco"):
+		sprite.offset.y-=2
+		return
 	var smoke=$Smoke.duplicate()
 	smoke.global_position=global_position
 	smoke.finished.connect(smoke.queue_free)
 	get_parent().call_deferred("add_child",smoke)
 	smoke.emitting=true
-	$Hurtbox.take_hit.connect(die)
 	timer.wait_time=randf_range(10,20)
 	timer.timeout.connect(startshrink)
 	timer.start()
@@ -47,6 +51,8 @@ func die(_area=null):
 	queue_free()
 
 func _process(delta):
+	if type.begins_with("deco"):
+		return
 	step+=1*60*delta
 	if shrinking:
 		if step>=6:

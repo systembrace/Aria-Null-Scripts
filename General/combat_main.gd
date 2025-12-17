@@ -22,7 +22,7 @@ func num_enemies_in_wave(w=wave, active=false):
 	if w>=0 and w<num_waves:
 		node=waves[w]
 	for child in node.get_children():
-		if child is Enemy and (!active or is_instance_valid(child.target)):
+		if (child is Enemy and (!active or is_instance_valid(child.target))) or (child is Spawner and (!active or child.activated)):
 			res+=1
 	return res
 
@@ -39,14 +39,15 @@ func _process(_delta):
 		#check_combat_over=false
 		#if num_enemies(false,true)==0:
 			#combat_over.emit()
-	if wave>=num_waves:
-		return
-	
-	var enemy_count=num_enemies()
 	if num_enemies(true)>0 and wave+1>=start_combat_wave:
 		Global.in_combat=true
 	else:
 		Global.in_combat=false
+	
+	if wave>=num_waves:
+		return
+	
+	var enemy_count=num_enemies()
 	
 	if len(waves)==0:
 		return

@@ -13,6 +13,7 @@ var shaketime:SceneTreeTimer
 var shakeamt=1
 var can_hitstop=true
 var slow_down_to_zero=false
+var slow_down_speed=1
 var load_game=true
 var endless=false
 var checkpoint_scene
@@ -323,7 +324,7 @@ func slowdown(duration, time_scale=0.05):
 		var timer = get_tree().create_timer(duration*time_scale)
 		await timer.timeout
 		Engine.time_scale = 1
-	
+
 func screenshake(time=.1,amount=1):
 	shaketime=get_tree().create_timer(time,true,false,false)
 	shaketime.timeout.connect(stopshake)
@@ -353,9 +354,9 @@ func change_window_mode():
 
 func _process(delta):
 	if slow_down_to_zero and Engine.time_scale>0:
-		Engine.time_scale=move_toward(Engine.time_scale,0,.000001/delta*90/(Engine.time_scale+1))
+		Engine.time_scale=move_toward(Engine.time_scale,0,.000001/delta*90/(Engine.time_scale+1)*slow_down_speed)
 	elif !slow_down_to_zero and Engine.time_scale<1.0:
-		Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60)
+		Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60*slow_down_speed)
 	
 	if wind_dir!=0:
 		wind_speed_step+=delta*.7

@@ -68,11 +68,14 @@ func create_tessa(rand_position=true):
 			if !ray.is_colliding():
 				positions.append(ray.target_position)
 	main.call_deferred("add_child",tessa)
+	if len(positions)==0:
+		positions.append(Vector2.ZERO)
 	tessa.global_position=global_position+positions.pick_random().normalized()*16
 	tessa.prev_location=global_position
 
 func stop_revive():
 	revive=false
+	control.paused=false
 
 func create_dummy():
 	if !main:

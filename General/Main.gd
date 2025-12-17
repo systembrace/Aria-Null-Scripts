@@ -97,7 +97,7 @@ func save_objects(checkpoint=false):
 		namedict[obj.name]+=1
 		if namedict[obj.name]>1:
 			print("Duplicate name found, fix required for enemy status to save")
-		if obj is Enemy:
+		if obj is Enemy or obj is Spawner:
 			config.set_value(scene_name,obj.name,"alive")
 		elif obj is Ally:
 			config.set_value(scene_name,obj.name,var_to_str(obj.global_position))
@@ -136,10 +136,10 @@ func load_objects():
 			return
 		for obj in get_tree().get_nodes_in_group("objs_to_load"):
 			if not obj.name in config.get_section_keys(scene_name):
-				if obj is Enemy or obj is FadeTransition or obj is BreakableWall:
+				if obj is Enemy or obj is FadeTransition or obj is BreakableWall or obj is Spawner:
 					obj.queue_free()
 			elif obj.name in config.get_section_keys(scene_name):
-				if obj is Enemy or obj is FadeTransition:
+				if obj is Enemy or obj is FadeTransition or obj is Spawner:
 					continue
 				elif obj is Ally:
 					obj.global_position=str_to_var(config.get_value(scene_name,obj.name))

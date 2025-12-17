@@ -9,6 +9,9 @@ var accel=16
 var min_speed=52
 var max_speed=104
 var loaded_in=false
+var control=self
+var combo=null
+var stunned=false
 @onready var health=$Health
 @onready var hp_bar=$HPBar
 

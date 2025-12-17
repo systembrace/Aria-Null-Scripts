@@ -18,6 +18,7 @@ var control: PlayerControl
 @onready var scrapicon=$VBoxContainer/Control2/ScrapIcon
 @onready var dialogue_box=$Dialogue
 @onready var icon=$VBoxContainer/Control/Icon
+@onready var item_popup=$NewItemPopup
 
 var scrapframes=0
 
@@ -51,6 +52,8 @@ func reset():
 	if ammoclip and inventory:
 		ammoclip.inventory=inventory
 		ammoclip.init_dividers()
+	if inventory:
+		item_popup.inventory=inventory
 	#if control and speedometer:
 	#	speedometer.control=control
 	#	speedometer.start()

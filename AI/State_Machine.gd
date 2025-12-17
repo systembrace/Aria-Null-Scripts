@@ -20,6 +20,7 @@ var dead=false
 var out_of_combat=true
 var timer
 var paused=false
+var dont_notice=false
 
 func _ready():
 	if can_retarget:
@@ -95,8 +96,9 @@ func _process(_delta):
 			var notarget=!is_instance_valid(body.target)
 			var potentialtarget=searchfield.find_body()
 			if is_instance_valid(potentialtarget) and body.target!=potentialtarget:
-				if body.target==null:
+				if body.target==null and !dont_notice:
 					searchfield.found()
+				dont_notice=false
 				body.target=potentialtarget
 				searchfield.monitoring=false
 				if notarget and force_target_state:
