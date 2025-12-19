@@ -53,7 +53,13 @@ func draw_portrait(current_data=null,current_section=null,index=1):
 	var speaker="player"
 	if current_data:
 		if current_data.has_section("Info"):
-			speaker=current_data.get_value("Info","speaker")
+			if current_data.has_section_key("Info","speaker"):
+				speaker=current_data.get_value("Info","speaker")
+			if current_data.has_section_key("Info","cutscene"):
+				hide()
+				return
+			elif !visible:
+				show()
 		if current_data.has_section_key(current_section,str(index)+"speaker"):
 			speaker=current_data.get_value(current_section,str(index)+"speaker")
 		if current_data.has_section_key(current_section,str(index)+"eyebrows"):
@@ -77,7 +83,11 @@ func draw_portrait(current_data=null,current_section=null,index=1):
 	mouth=null
 	eyebrows=null
 	eyes=null
-	texture=load("res://Assets/Art/portraits/"+speaker+"/head.png")
+	if speaker.ends_with("_virtual"):
+		speaker=speaker.replace("_virtual","")
+		texture=load("res://Assets/Art/portraits/"+speaker+"/head_virtual.png")
+	else:
+		texture=load("res://Assets/Art/portraits/"+speaker+"/head.png")
 	if DirAccess.dir_exists_absolute("res://Assets/Art/portraits/"+speaker+"/shoulders"):
 		shoulders=load("res://Assets/Art/portraits/"+speaker+"/shoulders/shoulders"+str(shoulders_index)+".png")
 	if DirAccess.dir_exists_absolute("res://Assets/Art/portraits/"+speaker+"/mouths"):

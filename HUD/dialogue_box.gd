@@ -7,7 +7,6 @@ var index=1
 var text=""
 var current_data:ConfigFile
 var current_section=""
-var control:PlayerControl
 var speed=1
 var eyebrows
 var eyes
@@ -22,17 +21,14 @@ var death_change=1
 @onready var label=$PanelContainer/MarginContainer/HBoxContainer/Dialogue
 @onready var timer=$Timer
 
-func enter(data,section,t=false,node=null,interrupt=false,interruptable=true,change_on_death=-1):
+func enter(data,section,t=false,interrupt=false,interruptable=true,change_on_death=-1):
 	if current_section!="":
-		if (!node and !interrupt) or !currently_interruptable:
+		if (!interrupt and t) or !currently_interruptable:
 			if !currently_interruptable and interrupt:
 				dialogue_queue.clear()
-			dialogue_queue.append([data,section,t,node,interruptable])
+			dialogue_queue.append([data,section,t,interruptable])
 			return
 		exit()
-	if node:
-		control=node
-		control.call_deferred("pause")
 	death_change=change_on_death
 	currently_interruptable=interruptable
 	do_timer=t
@@ -51,13 +47,10 @@ func exit(clear_queue=false):
 		print(heard_name)
 		if play_number and play_number==death_change:
 			Global.set_permanent_data("heard_dialogue",heard_name,play_number+1)
-	if control:
-		control.set_deferred("paused",false)
 	if do_timer:
 		do_timer=false
 		timer.timeout.disconnect(next)
 		timer.stop()
-	control=null
 	text=""
 	current_section=""
 	label.text=""
@@ -69,7 +62,7 @@ func exit(clear_queue=false):
 	if len(dialogue_queue)>0:
 		var next_dialogue=dialogue_queue[0]
 		dialogue_queue.remove_at(0)
-		enter(next_dialogue[0],next_dialogue[1],next_dialogue[2],next_dialogue[3],next_dialogue[4])
+		enter(next_dialogue[0],next_dialogue[1],next_dialogue[2],next_dialogue[3])
 
 func display(data:ConfigFile,section):
 	label.text=""
@@ -107,10 +100,14 @@ func _process(delta):
 		return
 	step+=delta*50*speed
 	var speaker="player"
-	if current_data.has_section("Info"):
+	if current_data.has_section_key("Info","speaker"):
 		speaker=current_data.get_value("Info","speaker")
 	if current_data.has_section_key(current_section,str(index)+"speaker"):
 		speaker=current_data.get_value(current_section,str(index)+"speaker").to_lower()
+	if speaker=="none":
+		speaker="player"
+	if speaker.ends_with("_virtual"):
+		speaker=speaker.replace("_virtual","")
 	if step>1:
 		while step>0:
 			if step>1:

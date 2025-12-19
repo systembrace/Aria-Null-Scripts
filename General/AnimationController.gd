@@ -33,16 +33,19 @@ class_name AnimationController
 @export var out_of_combat_anims=false
 @export var flicker_iframes=false
 @export var footsteps=-1
+var cutscene_anim="none"
 var body
 var gun: Secondary
 var vel_threshold=.02
-var direction=Vector2.UP
+var direction=Vector2.DOWN
 var anim="idle"
 var idle_time=0.0
 signal step
 
 func _ready():
 	body=get_parent()
+	if body is RolyPoly:
+		direction=Vector2.UP
 	while not body is CharacterBody2D:
 		body=body.get_parent()
 	if health and flash_anim:
@@ -150,6 +153,11 @@ func _process(delta):
 		curr_anim_name="revive"
 		vertical_sprites_enabled=false
 	
+	if cutscene_anim!="none":
+		anim=cutscene_anim
+		curr_anim_name=cutscene_anim
+		vertical_sprites_enabled=false
+	
 	if (anim==attackname or anim==readyattackname or anim==recovername) and combo and combo.current_attack.unique_anim:
 		curr_anim_name+="_"+str(combo.current_attack.combo_index)
 	
@@ -180,7 +188,7 @@ func _process(delta):
 	
 	if gun_anims and (gun.shooting or gun.readying) and (curr_anim_name==runname or curr_anim_name==walkname or curr_anim_name==idlename):
 		curr_anim_name="gun_"+curr_anim_name
-	elif out_of_combat_anims and body.control.out_of_combat and combo.can_move() and curr_anim_name!=stunname:
+	elif out_of_combat_anims and body.control.out_of_combat and combo.can_move() and curr_anim_name!=stunname and curr_anim_name!=cutscene_anim:
 		curr_anim_name="ooc_"+curr_anim_name
 	
 	if runspeed>0 and anim==runname:

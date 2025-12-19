@@ -22,7 +22,7 @@ var maxheals: int = 0
 var heals: int = 0
 var scrap: int = 0
 var just_unpaused=false
-@onready var hud=$Camera2D/Hud
+@onready var hud: HUD=$Camera2D/Hud
 @onready var pausemenu=$Camera2D/CanvasLayer/PauseMenu
 @onready var inventorymenu=$Camera2D/CanvasLayer/InventoryMenu
 @onready var gunsprite=$CanvasLayer/Gun
@@ -54,10 +54,16 @@ func _ready():
 	assign_player()
 	if Global.death_cutscene:
 		Global.death_cutscene=false
-		player.control.pause()
+		player.control.call_deferred("pause")
 		await get_tree().create_timer(1,false).timeout
-		player.control.paused=false
-		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true,true,false)
+		player.control.call_deferred("pause")
+		Global.dialogue_ended.connect(death_scene_over)
+		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true,true,-1)
+
+func death_scene_over():
+	print("lol")
+	Global.dialogue_ended.disconnect(death_scene_over)
+	player.control.paused=false
 
 func update_camera():
 	if !main.tilemap:

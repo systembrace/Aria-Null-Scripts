@@ -1,4 +1,5 @@
 extends CanvasLayer
+class_name HUD
 
 var inventory: Inventory
 var health: Health
@@ -135,10 +136,7 @@ func _process(_delta):
 		else:
 			$VBoxContainer/Control.visible=false
 
-func dialogue(scene_name,section,do_timer,pause_player,interrupt,interruptable,change_on_death):
+func dialogue(scene_name,section,do_timer,interrupt,interruptable,change_on_death):
 	var data=ConfigFile.new()
 	data.load("res://dialogue/"+scene_name+".ini")
-	if pause_player:
-		dialogue_box.enter(data,section,do_timer,inventory.player.control,interrupt,interruptable,change_on_death)
-	else:
-		dialogue_box.enter(data,section,do_timer,null,interrupt,interruptable,change_on_death)
+	dialogue_box.enter(data,section,do_timer,interrupt,interruptable,change_on_death)

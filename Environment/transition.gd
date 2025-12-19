@@ -65,7 +65,7 @@ func change_scene(body=null):
 	for node in get_tree().get_nodes_in_group("objs_to_load"):
 		node.remove_from_group("objs_to_load")
 	main.call_deferred("exit")
-	scene=load("res://maps/"+scene_name+".tscn").instantiate()
+	scene=load("res://Maps/"+scene_name+".tscn").instantiate()
 	scene.scene_name=scene_name.substr(scene_name.find("/")+1)
 	scene.name="Main"
 	scene.remove_child(scene.find_child("Player"))

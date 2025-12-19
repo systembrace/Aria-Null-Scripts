@@ -11,6 +11,7 @@ var main
 var min_speed
 var ammo=60.0
 var kneeling=false
+@onready var anim_controller=$AnimationController
 @onready var control=$AI
 
 func _ready():

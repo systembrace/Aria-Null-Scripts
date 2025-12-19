@@ -2,7 +2,7 @@ extends Node
 class_name EventSequence
 
 var events=[]
-var active="None"
+var active="First"
 var last_waypoint=Waypoint
 var npc_endings=[]
 

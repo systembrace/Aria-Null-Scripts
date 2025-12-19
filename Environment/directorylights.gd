@@ -30,9 +30,9 @@ func _ready():
 			x=global_position.x+16*dx
 			var tempx=midx
 			var tempy=layery[dy]
-			if dx==0:
+			if dx==0 and length!=2:
 				tempx=startx
-			elif dx==length-1:
+			elif dx==length-1 and length!=2:
 				tempx=endx
 			if Vector2(dx,dy) in tvs:
 				if randi_range(0,2)==0:

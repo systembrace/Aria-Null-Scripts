@@ -1,7 +1,6 @@
 extends Event
 class_name DialogueEvent
 
-@export var pause_player=true
 @export var interrupt=false
 @export var interruptable=true
 @export var change_on_death=-1
@@ -16,7 +15,7 @@ func activate():
 		active=true
 		complete()
 		return
-	if active or completed:
+	if active or completed or skipped:
 		return
 	if !main.is_node_ready():
 		await main.ready
@@ -29,7 +28,7 @@ func activate():
 		Global.set_permanent_data("heard_dialogue",heard_name,1)
 	elif play_number and play_number<change_on_death:
 		Global.set_permanent_data("heard_dialogue",heard_name,play_number+1)
-	main.inventory.hud.dialogue(main.scene_name,dialogue_name,coroutine,pause_player,interrupt,interruptable,change_on_death)
+	main.inventory.hud.dialogue(main.scene_name,dialogue_name,coroutine,interrupt,interruptable,change_on_death)
 	Global.dialogue_ended.connect(dialogue_ended)
 
 func dialogue_ended():

@@ -10,6 +10,7 @@ class_name Event
 @export var branch_when_skipped: Event
 @export var ignore_when_event_completed: Event
 @export var save_when_completed=false
+@export var pause_player=false
 signal activated
 signal just_completed
 signal task_finished
@@ -21,7 +22,7 @@ var branch=false
 var branched_here=false
 var skipped=false
 var branched_successfully=false
-var main
+var main: Main
 var waiting=false
 var completed=false
 var coroutine_done=true
@@ -51,9 +52,12 @@ func activate():
 	if active or completed:
 		return
 	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed and not ignore_when_event_completed.skipped):
+		print(name)
 		active=true
 		complete()
 		return
+	if pause_player:
+		main.player.control.call_deferred("pause")
 	branch=should_branch
 	active=true
 	completed=false
@@ -82,6 +86,8 @@ func complete():
 		print(name+" completed via coroutine")
 	else:
 		print(name+" completed")
+	if pause_player and (!coroutine or coroutine_done):
+		main.player.control.set_deferred("paused",false)
 	completed=true
 	active=false
 	just_completed.emit()

@@ -1,7 +1,9 @@
 extends Event
-class_name RewardEvent
+class_name SetNPCAnim
 
-@export var scrap=20
+@export var actor_name="Cherry"
+@export var anim_name="none"
+var actor
 
 func activate():
 	if active or completed:
@@ -11,12 +13,6 @@ func activate():
 		complete()
 		return
 	super.activate()
-	if !main.is_node_ready():
-		await main.ready
-
-func _process(_delta):
-	if active:
-		main.player.control.collect_scrap()
-		scrap-=1
-		if scrap<=0:
-			complete()
+	actor=main.npcs[actor_name]
+	actor.anim_controller.cutscene_anim=anim_name
+	complete()

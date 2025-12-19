@@ -3,12 +3,12 @@ extends Node2D
 func _ready():
 	if not Global.endless and not FileAccess.file_exists("user://last_scene.dat"):# or true:
 		var scenefile = FileAccess.open("user://last_scene.dat", FileAccess.WRITE)
-		scenefile.store_string("res://maps/directory/startroom.tscn")
-		#scenefile.store_string("res://maps/Endless.tscn")
+		scenefile.store_string("res://Maps/intro_cutscene.tscn")
+		#scenefile.store_string("res://Maps/Endless.tscn")
 		scenefile.close()
 		var checkpoint = FileAccess.open("user://checkpoint_scene.dat", FileAccess.WRITE)
-		checkpoint.store_string("res://maps/directory/startroom.tscn")
-		#checkpoint.store_string("res://maps/Endless.tscn")
+		checkpoint.store_string("res://Maps/intro_cutscene.tscn")
+		#checkpoint.store_string("res://Maps/Endless.tscn")
 		checkpoint.close()
 	
 	if not FileAccess.file_exists("user://last_data.dat") or Global.get_flag("version")!=Global.version:# or true:
@@ -29,7 +29,7 @@ func _ready():
 			invfile.close()
 		var lastfile = FileAccess.open("user://last_data.dat", FileAccess.WRITE)
 		var cpfile = FileAccess.open("user://checkpoint_data.dat", FileAccess.WRITE)
-		var save_data = {"path":"res://Scenes/Allies/player.tscn","name":"Player","pos_x":0,"pos_y":8,"health":5,"original":true,"revives":1}
+		var save_data = {"path":"res://Scenes/Allies/player.tscn","name":"Player","pos_x":-6,"pos_y":8,"health":5,"original":true,"revives":1,"dir":var_to_str(Vector2.LEFT)}
 		#var save_data = {"path":"Scenes/Allies/player.tscn","name":"Player","pos_x":192,"pos_y":816,"health":5,"original":true}
 		var json_string = JSON.stringify(save_data)
 		cpfile.store_line(json_string)
@@ -59,5 +59,5 @@ func _ready():
 		scene = load(file.get_as_text())
 		file.close()
 	if Global.endless:
-		scene=load("res://maps/Endless.tscn")
+		scene=load("res://Maps/Endless.tscn")
 	get_tree().call_deferred("change_scene_to_packed",scene)

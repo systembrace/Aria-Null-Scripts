@@ -32,11 +32,12 @@ func _ready():
 		started_game=true
 		load_from_save()
 	if save_object_status:
-		var area=scene_file_path.substr(scene_file_path.find("maps/")+5)
-		if scene_name=="":
-			scene_name=area.substr(area.find("/")+1)
-			scene_name=scene_name.substr(0,scene_name.find("."))
+		var area=scene_file_path.substr(scene_file_path.to_lower().find("maps/")+5)
+		print(area)
+		scene_name=area.substr(area.find("/")+1)
+		scene_name=scene_name.substr(0,scene_name.find("."))
 		area=area.substr(0,area.find("/"))
+		print(area)
 		config_name="user://area_data/last_"+area+".ini"
 		checkpoint_config_name="user://area_data/checkpoint_"+area+".ini"
 		load_objects()
@@ -114,6 +115,8 @@ func save_objects(checkpoint=false):
 		elif obj is InteractPanel:
 			config.set_value(scene_name,obj.name,obj.disabled)
 		elif obj is EventSequence:
+			if obj.active=="First":
+				obj.active=obj.events[0].name
 			config.set_value(scene_name,obj.name,obj.active)
 			var waypoint_name="none"
 			if current_waypoint:

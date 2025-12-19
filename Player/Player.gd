@@ -17,11 +17,12 @@ var dir=Vector2.DOWN
 var veldir=Vector2.DOWN
 var aiming=false
 var main: Main
+var scarf
 var tessa
 var has_tessa=true
 var revive=false
 signal healing
-@onready var control=$Control
+@onready var control:PlayerControl=$Control
 
 func _ready():
 	super._ready()
@@ -45,7 +46,7 @@ func _ready():
 func make_scarf():
 	if !original_player:
 		return
-	var scarf=Node2D.new()
+	scarf=Node2D.new()
 	scarf.set_script(ScarfStart)
 	scarf.parent=self
 	scarf.global_position=round(global_position+Vector2.UP)
