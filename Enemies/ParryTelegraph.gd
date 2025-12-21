@@ -5,14 +5,17 @@ extends AnimatedSprite2D
 var slowdown_entered=false
 
 func _ready():
+	process_mode=Node.PROCESS_MODE_ALWAYS
 	visible=false
 
 func _process(_delta):
-	if slowdown_entered and (Input.is_action_just_released("attack") or !visible):
-		Global.slow_down_to_zero=false
-		Global.slow_down_speed=1
-	elif slowdown_entered and Engine.time_scale==1:
-		slowdown_entered=false
+	if slowdown_entered:
+		var target=combo.current_attack.target
+		if Engine.time_scale==1 or (!visible and target is Player and target.control.parry_moment):
+			get_tree().create_timer(1,false,false,true).timeout.connect(set.bind("slowdown_entered",false))
+			Global.slow_down_to_zero=false
+			Global.slow_down_speed=1
+			target.control.parry_moment=false
 	if combo:
 		if combo.is_parriable():
 			visible=true
@@ -24,9 +27,9 @@ func _process(_delta):
 			visible=true
 			animation="off"
 			var target=combo.current_attack.target
-			if target is Player:
+			if not Global.get_permanent_data("global","has_parried") and !slowdown_entered and is_instance_valid(target) and target is Player and target.original_player and !Global.slow_down_to_zero and Engine.time_scale==1 and !target.control.parry_moment:
 				var targetdist=combo.to_local(target.global_position).length()
-				if not Global.get_permanent_data("global","has_parried") and !slowdown_entered and targetdist<112:
+				if targetdist<112:
 					target.control.parry_moment=true
 					slowdown_entered=true
 					Global.slow_down_to_zero=true

@@ -87,7 +87,7 @@ func open(_body=null):
 		state="opening"
 		$PointLight2D.visible=false
 
-func _process(_delta):
+func _process(delta):
 	if state!="":
 		$Side1/Dust.emitting=true
 		$Side2/Dust.emitting=true
@@ -108,8 +108,8 @@ func _process(_delta):
 			state=""
 			$PointLight2D.visible=true
 			return
-		side1.position=side1.position.move_toward(closed_1,speed)
-		side2.position=side2.position.move_toward(closed_2,speed)
+		side1.position=side1.position.move_toward(closed_1,speed*60*delta)
+		side2.position=side2.position.move_toward(closed_2,speed*60*delta)
 	elif state=="opening":
 		if not opened and (side2.position-open_2).length()>(closed_2-open_2).length()*.375:
 			opened=true
@@ -118,5 +118,5 @@ func _process(_delta):
 		if side2.position==open_2:
 			state=""
 			return
-		side1.position=side1.position.move_toward(open_1,speed)
-		side2.position=side2.position.move_toward(open_2,speed)
+		side1.position=side1.position.move_toward(open_1,speed*60*delta)
+		side2.position=side2.position.move_toward(open_2,speed*60*delta)

@@ -14,6 +14,7 @@ var eyebrows
 var shoulders
 var mouth
 var section_index=0
+var eyebrows_offset=Vector2.ZERO
 
 func _ready():
 	draw_portrait()
@@ -40,7 +41,7 @@ func _draw():
 	if mouth:
 		draw_texture(mouth,Vector2.ZERO)
 	if eyebrows:
-		draw_texture(eyebrows,Vector2.ZERO)
+		draw_texture(eyebrows,eyebrows_offset)
 	if eyes:
 		draw_texture(eyes,Vector2.ZERO)
 
@@ -83,9 +84,13 @@ func draw_portrait(current_data=null,current_section=null,index=1):
 	mouth=null
 	eyebrows=null
 	eyes=null
+	eyebrows_offset=Vector2.ZERO
 	if speaker.ends_with("_virtual"):
 		speaker=speaker.replace("_virtual","")
 		texture=load("res://Assets/Art/portraits/"+speaker+"/head_virtual.png")
+		eyebrows_offset=Vector2.UP
+		if eyes_index==1:
+			eyes_index=2
 	else:
 		texture=load("res://Assets/Art/portraits/"+speaker+"/head.png")
 	if DirAccess.dir_exists_absolute("res://Assets/Art/portraits/"+speaker+"/shoulders"):

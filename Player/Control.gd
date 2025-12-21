@@ -72,6 +72,7 @@ func die():
 		main.add_child(playercorpse)
 	else:
 		body.create_tessa()
+		inventory.ammo-=20
 	if body.original_player or main.player_corpse:
 		var playerghost=load("res://Scenes/Allies/player_ghost.tscn").instantiate()
 		playerghost.tessa=body.tessa
@@ -86,7 +87,7 @@ func die():
 		main.add_child(playerghost)
 	elif !body.original_player and !main.player_corpse:
 		undo_dummy()
-		main.player.hurtbox.take_non_attack_damage("HoloDied")
+		#main.player.hurtbox.take_non_attack_damage("HoloDied")
 	body.queue_free()
 	#inventory.call_deferred("set","can_revive",false)
 	if inventory.can_revive and body.original_player:
@@ -174,6 +175,8 @@ func _process(delta):
 		prevent_movement()
 		if !Input.is_action_just_pressed("attack"):
 			return
+		Global.slow_down_to_zero=false
+		Global.slow_down_speed=1
 		parry_moment=false
 	
 	dir=Input.get_vector("left","right","up","down")
@@ -201,13 +204,25 @@ func _process(delta):
 			prevent_movement()
 		
 		if not combo.is_charging() and (!dash or not dash.dashing) and Input.is_action_just_released("hologram"):
-			if body.original_player and inventory.revival!="none":
-				inventory.revive()
-				body.create_dummy()
-				body.queue_free()
+			if body.original_player and inventory.revival!="none" and inventory.ammo>=20:
+				var ray = RayCast2D.new()
+				body.add_child(ray)
+				ray.global_position=body.global_position
+				ray.set_collision_mask_value(1,false)
+				ray.set_collision_mask_value(23,true)
+				ray.target_position=body.to_local(body.tessa.global_position)
+				ray.force_raycast_update()
+				if !ray.is_colliding():
+					inventory.revive()
+					body.create_dummy()
+					body.queue_free()
+				ray.queue_free()
 			elif !body.original_player and inventory.dummy:
 				body.create_tessa(false)
 				undo_dummy()
+			elif inventory.ammo<20:
+				inventory.find_child("NoAmmo").play()
+				inventory.hud.ammoclip.shake=.25
 	
 	if Input.is_action_just_pressed("attack") or input_buffer=="attack":
 		if not combo.is_done_attacking():

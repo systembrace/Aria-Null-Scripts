@@ -4,6 +4,8 @@ var ammo
 var numshots
 var dividers=[]
 var inventory: Inventory
+var shake=0
+var shake_offset=Vector2.ZERO
 @onready var full=$Full
 @onready var basedivider=$Divider
 @onready var count=$CBack/MarginContainer/Count
@@ -23,15 +25,40 @@ func init_dividers():
 		divider.visible=true
 		dividers.append(divider)
 
-func _process(_delta):
+func _process(delta):
 	if not inventory:
 		return
-	if not inventory.secondary:
-		visible=false
+	if !Global.get_flag("roly_poly"):
+		hide()
 		return
-	elif not visible:
-		visible=true
+	elif not inventory.secondary:
+		show()
+		$TrueAmmo.scale.x=floor(inventory.ammo)
+		animation="none"
+		$Backdrop.scale.y=3
+		$Empty.hide()
+		full.hide()
+		for divider in dividers:
+			divider.hide()
+		$CBack.hide()
+		return
+	elif animation=="none":
+		$Backdrop.scale.y=11
+		$Empty.show()
+		full.show()
+		for divider in dividers:
+			divider.show()
+		$CBack.show()
 		get_parent().visible=true
+	if shake>0:
+		shake-=delta
+		shake_offset=Vector2(randi_range(-1,1),randi_range(-1,1))
+	elif shake_offset!=Vector2.ZERO:
+		shake_offset=Vector2.ZERO
+	position=Vector2(30,17)+shake_offset
+	
+	$TrueAmmo.scale.x=floor(inventory.ammo)
+	
 	if numshots!=inventory.numshots:
 		init_dividers()
 	if ammo==inventory.ammo:

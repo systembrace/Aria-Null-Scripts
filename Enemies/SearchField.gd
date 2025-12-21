@@ -14,17 +14,17 @@ func raytarget(pos):
 	ray.force_raycast_update()
 
 func find_body():
-	var bodies=get_overlapping_areas()
+	var bodies=get_overlapping_bodies()
 	if bodies:
-		var potentialtarget=bodies[0].get_parent()
+		var potentialtarget=bodies[0]
 		if len(bodies)>1:
 			var bodydists={}
 			for body in bodies:
-				if body.get_parent() is CharacterBody2D:
-					var dist=global_position.distance_squared_to(body.get_parent().global_position)
-					if body.get_parent() is RolyPoly or body.get_parent() is Player:
+				if body is CharacterBody2D:
+					var dist=global_position.distance_squared_to(body.global_position)
+					if body is RolyPoly or body is Player:
 						dist=sqrt(dist)
-					bodydists[dist]=body.get_parent()
+					bodydists[dist]=body
 			potentialtarget=bodydists[bodydists.keys().min()]
 		raytarget(potentialtarget.global_position)
 		if see_through_walls or not ray.is_colliding():
@@ -42,12 +42,12 @@ func nearby_count(max_dist=40):
 	if !monitoring:
 		turn_off=true
 	monitoring=true
-	var bodies=get_overlapping_areas()
+	var bodies=get_overlapping_bodies()
 	var res=0
 	if bodies:
 		max_dist=max_dist*max_dist
 		for body in bodies:
-			var dist=global_position.distance_squared_to(body.get_parent().global_position)
+			var dist=global_position.distance_squared_to(body.global_position)
 			if dist<max_dist:
 				res+=1
 	if turn_off:

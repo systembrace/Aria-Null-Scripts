@@ -45,12 +45,12 @@ func interact(player):
 		player.control.set_deferred("paused",true)
 		$CanvasLayer/Shop.player=player
 		$CanvasLayer/Shop.set_deferred("visible",true)
-	else:
-		var new_player=load("res://Scenes/Allies/player.tscn").instantiate()
-		main.add_child(new_player)
-		new_player.global_position=player.global_position
-		player.free()
-		call_deferred("interact",new_player)
+	#else:
+		#var new_player=load("res://Scenes/Allies/player.tscn").instantiate()
+		#main.add_child(new_player)
+		#new_player.global_position=player.global_position
+		#player.free()
+		#call_deferred("interact",new_player)
 
 func exit_shop():
 	if shop.tried_connecting:

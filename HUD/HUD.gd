@@ -58,7 +58,14 @@ func reset():
 	#if control and speedometer:
 	#	speedometer.control=control
 	#	speedometer.start()
-		
+
+func show_notice(text=""):
+	if text=="":
+		$Notice.hide()
+		return
+	$Notice.show()
+	$Notice/PanelContainer/MarginContainer/Label.text=Global.format_keybind(text).to_upper()
+
 func _process(_delta):
 	if is_instance_valid(control):
 		if control.healing:
@@ -136,7 +143,7 @@ func _process(_delta):
 		else:
 			$VBoxContainer/Control.visible=false
 
-func dialogue(scene_name,section,do_timer,interrupt,interruptable,change_on_death):
+func dialogue(scene_name,section,do_timer,interrupt=false,interruptable=true,change_on_death=-1,loop_last=false):
 	var data=ConfigFile.new()
 	data.load("res://dialogue/"+scene_name+".ini")
-	dialogue_box.enter(data,section,do_timer,interrupt,interruptable,change_on_death)
+	dialogue_box.enter(data,section,do_timer,interrupt,interruptable,change_on_death,loop_last)

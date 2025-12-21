@@ -19,7 +19,10 @@ func _ready():
 	main=get_tree().get_root().get_node("Main")
 	if actor:
 		main.npcs[name]=self
-	if tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
+	if !Global.endless and tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
+		if !is_instance_valid(main.npcs["Cherry"]):
+			queue_free()
+			return
 		global_position=main.npcs["Cherry"].global_position
 	super._ready()
 

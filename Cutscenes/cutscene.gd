@@ -13,6 +13,7 @@ var skip_time=0.0
 @onready var dialogue_box=$Dialogue
 @onready var slides=$Slides
 @onready var timer=$Timer
+@onready var skip=$Skip
 
 func _ready():
 	Music.eject(1)
@@ -47,11 +48,15 @@ func end():
 	get_tree().call_deferred("change_scene_to_packed",scene)
 
 func _process(delta):
-	if Input.is_action_pressed("pause"):
+	if Input.is_action_pressed("pause") || Input.is_action_pressed("interact") || Input.is_action_pressed("attack"):
+		skip.show()
+		var bars=min(int((skip_time+0.5)*5/3),5)
+		skip.text="["+"|".repeat(bars)+" ".repeat(5-bars)+"]"
 		skip_time+=delta
 	elif skip_time>0:
+		skip.hide()
 		skip_time=0
-	if skip_time>5:
+	if skip_time>3:
 		end()
 	
 	if fade!=-1 and slides.modulate.a!=fade:

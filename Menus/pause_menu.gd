@@ -22,6 +22,8 @@ func _ready():
 	$PanelContainer/MarginContainer/QuitMenu/HBoxContainer/Cancel.pressed.connect(go_back)
 	$PanelContainer/MarginContainer/CheckpointMenu/HBoxContainer/Confirm.pressed.connect(reset)
 	$PanelContainer/MarginContainer/CheckpointMenu/HBoxContainer/Cancel.pressed.connect(go_back)
+	if !Global.endless:
+		$PanelContainer/MarginContainer/StartMenu/Checkpoint.hide()
 	main=get_tree().get_root().get_node("Main")
 
 func disable_menu(node,disabled=true):

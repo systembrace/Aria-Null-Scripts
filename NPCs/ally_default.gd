@@ -39,9 +39,9 @@ func update():
 			direction=navigator.next_direction(main.current_waypoint.global_position)
 			return
 	if not is_instance_valid(player) or (body.tessa and player is Ally and Global.get_flag("with_tessa")):
-		if is_instance_valid(main.player) and (!body.tessa or Global.get_flag("with_tessa")):
+		if is_instance_valid(main.player) and (!body.tessa or Global.endless or Global.get_flag("with_tessa")):
 			player=main.player
-		elif body.tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
+		elif !Global.endless and body.tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
 			player=main.npcs["Cherry"]
 		elif body.tessa and is_instance_valid(main.player_corpse):
 			player=main.player_corpse
@@ -80,10 +80,10 @@ func physics_update():
 	if dash and body.on_floor and dash.timer.is_stopped():
 		ray.target_position=direction.normalized()*8
 		ray.force_raycast_update()
-		if ray.is_colliding() and is_instance_valid(player) and (player is PlayerCorpse or player.on_floor):
+		if ray.is_colliding() and (waypoint or is_instance_valid(player)):
 			if waypoint:
 				temp_target(waypoint)
-			else:
+			elif player is PlayerCorpse or player.on_floor:
 				temp_target(player)
 			dash.go_to="Wander"
 			transition.emit(self,"Dodge")

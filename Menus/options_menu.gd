@@ -77,9 +77,9 @@ func switch_menus(menu_name):
 	current_menu.show()
 	disable_menu(current_menu,false)
 	if (pause_menu and menu_name=="GameMenu") or !FileAccess.file_exists("user://last_scene.dat"):
-		$PanelContainer/MarginContainer/GameMenu/DeleteSave.disabled=true
+		$PanelContainer/MarginContainer/GameMenu/DeleteSave.hide()
 	if pause_menu and menu_name=="VideoMenu":
-		$PanelContainer/MarginContainer/VideoMenu/SubViewportContainer.visible=false
+		$PanelContainer/MarginContainer/VideoMenu/SubViewportContainer.hide()
 
 func open_options():
 	visible=true

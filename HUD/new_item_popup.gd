@@ -29,13 +29,7 @@ func display(item_name):
 	if holo_texture:
 		$PanelContainer/MarginContainer/VBoxContainer/Hologram.texture=load(holo_texture)
 	$PanelContainer/MarginContainer/VBoxContainer/ItemTexture.texture=load(texture_name)
-	var item_dir=directions[item_name]
-	if "{" in item_dir:
-		var start=item_dir.find("{")
-		var end=item_dir.find("}")
-		var action=item_dir.substr(start+1, end-start-1)
-		var keybind=InputMap.action_get_events(action)[0].as_text().to_upper()
-		item_dir=item_dir.replace("{"+action+"}",keybind)
+	var item_dir=Global.format_keybind(directions[item_name])
 	$PanelContainer/MarginContainer/VBoxContainer/Directions.text=item_dir
 	$PanelContainer/MarginContainer/VBoxContainer/Description.text=descriptions[item_name].to_upper()
 

@@ -17,6 +17,8 @@ func spawn(parry=false,pos=get_parent().global_position,mod=1):
 func spawn_spec(pname,pos=get_parent().global_position,parry=false,mod=1,blood_for_corpse=false):
 	if not main:
 		return
+	if Global.endless:
+		blood_for_corpse=false
 	var mn=particles[pname].x*mod
 	var mx=particles[pname].y*mod
 	var scene=load("res://Scenes/Particles/"+pname+".tscn")

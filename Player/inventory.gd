@@ -15,7 +15,7 @@ var charge=0
 var player: CharacterBody2D
 var dummy: PlayerDummy
 var main
-var revivenames={"none":"None","roly_poly":"Roly Poly","enemy":"Infected","elite":"Elite Guard"}
+var revivenames={"none":"None","roly_poly":"Roly Poly","enemy":"Infected","elite":"Guardian"}
 var revival="none"
 var can_revive=true
 var maxheals: int = 0
@@ -58,7 +58,7 @@ func _ready():
 		await get_tree().create_timer(1,false).timeout
 		player.control.call_deferred("pause")
 		Global.dialogue_ended.connect(death_scene_over)
-		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true,true,-1)
+		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true)
 
 func death_scene_over():
 	print("lol")
@@ -139,8 +139,9 @@ func use_secondary(_amount=10):
 	if secondary and secondary is Shield and !Input.is_action_pressed("secondary"):
 		secondary.deactivate()
 	if not secondary or (floor(ammo*numshots/60)<1 and ((secondary is Grapple and !secondary.deployed) or not secondary is Grapple)) or not secondary.can_use():
-		if secondary and (Input.is_action_just_pressed("secondary") or not secondary.can_use()) and floor(ammo*numshots/60)<1:
+		if secondary and (Input.is_action_just_pressed("secondary") or not secondary.can_use() or secondary is Grapple) and floor(ammo*numshots/60)<1:
 			$NoAmmo.play()
+			hud.ammoclip.shake=.25
 		return
 	if secondary is Shield:
 		secondary.durability=ammo

@@ -5,7 +5,7 @@ signal started
 var wave:int=0
 var wavepoints=0
 var add_wave=[1,4,7,15,12]
-var possibleenemies={"spider":1,"enemy":3,"gunman":5,"roly_poly":7,"elite":20}
+var possibleenemies={"roly_poly":1,"enemy":3,"gunman":5,"elite":15}
 var maxindex=-1
 var highscore:int=0
 var spawning=false
@@ -146,8 +146,8 @@ func save_data(_checkpoint=false,autosave=false,reset=false):
 		inventorydata["grenadesmax"]=0
 		inventorydata["earthshaker"]=0
 		inventorydata["earthshakermax"]=0
-		inventorydata["heals"]=0
-		inventorydata["maxheals"]=0
+		inventorydata["heals"]=1
+		inventorydata["maxheals"]=1
 		inventorydata["ammo"]=60.0
 	elif not spawning:
 		data+=JSON.stringify({"name":"Endless","wave":wave})

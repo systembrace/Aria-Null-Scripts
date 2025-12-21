@@ -1,7 +1,7 @@
 extends Node2D
 class_name Spawner
 
-@export var enemy_name="enemy"
+@export var enemy_name="default"
 @export var spawn_time=3.0
 signal spawned
 var activated=false

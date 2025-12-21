@@ -10,6 +10,7 @@ class_name Player
 @export var original_player=true
 @export var virtual=false
 @export var mask: Sprite2D
+@export var anim_controller:AnimationController
 signal collision
 var speed=min_speed
 var inventory: Inventory
@@ -120,7 +121,7 @@ func _physics_process(delta):
 	super._physics_process(delta)
 	if main.num_enemies(true)>0 and !get_collision_mask_value(23):
 		set_collision_mask_value(23,true)
-	elif main.num_enemies(true)==0 and get_collision_mask_value(23):
+	elif (!Global.endless or !main.inventory.dummy) and main.num_enemies(true)==0 and get_collision_mask_value(23):
 		set_collision_mask_value(23,false)
 	var coll = move_and_collide(velocity*delta,true)
 	if coll:
@@ -128,14 +129,21 @@ func _physics_process(delta):
 	move_and_slide()
 
 func save_data():
+	var path=scene_file_path
+	var hp=$Health.hp
+	var prevhp=$Health.prevhp
+	if Global.endless and inventory and is_instance_valid(inventory.dummy):
+		path="res://Scenes/Allies/player.tscn"
+		hp=inventory.dummy.health.hp
+		prevhp=inventory.dummy.health.prevhp
 	var data = {
 		"name":"Player",
-		"path":scene_file_path,
+		"path":path,
 		"pos_x":prev_location.x,
 		"pos_y":prev_location.y,
-		"health":$Health.hp,
-		"prevhp":$Health.prevhp,
-		"dir":var_to_str(find_child("AnimationController").direction),
+		"health":hp,
+		"prevhp":prevhp,
+		"dir":var_to_str(anim_controller.direction),
 	}
 	return data
 
@@ -151,4 +159,4 @@ func load_data(data):
 	else:
 		$Health.prevhp=$Health.hp
 	if "dir" in data.keys():
-		$AnimationController.direction=str_to_var(data["dir"])
+		anim_controller.direction=str_to_var(data["dir"])

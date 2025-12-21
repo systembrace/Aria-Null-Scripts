@@ -84,6 +84,8 @@ func _process(_delta):
 	if dead or paused:
 		return
 	if dying:
+		if !body.on_floor:
+			body.set_collision_mask_value(19,true)
 		hurtbox.disable_hurtbox()
 	if body.target!=null and !is_instance_valid(body.target):
 		body.target=null
@@ -127,7 +129,7 @@ func transition_state(old_state, new_state_name):
 		return
 	var new_state=states.get(new_state_name.to_lower())
 	if not new_state:
-		print("state not found")
+		print(body.name+" state not found")
 		return
 	if current_state:
 		current_state.exit()

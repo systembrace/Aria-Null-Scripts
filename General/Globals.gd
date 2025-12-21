@@ -4,7 +4,7 @@ class_name Globals
 signal saving
 signal environment_updated
 signal dialogue_ended
-var version=2
+var version=3
 var death_cutscene=false
 var flags = {}
 var config=ConfigFile.new()
@@ -73,6 +73,9 @@ func _ready():
 		flags={"endlesshs":0,"version":version}
 		save_flags(true)
 	else:
+		load_flags()
+		if get_flag("version")!=version and FileAccess.file_exists("user://endless_loadout.dat"):
+			DirAccess.remove_absolute("user://endless_loadout.dat")
 		if not FileAccess.file_exists("user://last_scene.dat"):
 			delete_all_save_data()
 		else:
@@ -257,7 +260,8 @@ func save_data(data,scene_path,checkpoint=false,autosave=false):
 
 func set_permanent_data(section,field,value):
 	permanent_data.set_value(section,field,value)
-	permanent_data.save("user://permanent_data.ini")
+	if field=="deaths" or field=="player_dead":
+		permanent_data.save("user://permanent_data.ini")
 
 func get_permanent_data(section,field):
 	if !permanent_data.has_section_key(section,field):
@@ -301,6 +305,19 @@ func set_input_map(bindings):
 			event=InputEventKey.new()
 			event.keycode=OS.find_keycode_from_string(event_str)
 		InputMap.action_add_event(action,event)
+
+func format_keybind(text):
+	while "{" in text:
+		var start=text.find("{")
+		var end=text.find("}")
+		var action=text.substr(start+1, end-start-1)
+		var keybind
+		if action!="move":
+			keybind=InputMap.action_get_events(action)[0].as_text().to_upper()
+		else:
+			keybind=format_keybind("{up}{left}{down}{right}")
+		text=text.replace("{"+action+"}",keybind)
+	return text
 
 func hitstop(duration,bypass=false):
 	var hitstop_mod=config.get_value("video","hitstop")

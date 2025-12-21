@@ -111,7 +111,8 @@ func deflect(attack,charged=false):
 	if stuck_in_enemy:
 		stuck_in_enemy=false
 		previous_enemy=enemy
-		enemy.remove_status_effect(self)
+		if is_instance_valid(enemy):
+			enemy.remove_status_effect(self)
 		enemy=null
 		$Mask/End.animation="default"
 		$Mask/End.z_index=0

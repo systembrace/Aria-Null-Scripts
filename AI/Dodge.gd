@@ -37,7 +37,7 @@ func enter():
 		body.velocity=body.to_local(target.global_position).normalized()*speed
 		if body.can_jump:
 			body.jump()
-	else:
+	elif is_instance_valid(target):
 		body.velocity=target.to_local(body.global_position).normalized()*speed
 		if body.can_jump and can_fall:
 			body.jump()
