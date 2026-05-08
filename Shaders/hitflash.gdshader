@@ -19,7 +19,6 @@ void fragment() {
 		if (COLOR.a>0.0){
 			COLOR = mix(COLOR, tint_color, tint_amt);
 		}
-		NORMAL=vec3(0.0,0.0,1.0);
 	}
 	else{
 		NORMAL=vec3(0.0,0.0,-1.0);
@@ -32,6 +31,6 @@ void light() {
 	}
 	else{
 		float cNdotL = max(no_normal, dot(NORMAL, LIGHT_DIRECTION));
-		LIGHT = LIGHT_COLOR * COLOR * cNdotL * LIGHT_ENERGY;
+		LIGHT += LIGHT_COLOR * COLOR * cNdotL * LIGHT_ENERGY;
 	}
 }

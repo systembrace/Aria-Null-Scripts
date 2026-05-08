@@ -11,8 +11,10 @@ var main
 var min_speed
 var ammo=60.0
 var kneeling=false
+var jump_point:Area2D=null
 @onready var anim_controller=$AnimationController
 @onready var control=$AI
+@onready var nav_agent=$Navigator.nav_agent
 
 func _ready():
 	min_speed=max_speed/2
@@ -24,6 +26,8 @@ func _ready():
 			queue_free()
 			return
 		global_position=main.npcs["Cherry"].global_position
+	if nav_agent.avoidance_enabled:
+		nav_agent.velocity_computed.connect(nav_velocity_computed)
 	super._ready()
 
 func interact(_interacted=null):
@@ -43,9 +47,15 @@ func _process(delta):
 
 func _physics_process(delta):
 	super._physics_process(delta)
+	#navigator.nav_agent.set_velocity(velocity)
 	#var coll = move_and_collide(velocity*delta,true)
 	#if coll:
 	#	collision.emit(coll)
 	move_and_slide()
 	if velocity.length()<.5:
 		global_position=global_position.round()
+
+func nav_velocity_computed(new_velocity):
+	if nav_agent.avoidance_enabled and !nav_agent.is_navigation_finished():
+		var speed=velocity.length()
+		velocity=new_velocity.normalized()*speed

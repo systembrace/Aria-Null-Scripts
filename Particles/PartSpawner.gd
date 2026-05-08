@@ -18,6 +18,8 @@ func spawn_spec(pname,pos=get_parent().global_position,parry=false,mod=1,blood_f
 	if not main:
 		return
 	if Global.endless:
+		if blood_for_corpse:
+			parry=false
 		blood_for_corpse=false
 	var mn=particles[pname].x*mod
 	var mx=particles[pname].y*mod

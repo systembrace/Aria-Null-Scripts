@@ -21,10 +21,12 @@ func _ready():
 	sequence.load("res://Dialogue/Cutscenes/"+sequence_name+".ini")
 	Global.dialogue_ended.connect(next)
 	timer.timeout.connect(next)
+	timer.timeout.connect($Music.load_track)
 	timer.wait_time=3
 	timer.start()
 	slides.hide()
 	dialogue_box.hide()
+	dialogue_box.min_time=3
 
 func next():
 	index+=1
@@ -44,6 +46,7 @@ func next_slide():
 	slides.play()
 
 func end():
+	Music.eject(0.1)
 	var scene=load("res://Maps/"+go_to_after+".tscn")
 	get_tree().call_deferred("change_scene_to_packed",scene)
 
@@ -51,7 +54,7 @@ func _process(delta):
 	if Input.is_action_pressed("pause") || Input.is_action_pressed("interact") || Input.is_action_pressed("attack"):
 		skip.show()
 		var bars=min(int((skip_time+0.5)*5/3),5)
-		skip.text="["+"|".repeat(bars)+" ".repeat(5-bars)+"]"
+		skip.text="skip...\n["+"|".repeat(bars)+" ".repeat(5-bars)+"]"
 		skip_time+=delta
 	elif skip_time>0:
 		skip.hide()

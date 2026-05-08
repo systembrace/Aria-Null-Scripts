@@ -19,7 +19,7 @@ var next: Event
 var prev: Event
 var active=false
 var branch=false
-var branched_here=false
+var branched_here=null
 var skipped=false
 var branched_successfully=false
 var main: Main
@@ -27,11 +27,12 @@ var waiting=false
 var completed=false
 var coroutine_done=true
 var dont_skip=false
+var load_skip=false
 
 func reset():
 	active=false
 	branch=should_branch
-	branched_here=false
+	branched_here=null
 	skipped=false
 	branched_successfully=false
 	waiting=prerequisite!=null
@@ -52,7 +53,6 @@ func activate():
 	if active or completed:
 		return
 	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed and not ignore_when_event_completed.skipped):
-		print(name)
 		active=true
 		complete()
 		return
@@ -74,11 +74,11 @@ func finish_waiting():
 
 func complete():
 	if early_skip and !prev.completed:
-		skip()
+		skip(load_skip)
 		return
 	if branch and branch_when_skipped and !prev.completed:
 		branch=false
-		skip()
+		skip(load_skip)
 		return
 	if completed or !active or waiting:
 		return
@@ -99,7 +99,7 @@ func complete():
 
 func finish_task():
 	if early_skip and !prev.completed:
-		skip()
+		skip(load_skip)
 		return
 	task_finished.emit()
 	coroutine_done=true
@@ -114,26 +114,28 @@ func branch_here(branched_from=null):
 		return
 	print("branched to "+name)
 	if prev!=branched_from:
-		prev.skip()
+		prev.skip(load_skip)
 	if interrupt_waypoint_when_branched:
 		main.current_waypoint=null
 	completed=false
 	branch=false
-	branched_here=true
+	branched_here=branched_from
 	active=false
 	activate()
 	
 func skip(trueskip=false):
-	if save_when_completed:
-		just_completed.disconnect(main.save_data)
-	if early_skip:
-		early_skip=false
+	load_skip=trueskip
 	if dont_skip:
+		print(name+" cant be skipped")
 		activate()
 		dont_skip=false
 		if prev:
 			prev.skip(trueskip)
 		return
+	if save_when_completed:
+		just_completed.disconnect(main.save_data)
+	if early_skip:
+		early_skip=false
 	if completed or skipped:
 		return
 	completed=true

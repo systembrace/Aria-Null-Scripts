@@ -13,6 +13,7 @@ var target: Node2D
 var accel
 var dashing=false
 var go_to="attack"
+var avoidance=false
 @onready var timer=$Timer
 @onready var iframes_timer=$Iframes
 
@@ -24,11 +25,12 @@ func _ready():
 	iframes_timer.timeout.connect(hurtbox.enable_hurtbox)
 
 func can_dodge():
-	if body.target is Event or !is_instance_valid(body.target.control.combo) or dashing:
+	if body.target is Event or !is_instance_valid(body.target.control.combo) or dashing or body.to_local(body.target.global_position).length()>dodge_dist*1.5:
 		return false
 	return timer.is_stopped() and combo.is_done_attacking() and ((body.target.control.combo.is_damaging() and body.to_local(body.target.global_position).length()<dodge_dist) or (searchfield and searchfield.nearby_count()>3))
 
 func enter():
+	body.nav_agent.avoidance_enabled=false
 	timer.start()
 	iframes_timer.start()
 	accel=body.accel
@@ -46,6 +48,7 @@ func enter():
 	dashing=true
 	if find_child("SFX"):
 		$SFX.play()
+	avoidance=body.nav_agent.avoidance_enabled
 
 func update():
 	if body.velocity.length()<=20:
@@ -63,3 +66,4 @@ func exit():
 	if is_instance_valid(body.target) and body.target is Waypoint:
 		body.target=null
 	go_to="attack"
+	body.nav_agent.avoidance_enabled=avoidance

@@ -25,6 +25,8 @@ var inventory: Inventory
 var healing=false
 var paused=false
 var parry_moment=false
+var wobble=Vector2.RIGHT
+var wobble_t=0
 @onready var healtimer=$HealTimer
 
 func _ready():
@@ -50,7 +52,7 @@ func _ready():
 	healtimer.timeout.connect(stop_heal)
 
 func parried():
-	if !Global.get_permanent_data("global","has_parried"):
+	if !Global.get_permanent_data("global","has_parried") and body.original_player:
 		Global.set_permanent_data("global","has_parried",true)
 
 func death_throes():
@@ -70,22 +72,27 @@ func die():
 		var playercorpse=load("res://Scenes/Allies/player_corpse.tscn").instantiate()
 		playercorpse.global_position=body.global_position
 		main.add_child(playercorpse)
+		main.player_corpse=playercorpse
 	else:
 		body.create_tessa()
 		inventory.ammo-=20
-	if body.original_player or main.player_corpse:
+	if body.original_player or main.player_corpse or (!body.original_player and Global.endless):
 		var playerghost=load("res://Scenes/Allies/player_ghost.tscn").instantiate()
 		playerghost.tessa=body.tessa
 		if body.original_player:
 			playerghost.global_position=body.global_position
 		else:
-			playerghost.global_position=main.player_corpse.global_position
+			inventory.can_revive=false
+			if !Global.endless:
+				playerghost.global_position=main.player_corpse.global_position
+			else:
+				playerghost.global_position=body.global_position
 		playerghost.inventory=inventory
 		playerghost.maxhp=health.maxhp
 		playerghost.firstdeath=inventory.can_revive
 		#inventory.can_revive=false
 		main.add_child(playerghost)
-	elif !body.original_player and !main.player_corpse:
+	elif !body.original_player and !main.player_corpse and !Global.endless:
 		undo_dummy()
 		#main.player.hurtbox.take_non_attack_damage("HoloDied")
 	body.queue_free()
@@ -123,7 +130,7 @@ func stop_heal():
 	healing=false
 	health.heal()
 
-func damaged():
+func damaged(_area=null):
 	Global.hitstop(.3,true)
 	speed_falloff=0
 	input_buffer=null
@@ -161,6 +168,11 @@ func prevent_movement():
 	body.velocity=body.velocity.move_toward(Vector2.ZERO,accel/2)
 
 func _process(delta):
+	if inventory.heals>0 and health.hp<=health.maxhp/2 and (Global.get_permanent_data("global","times_healed")==null or Global.get_permanent_data("global","times_healed")<2):
+		if !inventory.hud.notice.visible:
+			inventory.hud.show_notice("{heal}: heal")
+	elif "heal" in inventory.hud.notice_label.text.to_lower():
+		inventory.hud.show_notice("")
 	if paused:
 		prevent_movement()
 		#prevent_attack()
@@ -173,8 +185,16 @@ func _process(delta):
 		return
 	if parry_moment:
 		prevent_movement()
-		if !Input.is_action_just_pressed("attack"):
+		if Engine.time_scale>=0.1 or !Input.is_action_just_pressed("attack"):
 			return
+		var main=get_tree().get_root().get_node("Main")
+		var active_enemies=main.waves[main.wave].get_children()
+		var to_mouse=body.to_local(body.target.global_position)
+		for enemy in active_enemies:
+			if not enemy is Enemy:
+				continue 
+			if abs(to_mouse.angle_to(body.to_local(enemy.global_position)))>PI/6:
+				return
 		Global.slow_down_to_zero=false
 		Global.slow_down_speed=1
 		parry_moment=false
@@ -187,6 +207,10 @@ func _process(delta):
 			healtimer.start()
 			$Heal.play()
 			body.healing.emit()
+			var numheals=Global.get_permanent_data("global","times_healed",)
+			if !numheals:
+				numheals=0
+			Global.set_permanent_data("global","times_healed",numheals+1)
 		
 		if healing:
 			prevent_movement()
@@ -207,7 +231,7 @@ func _process(delta):
 			if body.original_player and inventory.revival!="none" and inventory.ammo>=20:
 				var ray = RayCast2D.new()
 				body.add_child(ray)
-				ray.global_position=body.global_position
+				ray.global_position=body.global_position-body.to_local(body.tessa.global_position).normalized()*8
 				ray.set_collision_mask_value(1,false)
 				ray.set_collision_mask_value(23,true)
 				ray.target_position=body.to_local(body.tessa.global_position)
@@ -271,6 +295,11 @@ func _process(delta):
 		if has_speed_boost and dir!=Vector2.ZERO:
 			boost_accel=accel+(speed-min_speed)/(max_speed-min_speed)*8
 		body.velocity=body.velocity.move_toward(dir*speed,boost_accel)
+		if Global.get_flag("wobble") and dir!=Vector2.ZERO and not dash.dashing:
+			wobble_t+=delta*2
+			wobble=wobble.rotated((sin(wobble_t)+sin(1.5*wobble_t))*delta*2)
+			body.velocity+=wobble*(cos(wobble_t*2)+1)*speed*delta*3
+			body.velocity*=.9
 	else:
 		body.velocity=body.velocity.move_toward(Vector2.ZERO,accel*30*delta)
 		if inventory.secondary is Shield:

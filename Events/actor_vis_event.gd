@@ -1,7 +1,7 @@
 extends Event
 class_name ActorVisEvent
 
-@export var show=true
+@export var show_actor=true
 
 func activate():
 	if active or completed:
@@ -11,7 +11,7 @@ func activate():
 		complete()
 		return
 	super.activate()
-	if show:
+	if show_actor:
 		main.player.show()
 		main.player.scarf.show()
 		main.inventory.hud.hpbar.show()

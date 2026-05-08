@@ -7,6 +7,7 @@ class_name Entity
 @export var can_jump=false
 @export var size=1.0
 @export var grappleable=false
+@export var body_sprite:Node2D
 signal started_falling
 signal fell
 var initial_fall_buffer=true
@@ -19,7 +20,6 @@ var fall_timer
 var on_floor=true
 var falling=false
 var body_dh=0
-var body_sprite
 var body_sprite_y_offset=0
 var jumping=false
 var enable_edges=false
@@ -27,12 +27,15 @@ var hurtbox:Hurtbox
 
 func _ready():
 	hurtbox=find_child("Hurtbox")
-	body_sprite=find_child("AnimatedSprite2D")
+	if !body_sprite:
+		body_sprite=find_child("AnimatedSprite2D")
+	if body_sprite:
+		body_sprite_y_offset=body_sprite.offset.y
 	get_tree().create_timer(.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
 	coyote=Timer.new()
 	coyote.name="CoyoteTimer"
 	coyote.one_shot=true
-	coyote.wait_time=.02
+	coyote.wait_time=.03
 	coyote.timeout.connect(fall)
 	add_child(coyote)
 	fall_timer=Timer.new()
@@ -80,6 +83,10 @@ func remove_status_effect(status:Node):
 		return
 	if status is Harpoon:
 		hurtbox.take_hit.disconnect(status.hit_enemy)
+		if status.stuck_in_enemy:
+			status.stuck_in_enemy=false
+			status.enemy=null
+			status.retract()
 	
 func reentered_floor():
 	on_floor=true
@@ -109,8 +116,6 @@ func stop_jump():
 func fall():
 	if !on_floor:
 		falling=true
-		if body_sprite:
-			body_sprite_y_offset=body_sprite.offset.y
 		fall_timer.start()
 		started_falling.emit()
 
@@ -165,7 +170,7 @@ func _physics_process(delta):
 		return
 	
 	if falling:
-		#z_index-=round(60*delta)
+		z_index=-11
 		if body_sprite:
 			body_dh+=delta*10 
 			body_sprite.offset.y+=body_dh

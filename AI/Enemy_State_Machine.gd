@@ -24,5 +24,5 @@ func die():
 		var corpse=load("res://Scenes/General/corpse.tscn").instantiate()
 		corpse.global_position=body.global_position
 		corpse.type=body.type
-		main.add_child(corpse)
+		main.call_deferred("add_child",corpse)
 	body.queue_free()

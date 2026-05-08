@@ -5,6 +5,7 @@ class_name InteractPanel
 @export var function: String
 @export var param= false
 @export var one_time=true
+@export var save_press=false
 var disabled=false
 signal pressed
 

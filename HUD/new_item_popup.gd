@@ -19,12 +19,12 @@ func display(item_name):
 	inventory.player.control.paused=true
 	$ItemGet.play()
 	var display_name=""
-	var texture_name="res://Assets/Art/HUD/Inventory/"
+	var texture_name="res://Assets/Art/HUD/inventory/"
 	var holo_texture
 	if item_name in Global.revives_list:
 		display_name="Holo-Regenerator: "+inventory.revivenames[item_name]
 		texture_name+="regenerator.png"
-		holo_texture="res://Assets/Art/HUD/Inventory/"+item_name+".png"
+		holo_texture="res://Assets/Art/HUD/inventory/"+item_name+".png"
 	$PanelContainer/MarginContainer/VBoxContainer/ItemName.text=display_name
 	if holo_texture:
 		$PanelContainer/MarginContainer/VBoxContainer/Hologram.texture=load(holo_texture)

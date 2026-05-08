@@ -22,10 +22,12 @@ var maxheals: int = 0
 var heals: int = 0
 var scrap: int = 0
 var just_unpaused=false
+var in_shop=false
 @onready var hud: HUD=$Camera2D/Hud
 @onready var pausemenu=$Camera2D/CanvasLayer/PauseMenu
 @onready var inventorymenu=$Camera2D/CanvasLayer/InventoryMenu
 @onready var gunsprite=$CanvasLayer/Gun
+@onready var dialogue_indicator=$DialogueIndicator
 
 func _ready():
 	$Camera2D/MouseLayer.layer=1025
@@ -61,7 +63,6 @@ func _ready():
 		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true)
 
 func death_scene_over():
-	print("lol")
 	Global.dialogue_ended.disconnect(death_scene_over)
 	player.control.paused=false
 
@@ -87,12 +88,11 @@ func open_pause_menu():
 	$Camera2D/CanvasLayer/PauseMenu/SFXConfirm.play()
 
 func open_inventory_menu():
-	var has_revives=false
+	var num_revives=0
 	for revive_name in revivenames:
 		if revive_name!="none" and Global.get_flag(revive_name):
-			has_revives=true
-			break
-	if secondaryindex==-1 and itemindex==-1 and !has_revives:
+			num_revives+=1
+	if secondaryindex==-1 and itemindex==-1 and num_revives<=1:
 		return
 	pause()
 	hud.visible=false
@@ -106,7 +106,7 @@ func resume():
 		pausemenu.visible=false
 		inventorymenu.visible=false
 		hud.visible=true
-		if player is Player:
+		if player is Player and (hud.dialogue_box.current_section=="" or hud.dialogue_box.do_timer):
 			player.control.paused=false
 
 func gain_ammo(area=null,full=false):
@@ -209,10 +209,13 @@ func revive(revive_name=revival):
 	new_player.original_player=false
 	main.add_child(new_player)
 	main.player=new_player
+	new_player.healing.connect(main.player_healed.emit)
 	player=new_player
 	assign_player()
 
 func _process(delta):
+	if !Input.is_action_pressed("interact") and !Input.is_action_pressed("attack") and Input.is_anything_pressed() and dialogue_indicator.visible:
+		dialogue_indicator.hide()
 	if main.dark and !$Lamp.enabled:
 		$Lamp.enabled=true
 	elif !main.dark and $Lamp.enabled:
@@ -227,10 +230,10 @@ func _process(delta):
 	if is_instance_valid(player):
 		gunsprite.position=player.position-$Camera2D.get_screen_center_position()+Vector2.UP*38+Vector2(240,135)
 		global_position=player.global_position+Vector2.UP*16
-		if (player is Player and !player.control.paused) or not player is Player:
+		if !in_shop and ((player is Player and !player.control.paused) or not player is Player or hud.dialogue_box.current_section!=""):
 			if Input.is_action_just_pressed("pause"):
 				open_pause_menu()
-			if Input.is_action_just_pressed("inventory"):
+			if hud.dialogue_box.current_section=="" and Input.is_action_just_pressed("inventory"):
 				open_inventory_menu()
 		if player is Player and not player.control.paused:
 			if itemindex!=-1 and Input.is_action_just_released("next item"):

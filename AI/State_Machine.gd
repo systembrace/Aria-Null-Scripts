@@ -50,6 +50,8 @@ func take_damage(_area=null, _parry=false):
 func death_throes():
 	body.death_throes.emit()
 	body.set_collision_mask_value(18,false)
+	body.set_collision_mask_value(24,false)
+	body.nav_agent.avoidance_enabled=false
 	dying=true
 	if hitstun:
 		hitstun.stun()
@@ -121,6 +123,7 @@ func _physics_process(_delta):
 			die()
 	elif current_state:
 		current_state.physics_update()
+	body.nav_agent.set_velocity(body.velocity)
 
 func transition_state(old_state, new_state_name):
 	if body.target!=null and !is_instance_valid(body.target):
@@ -129,7 +132,7 @@ func transition_state(old_state, new_state_name):
 		return
 	var new_state=states.get(new_state_name.to_lower())
 	if not new_state:
-		print(body.name+" state not found")
+		print(body.name+": state "+new_state_name+" not found")
 		return
 	if current_state:
 		current_state.exit()

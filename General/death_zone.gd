@@ -36,7 +36,7 @@ func _ready():
 func exit():
 	Music.eject(.1)
 	Global.set_permanent_data("global","player_dead",false)
-	if Global.get_permanent_data("global","deaths")<=3:
+	if Global.get_permanent_data("global","deaths")<=5:
 		Global.death_cutscene=true
 	Global.reset_game()
 

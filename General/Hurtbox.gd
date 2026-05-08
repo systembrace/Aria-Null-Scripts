@@ -6,6 +6,7 @@ signal hurtboxenabled
 @export var invincibility_time=0.0
 @export var parent_combo: Combo
 @export var has_hitbuffer=false
+@export var hitstop=0.0
 @export var always_hittable=false
 @onready var timer=$IFrames
 @onready var hitbuffer=find_child("HitBuffer")
@@ -13,6 +14,7 @@ signal hurtboxenabled
 var attack: Hitbox
 var monitor=true
 var add_damage=0
+var allow_melee_attacks=true
 
 func _ready():
 	area_entered.connect(hit)
@@ -32,16 +34,22 @@ func cancel_damage(parry=null):
 		return
 	attack=null
 	if parry:
-		take_hit.emit(parry, true)
+		take_hit.emit(parry, parent_combo.current_attack)
 	disable_hurtbox()
 	timer.start()
 
 func get_hit():
+	if attack is Attack and parent_combo and !parent_combo.current_attack.allow_melee_attacks_while_damaging and parent_combo.is_parriable():
+		return
 	if attack and (!attack.targetparent is Harpoon or attack.targetparent.previous_enemy!=get_parent()):
+		if attack is Attack and attack.stop_on_hit and attack.targetparent.target==get_parent():
+			attack.stop_attack()
 		if parent_combo and parent_combo.current_attack.interruptible:
 			parent_combo.disable_hitbox()
 		attack.hit_hurtbox.emit(get_parent())
 		take_hit.emit(attack)
+		if hitstop>0 and attack.targetparent is Player:
+			Global.hitstop(hitstop)
 		if invincibility_time!=0:
 			disable_hurtbox()
 			timer.start()

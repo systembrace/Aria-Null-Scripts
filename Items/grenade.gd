@@ -98,5 +98,8 @@ func _physics_process(delta):
 		if not tossed:
 			bounce()
 	trail.remove_point(1)
-	trail.add_point(trail.to_local(prev)*6)
+	if tossed:
+		trail.add_point(trail.to_local(prev)*8)
+	else:
+		trail.add_point(trail.to_local(prev)*4)
 	$Destination.global_position=target

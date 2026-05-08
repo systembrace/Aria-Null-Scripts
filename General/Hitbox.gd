@@ -8,6 +8,8 @@ class_name Hitbox
 @export var player_damage=0
 @export var start_enabled=false
 @export var always_hittable=false
+@export var disable_on_parried=true
+@export var destructive=false
 var posture=base_posture
 var knockback=base_knockback
 var monitor=true
@@ -24,7 +26,9 @@ func _ready():
 		enable_hitbox()
 
 func knockback_vector(pos):
-	return targetparent.to_local(pos).normalized()*knockback
+	if not targetparent is Bullet:
+		return targetparent.to_local(pos).normalized()*knockback
+	return targetparent.dir*knockback
 
 func enable_hitbox():
 	hitbox.set_deferred("disabled",false)
@@ -47,6 +51,10 @@ func is_area_hittable(area):
 	if ray.is_colliding():
 		return false
 	return true
+
+func get_parried():
+	if disable_on_parried:
+		disable_hitbox()
 
 func _process(_delta):
 	posture=base_posture

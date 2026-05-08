@@ -12,13 +12,22 @@ class_name Attack
 @export var reach=0.0
 @export var hitbox_flicker=0.0
 @export var interruptible=true
+@export var stunnable=true
+@export var stop_on_hit=false
 @export var can_navigate=false
+@export var nav_speed_scale=1.0
+@export var nav_accel_scale=1.0
 @export var pick_weight:float=1
 @export var combo_index=0
 @export var is_special=false
 @export var unique_anim=false
 @export var has_recovery=true
 @export var unique_sfx=false
+@export var transition_to=""
+@export var redirect_when_parried=false
+@export var allow_melee_attacks_while_damaging=true
+@export var allow_knockback=true
+@export var parry_bullets=true
 signal parry(area)
 var target: Node2D
 @onready var attack_timer=$AttackTimer
@@ -129,6 +138,7 @@ func stop_attack():
 	done_attacking=true
 	damaging=false
 	recovering=true
+	disable_parry()
 	if hitbox_flicker:
 		$Flicker.stop()
 	if finished_time!=0:
@@ -169,9 +179,11 @@ func enable_attack():
 	
 
 func knockback_vector(pos):
-	var vec=target.global_position-pos
+	if !is_instance_valid(target):
+		return Vector2.ZERO
+	var vec=target.global_position-targetparent.global_position
 	if target is Mouse:
-		vec+=Vector2.DOWN*16
+		vec=target.global_position-pos+Vector2.DOWN*16
 	return vec.normalized()*knockback
 	#return Vector2.RIGHT.rotated(rotation)*knockback
 
@@ -189,6 +201,8 @@ func _on_area_entered(area):
 				Global.hitstop(.15)
 			parry.emit()
 			area.parry.emit(self)
-			area.disable_hitbox()
+			area.get_parried()
 		elif area is Hurtbox:
 			area.hit(self)
+			if stop_on_hit and area.get_parent()==targetparent.target:
+				stop_attack()

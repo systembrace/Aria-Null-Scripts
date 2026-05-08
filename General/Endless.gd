@@ -4,8 +4,8 @@ class_name Endless
 signal started
 var wave:int=0
 var wavepoints=0
-var add_wave=[1,4,7,15,12]
-var possibleenemies={"roly_poly":1,"enemy":3,"gunman":5,"elite":15}
+var add_wave=[1,4,7,15]
+var possibleenemies={"roly_poly":1,"enemy":3,"gunman":5,"elite":20}
 var maxindex=-1
 var highscore:int=0
 var spawning=false
@@ -149,6 +149,7 @@ func save_data(_checkpoint=false,autosave=false,reset=false):
 		inventorydata["heals"]=1
 		inventorydata["maxheals"]=1
 		inventorydata["ammo"]=60.0
+		inventorydata["canrevive"]=true
 	elif not spawning:
 		data+=JSON.stringify({"name":"Endless","wave":wave})
 	else:

@@ -3,6 +3,7 @@ class_name Spawner
 
 @export var enemy_name="default"
 @export var spawn_time=3.0
+@export var flipped=false
 signal spawned
 var activated=false
 @onready var timer=$Timer
@@ -10,14 +11,17 @@ var activated=false
 func _ready():
 	if spawn_time>0:
 		$Sprite.scale=Vector2(2,2)
+		$Sprite.offset=Vector2(-0.5,-4)
 		$Sprite.play()
 		spawn_time+=randf_range(-spawn_time/2,spawn_time/2)
 		timer.wait_time=spawn_time
 		timer.timeout.connect(spawn)
 		timer.start()
 		return
-	$Sprite.flip_h=randi_range(0,1)
+	$Sprite.flip_h=flipped
 	$Sprite.animation=enemy_name
+	if enemy_name[1]=="_":
+		enemy_name=enemy_name.substr(2)
 	$Sprite.animation_finished.connect(spawn)
 	
 func activate():

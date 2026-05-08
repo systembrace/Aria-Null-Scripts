@@ -17,6 +17,7 @@ var calm_db=0.0
 var combat_db=-64.0
 var time_scale=1.0
 var pitch_scale=1.0
+var first_play=true
 var base: AudioStreamPlayer
 var calm: AudioStreamPlayer
 var combat: AudioStreamPlayer
@@ -38,7 +39,7 @@ func try_autoplay():
 func update_volume():
 	if !base:
 		return
-	db=init_db+Global.load_config("audio","music")
+	db=init_db+Global.load_config("audio","music")+Global.load_config("audio","master")
 	base.volume_db=db+pause_offset
 	if calm:
 		calm.volume_db=db+calm_db+pause_offset
@@ -55,8 +56,10 @@ func load_track():
 		Music.eject()
 
 func play():
-	print("Playing "+name)
-	db=init_db+Global.load_config("audio","music")
+	if first_play:
+		print("Playing "+name)
+		first_play=false
+	db=init_db+Global.load_config("audio","music")+Global.load_config("audio","master")
 	update_volume()
 	base.play()
 	if calm:
@@ -82,7 +85,7 @@ func _process(delta):
 	
 	if fading:
 		init_db=move_toward(init_db,-64,60*delta/fade_speed)
-	if init_db<=-16:
+	if init_db<=-24:
 		stop()
 		queue_free()
 	
@@ -114,5 +117,5 @@ func _process(delta):
 		calm_db=move_toward(calm_db,0,5*delta)
 		combat_db=move_toward(combat_db,-64,5*delta)
 		update_volume()
-	elif db!=init_db+Global.load_config("audio","music"):
+	elif db!=init_db+Global.load_config("audio","music")+Global.load_config("audio","master"):
 		update_volume()

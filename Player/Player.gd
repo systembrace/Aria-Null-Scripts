@@ -43,6 +43,8 @@ func _ready():
 		$Hurtbox.disable_hurtbox()
 		$Hurtbox.timer.start()
 		$Hologram.play()
+		if Global.endless and !main.player_corpse:
+			set_collision_mask_value(23,false)
 
 func make_scarf():
 	if !original_player:
@@ -119,10 +121,10 @@ func _process(delta):
 
 func _physics_process(delta):
 	super._physics_process(delta)
-	if main.num_enemies(true)>0 and !get_collision_mask_value(23):
-		set_collision_mask_value(23,true)
-	elif (!Global.endless or !main.inventory.dummy) and main.num_enemies(true)==0 and get_collision_mask_value(23):
-		set_collision_mask_value(23,false)
+	#if main.num_enemies(true)>0 and !get_collision_mask_value(23):
+		#set_collision_mask_value(23,true)
+	#elif (!Global.endless or !main.inventory.dummy) and main.num_enemies(true)==0 and get_collision_mask_value(23):
+		#set_collision_mask_value(23,false)
 	var coll = move_and_collide(velocity*delta,true)
 	if coll:
 		collision.emit(coll)

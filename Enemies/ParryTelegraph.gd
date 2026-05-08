@@ -27,9 +27,10 @@ func _process(_delta):
 			visible=true
 			animation="off"
 			var target=combo.current_attack.target
-			if not Global.get_permanent_data("global","has_parried") and !slowdown_entered and is_instance_valid(target) and target is Player and target.original_player and !Global.slow_down_to_zero and Engine.time_scale==1 and !target.control.parry_moment:
+			if !Global.endless and not Global.get_permanent_data("global","has_parried") and !slowdown_entered and is_instance_valid(target) and target is Player and target.original_player and !Global.slow_down_to_zero and Engine.time_scale==1 and !target.control.parry_moment:
 				var targetdist=combo.to_local(target.global_position).length()
 				if targetdist<112:
+					target.control.paused=false
 					target.control.parry_moment=true
 					slowdown_entered=true
 					Global.slow_down_to_zero=true

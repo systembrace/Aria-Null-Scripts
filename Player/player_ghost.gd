@@ -17,6 +17,8 @@ func _ready():
 	timer.wait_time=2
 	var has_revives=false
 	for button in $CanvasLayer/ReviveMenu/MarginContainer/VBoxContainer/Revive/ReviveOptions.get_children():
+		if !button is Button:
+			continue
 		button.pressed.connect(revive_as.bind(button.name.to_lower()))
 		if Global.get_flag(button.name.to_lower()):
 			button.show()
@@ -83,6 +85,7 @@ func revive_as(button_name):
 	player.original_player=false
 	main.add_child(player)
 	main.player=player
+	player.healing.connect(main.player_healed.emit)
 	queue_free()
 
 func _process(_delta):

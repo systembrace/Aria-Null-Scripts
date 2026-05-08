@@ -22,7 +22,7 @@ func _ready():
 		var dialogue_box=get_parent().get_parent().get_parent().get_parent()
 		await dialogue_box.ready
 		var data=ConfigFile.new()
-		data.load("res://dialogue/"+test_dialogue_file+".ini")
+		data.load("res://Dialogue/"+test_dialogue_file+".ini")
 		if test_dialogue_section:
 			get_parent().get_parent().get_parent().get_parent().enter(data,test_dialogue_section,true)
 			return
@@ -32,6 +32,10 @@ func _ready():
 func test_next_section(data):
 	if section_index>=len(data.get_sections()):
 		return
+	eyes_index=1
+	eyebrows_index=1
+	mouth_index=1
+	shoulders_index=1
 	get_parent().get_parent().get_parent().get_parent().enter(data,data.get_sections()[section_index],true)
 	section_index+=1
 

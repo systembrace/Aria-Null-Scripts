@@ -11,7 +11,8 @@ func _ready():
 	health.took_damage.connect(shake)
 	health.dead.connect(die)
 	
-func shake():
+func shake(_area=null):
+	Global.screenshake(.05)
 	tilemap.position=Vector2.RIGHT.rotated(randf_range(0,2*PI))*randi_range(6,8)
 	$Hit.play()
 

@@ -18,6 +18,7 @@ var current_waypoint: Waypoint
 var transition:FadeTransition
 var canvasmod:CanvasModulate
 var worldenv:WorldEnvironment
+@onready var nav_map=$NavMap
 
 func _ready():
 	#seed(23017031)
@@ -33,11 +34,9 @@ func _ready():
 		load_from_save()
 	if save_object_status:
 		var area=scene_file_path.substr(scene_file_path.to_lower().find("maps/")+5)
-		print(area)
 		scene_name=area.substr(area.find("/")+1)
 		scene_name=scene_name.substr(0,scene_name.find("."))
 		area=area.substr(0,area.find("/"))
-		print(area)
 		config_name="user://area_data/last_"+area+".ini"
 		checkpoint_config_name="user://area_data/checkpoint_"+area+".ini"
 		load_objects()
@@ -103,7 +102,7 @@ func save_objects(checkpoint=false):
 		elif obj is Ally:
 			config.set_value(scene_name,obj.name,var_to_str(obj.global_position))
 			config.set_value(scene_name,obj.name+"_dir",var_to_str(obj.find_child("AnimationController").direction))
-		elif obj is Box:
+		elif obj is Breakable:
 			if obj.broken:
 				config.set_value(scene_name,obj.name,"broken")
 		elif obj is BreakableWall:
@@ -156,11 +155,14 @@ func load_objects():
 					obj.snap_to_init(config.get_value(scene_name,obj.name))
 				elif obj is InteractPanel:
 					if config.get_value(scene_name,obj.name):
-						obj.disable()
+						if obj.save_press:
+							obj.interact()
+						else:
+							obj.disable()
 					else:
 						obj.turn_on()
 						obj.turn_off()
-				elif obj is Box and config.get_value(scene_name,obj.name)=="broken":
+				elif obj is Breakable and config.get_value(scene_name,obj.name)=="broken":
 					obj.set_broken()
 				elif obj is RepeatingEvent:
 					obj.current=config.get_value(scene_name,obj.name)
@@ -181,7 +183,7 @@ func num_enemies(active=false):
 	return res
 
 func can_save():
-	return num_enemies(true)==0 and not Global.get_permanent_data("global","player_dead")
+	return num_enemies(true)==0 and not Global.get_permanent_data("global","player_dead") and inventory.hud.dialogue_box.current_section==""
 
 func save_data(checkpoint=false, autosave=false):
 	Global.save_flags(checkpoint,autosave)

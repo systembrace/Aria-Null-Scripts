@@ -22,8 +22,8 @@ func find_body():
 			for body in bodies:
 				if body is CharacterBody2D:
 					var dist=global_position.distance_squared_to(body.global_position)
-					if body is RolyPoly or body is Player:
-						dist=sqrt(dist)
+					if body is RolyPoly:
+						dist=dist/2
 					bodydists[dist]=body
 			potentialtarget=bodydists[bodydists.keys().min()]
 		raytarget(potentialtarget.global_position)

@@ -33,6 +33,7 @@ class_name AnimationController
 @export var out_of_combat_anims=false
 @export var flicker_iframes=false
 @export var footsteps=-1
+@export var parent_controller: AnimationController
 var cutscene_anim="none"
 var body
 var gun: Secondary
@@ -40,10 +41,12 @@ var vel_threshold=.02
 var direction=Vector2.DOWN
 var anim="idle"
 var idle_time=0.0
+var y_offset=0
 signal step
 
 func _ready():
 	body=get_parent()
+	y_offset=sprite.offset.y
 	if body is RolyPoly:
 		direction=Vector2.UP
 	while not body is CharacterBody2D:
@@ -74,10 +77,19 @@ func disableflicker():
 	flicker.stop()
 
 func hitflash(dead=false):
+	set_offset()
 	flash_anim.stop()
 	flash_anim.play("hitflash")
 	if flicker_iframes or dead:
 		flicker.start()
+
+func set_offset():
+	if parent_controller:
+		z_index=parent_controller.z_index
+		var new_offset=parent_controller.sprite.offset.y-parent_controller.y_offset
+		sprite.offset.y=y_offset+new_offset
+		if get_parent() is Sprite2D and get_parent().name=="Mask":
+			get_parent().offset.y=-32+new_offset
 
 func _process(delta):
 	var curr_anim_name=idlename
@@ -85,6 +97,9 @@ func _process(delta):
 	var curr_prog=sprite.get_frame_progress()
 	var prevanim=anim
 	var vertical_sprites_enabled=has_vertical_sprites
+	var prefix=""
+	
+	set_offset()
 	
 	if body.velocity.length()>=body.accel/4:
 		anim=runname
@@ -161,6 +176,11 @@ func _process(delta):
 	if (anim==attackname or anim==readyattackname or anim==recovername) and combo and combo.current_attack.unique_anim:
 		curr_anim_name+="_"+str(combo.current_attack.combo_index)
 	
+	if gun_anims and (gun.shooting or gun.readying) and (curr_anim_name==runname or curr_anim_name==walkname or curr_anim_name==idlename):
+		prefix="gun_"
+	elif out_of_combat_anims and body.control.out_of_combat and combo.can_move() and curr_anim_name!=stunname and curr_anim_name!=cutscene_anim:
+		prefix="ooc_"
+	
 	if body.velocity.length()>vel_threshold:
 		if (hastarget or (haschargedattack and Input.is_action_pressed("attack"))) and (anim==runname or anim==readyattackname or anim==walkname) and is_instance_valid(body.target):
 			direction=body.to_local(body.target.global_position)*2
@@ -170,7 +190,9 @@ func _process(delta):
 		direction=body.to_local(combo.current_attack.hitbox.global_position)
 	if gun and gun.firing:
 		direction=gun.dir
-	if vertical_sprites_enabled and abs(direction.y)>abs(direction.x):
+	direction=direction.normalized()
+	#if vertical_sprites_enabled and abs(direction.y)>abs(direction.x) and !curr_anim_name.ends_with("_long"):
+	if (vertical_sprites_enabled or prefix=="ooc_") and abs(direction.y)>abs(direction.x)+.25:
 		sprite.flip_h=false
 		if direction.y<0:
 			curr_anim_name+="_up"
@@ -186,10 +208,7 @@ func _process(delta):
 			if gun and !vertical_sprites_enabled and ("_up" in gun.sprite.animation or "_down" in gun.sprite.animation):
 				gun.sprite.flip_v=true
 	
-	if gun_anims and (gun.shooting or gun.readying) and (curr_anim_name==runname or curr_anim_name==walkname or curr_anim_name==idlename):
-		curr_anim_name="gun_"+curr_anim_name
-	elif out_of_combat_anims and body.control.out_of_combat and combo.can_move() and curr_anim_name!=stunname and curr_anim_name!=cutscene_anim:
-		curr_anim_name="ooc_"+curr_anim_name
+	curr_anim_name=prefix+curr_anim_name
 	
 	if runspeed>0 and anim==runname:
 		sprite.speed_scale=min(1,body.velocity.length()/body.max_speed*runspeed)

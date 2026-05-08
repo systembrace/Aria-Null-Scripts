@@ -20,6 +20,7 @@ func revive(tessa):
 	player.tessa=tessa
 	main.add_child(player)
 	main.player=player
+	player.healing.connect(main.player_healed.emit)
 	main.player_corpse=null
 	queue_free()
 

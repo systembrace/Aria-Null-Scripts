@@ -83,9 +83,11 @@ func open_quit(ex=false):
 		else:
 			$PanelContainer/MarginContainer/QuitMenu/Label.text="Warning\nOnly your last cleared\nwave and your highscore\nwill be saved."
 	elif main.can_save():
-		$PanelContainer/MarginContainer/QuitMenu/Label.text="Save and quit?\nYour progress will\nbe saved."
+		$PanelContainer/MarginContainer/QuitMenu/Label.text="Save and quit?\nAll progress will\nbe saved."
+	elif main.inventory.hud.dialogue_box.current_section!="":
+		$PanelContainer/MarginContainer/QuitMenu/Label.text="Save and quit?\nOnly your recent progress\n will be saved."
 	else:
-		$PanelContainer/MarginContainer/QuitMenu/Label.text="Warning:\nQuitting now will\nnot save the game.\nQuit?"
+		$PanelContainer/MarginContainer/QuitMenu/Label.text="Warning:\nQuitting now will\nrestart the encounter.\nQuit?"
 	switch_menus("QuitMenu")
 
 func resume():
@@ -97,6 +99,8 @@ func quit():
 		Music.eject()
 		if main.can_save():
 			main.save_data()
+		else:
+			Global.reset_permanent_data()
 		main.fade_out(true)
 		var timer=get_tree().create_timer(1)
 		timer.timeout.connect(finish_quit)
@@ -106,7 +110,7 @@ func finish_quit():
 	if exit:
 		get_tree().paused=false
 		var scene = load("res://Scenes/UI/main_menu.tscn")
-		get_tree().get_root().call_deferred("remove_child",main)
+		main.queue_free()
 		get_tree().call_deferred("change_scene_to_packed",scene)
 	else:
 		get_tree().quit()

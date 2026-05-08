@@ -59,6 +59,9 @@ func change_faction():
 
 func deflect(area):
 	Global.hitstop(.15)
+	if !area.parry_bullets:
+		hitbox.enable_hitbox()
+		return
 	if faction=="player":
 		if not area.targetparent is Player and not area.targetparent is Ally:
 			faction="enemy"

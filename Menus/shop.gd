@@ -110,6 +110,7 @@ func exit_menu(immediate=false):
 		else:
 			player.control.paused=false
 			visible=false
+		player.inventory.call_deferred("set","in_shop",false)
 		player=null
 		exited.emit()
 		for item in items.get_children():
@@ -152,6 +153,7 @@ func sell_item(cost,item):
 func _process(_delta):
 	if !visible:
 		return
+	player.inventory.in_shop=true
 	player.inventory.hud.scrapicon.show()
 	if !player.inventory.hud.scrapicon.find_child("Timer").is_stopped():
 		player.inventory.hud.scrapicon.find_child("Timer").stop()

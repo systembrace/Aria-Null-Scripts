@@ -2,7 +2,7 @@ extends Node
 class_name State
 
 signal transition
-var body: CharacterBody2D
+var body: Entity
 
 func enter():
 	pass

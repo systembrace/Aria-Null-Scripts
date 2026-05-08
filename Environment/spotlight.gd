@@ -23,12 +23,12 @@ func _ready():
 func switch_light(_body=null,mask=5):
 	$PointLight2D.range_item_cull_mask=mask
 
-func _process(_delta):
-	if flicker and visible and randf()*60<=.8:
+func _process(delta):
+	if flicker and visible and randf()/delta<=.8:
 		visible=false
 		$Flicker.play()
 		$Hum.stop()
-	elif flicker and not visible and randf()*60<2:
+	elif flicker and not visible and randf()/delta<2:
 		visible=true
 		$Flicker.play()
 		if !$Hum.is_playing():

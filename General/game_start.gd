@@ -29,7 +29,7 @@ func _ready():
 			invfile.close()
 		var lastfile = FileAccess.open("user://last_data.dat", FileAccess.WRITE)
 		var cpfile = FileAccess.open("user://checkpoint_data.dat", FileAccess.WRITE)
-		var save_data = {"path":"res://Scenes/Allies/player.tscn","name":"Player","pos_x":-6,"pos_y":8,"health":5,"original":true,"revives":1,"dir":var_to_str(Vector2.LEFT)}
+		var save_data = {"path":"res://Scenes/Allies/player.tscn","name":"Player","pos_x":-7,"pos_y":7,"health":5,"original":true,"revives":1,"dir":var_to_str(Vector2.LEFT)}
 		#var save_data = {"path":"Scenes/Allies/player.tscn","name":"Player","pos_x":192,"pos_y":816,"health":5,"original":true}
 		var json_string = JSON.stringify(save_data)
 		cpfile.store_line(json_string)
@@ -44,9 +44,9 @@ func _ready():
 		Global.save_flags(true)
 	
 	var scene
-	if Global.get_permanent_data("global","player_dead") and Global.get_permanent_data("global","deaths") in [1,2,3,5,10]:
+	if !Global.endless and Global.get_permanent_data("global","player_dead") and Global.get_permanent_data("global","deaths") in [1,2,5,10,30]:
 		Music.eject(.1)
-		scene=load("res://Maps/Death_zone.tscn")
+		scene=load("res://Maps/death_zone.tscn")
 		get_tree().call_deferred("change_scene_to_packed",scene)
 		return
 	

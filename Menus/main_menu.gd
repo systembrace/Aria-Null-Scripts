@@ -35,10 +35,12 @@ func disable_menu(node,disabled=true):
 func open_options():
 	options=true
 	disable_menu($Control/PanelContainer/MarginContainer/MainMenu)
-	$Control/PanelContainer/MarginContainer/MainMenu.visible=false
+	$TextureRect.hide()
+	$Control/PanelContainer/MarginContainer/MainMenu.hide()
 	$OptionsMenu.open_options()
 
 func start_game(endless=false):
+	Music.eject(3)
 	if endless:
 		Global.endless=true
 	var scene = load("res://Scenes/General/game_start.tscn")
@@ -55,5 +57,6 @@ func _process(_delta):
 		$Control/PanelContainer/MarginContainer/MainMenu/Start.text="New game"
 	if !$OptionsMenu.visible and options:
 		disable_menu($Control/PanelContainer/MarginContainer/MainMenu,false)
-		$Control/PanelContainer/MarginContainer/MainMenu.visible=true
+		$Control/PanelContainer/MarginContainer/MainMenu.show()
+		$TextureRect.show()
 		set_deferred("options",false)

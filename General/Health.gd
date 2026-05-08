@@ -9,7 +9,7 @@ var prevhp=hp
 var recent_hplost=0
 var main
 var timer:Timer
-signal took_damage(damage)
+signal took_damage(hitbox)
 signal hpchanged
 signal hplost
 signal dead
@@ -56,7 +56,7 @@ func take_damage(attack, parry=false):
 	if parry:
 		hp-=attack.damage
 	if not parry:
-		took_damage.emit()
+		took_damage.emit(attack)
 	if Global.load_config("game","damage_values") and timer.is_stopped() and not get_parent() is Player:
 		timer.start()
 	recent_hplost+=prevhp-hp

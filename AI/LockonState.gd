@@ -2,10 +2,11 @@ extends State
 class_name LockonState
 
 @export var navigator: Navigator
-@export var stay_away=false
+@export var try_stay_away=false
 @export var combat_dist=192
 @export var min_dist=32
 @export var max_dist=64
+@export var pivot_range_div=4
 var dist=0
 var pivot=0
 var nextdist=0
@@ -16,12 +17,14 @@ var targetdist=99999
 var speed
 var accel
 var direction=Vector2.ZERO
+var stay_away
 @onready var ray=$RayCast2D
 
 func enter():
 	if !is_instance_valid(body.target):
 		transition.emit(self, "Wander")
 		return
+	stay_away=try_stay_away
 	if is_instance_valid(body.target):
 		target=body.target
 	speed=body.max_speed
@@ -46,7 +49,7 @@ func next_dest():
 		nextdist=0
 		return
 	nextdist=randf_range(min_dist,max_dist)
-	nextpivot=pivot+randf_range(PI/16,PI/8)*(randi_range(0,1)*2-1)
+	nextpivot=pivot+randf_range(PI/pivot_range_div/2,PI/pivot_range_div)*(randi_range(0,1)*2-1)
 	while true:
 		var tempdestination=target.global_position+Vector2.RIGHT.rotated(nextpivot)*min_dist
 		raytarget(tempdestination, target.global_position)
@@ -72,7 +75,7 @@ func update_targetdist():
 
 func update():
 	#circle
-	if (targetdist>max_dist+16 or (stay_away and targetdist<min_dist)) and can_see_target():
+	if (targetdist>max_dist+16 or (stay_away and targetdist<min_dist*.75)) and can_see_target():
 		reset_dest()
 	elif body.to_local(destination).length()<16 or (!can_see_target() and nextdist!=0) or (nextdist==0 and can_see_target()):
 		next_dest()
@@ -83,5 +86,5 @@ func update():
 	destination=target.global_position+Vector2.RIGHT.rotated(pivot)*dist
 	raytarget(destination, target.global_position)
 	if ray.is_colliding():
-		destination=ray.get_collision_point()
+		destination=destination+(ray.get_collision_point()-destination)*1.5
 	direction=navigator.next_direction(destination)

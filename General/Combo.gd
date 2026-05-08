@@ -7,8 +7,8 @@ var combo_index=0
 var prev_index=0
 var current_attack: Attack
 var push=0
-var combo_beginnings=[]
-var starting_new_combo=true
+var combo_sets={}
+var current_combo=0
 signal parry
 signal started_ready
 signal started_attack
@@ -16,13 +16,14 @@ signal ended_attack
 signal fully_charged
 
 func _ready():
+	var current_combo=0
 	for child in get_children():
 		if child is Attack:
 			attack_list[child.combo_index]=child
 			child.parry.connect(emit_parry)
-			child.started_ready.connect(emit_ready)
+			child.started_ready.connect(emit_ready.bind(child))
 			child.started_attack.connect(emit_attack)
-			child.ended_attack.connect(emit_end)
+			child.ended_attack.connect(emit_end.bind(child))
 			if child is ChargedAttack:
 				child.fully_charged.connect(emit_charged)
 			if !child.unique_sfx and find_child("SFXAttack"):
@@ -34,7 +35,10 @@ func _ready():
 					child.started_ready.connect(find_child("SFXReady_"+str(child.combo_index)).play)
 				child.started_attack.connect(find_child("SFXAttack_"+str(child.combo_index)).play)
 			if child.pick_weight==0.0 and !child.is_special:
-				combo_beginnings.append(child.combo_index)
+				current_combo=child.combo_index
+				combo_sets[current_combo]=[child.combo_index]
+			elif !child.is_special:
+				combo_sets[current_combo].append(child.combo_index)
 	current_attack=attack_list[combo_index]
 	push=current_attack.push
 
@@ -45,7 +49,7 @@ func set_index(index=combo_index+1):
 func end_of_combo():
 	if combo_index>=len(attack_list.keys()):
 		return true
-	return !starting_new_combo and attack_list[combo_index].pick_weight==0
+	return current_combo!=combo_index and combo_sets[current_combo][-1]!=combo_index
 
 func emit_parry(parried_by=null):
 	if hurtbox_for_rally and (not parried_by is Bullet or parried_by.faction=="enemy") and not parried_by is Harpoon:
@@ -54,57 +58,62 @@ func emit_parry(parried_by=null):
 			hurtbox_for_rally.cancel_damage()
 	parry.emit(parried_by)
 
-func emit_ready():
+func emit_ready(attack=null):
 	started_ready.emit()
 
 func emit_attack():
 	started_attack.emit()
 
-func emit_end():
+func emit_end(attack=null):
 	ended_attack.emit()
 
 func emit_charged():
 	fully_charged.emit()
 
 func attack_index(index):
+	if index>=len(attack_list) or (attack_list[index].is_special and (!attack_list[index].can_attack or !can_attack())):
+		return false
 	set_index(index)
-	if combo_index>=len(attack_list):
-		return
 	current_attack=attack_list[combo_index]
 	current_attack.start_attack()
-	set_index()
 	if current_attack.is_special:
 		restart_combo()
+	else:
+		set_index()
+	return true
 
 func restart_combo():
-	starting_new_combo=true
-	if len(combo_beginnings)==0:
+	if len(combo_sets)<=1:
 		set_index(0)
+		current_combo=0
 		return
-	set_index(combo_beginnings[randi_range(0,len(combo_beginnings)-1)])
+	set_index(combo_sets.keys()[randi_range(0,len(combo_sets)-1)])
+	current_combo=combo_index
 
 func attack():
 	if can_attack():
 		restart_combo()
 	elif combo_index>=len(attack_list):
-		return
+		return false
+	elif combo_index==current_combo and !attack_list[combo_sets[current_combo][-1]].can_attack:
+		return false
 	current_attack=attack_list[combo_index]
-	if starting_new_combo:
+	if combo_index==current_combo:
 		current_attack.start_attack()
 		set_index()
-		starting_new_combo=false
-		return
+		return true
 	var prev_attack=attack_list[prev_index]
 	if !prev_attack.done_attacking:
-		return
+		return false
 	if not prev_attack.can_attack:
-		if end_of_combo():
+		if randf()<=current_attack.pick_weight:
+			current_attack.start_attack()
+			set_index()
+		else:
 			restart_combo()
-			return
-		current_attack=attack_list[combo_index]
-		current_attack.start_attack()
-		set_index()
-		
+		return true
+	return false
+	
 func is_charging():
 	if current_attack is ChargedAttack and is_readying():
 		return true
@@ -129,6 +138,9 @@ func stop_attack():
 	current_attack.stop_attack()
 
 func disable_hitbox(override=false):
+	for i in attack_list:
+		if i!=combo_index:
+			attack_list[i].disable_hitbox()
 	if override or current_attack.interruptible:
 		current_attack.disable_hitbox()
 	if override:
@@ -139,8 +151,7 @@ func disable_hitbox(override=false):
 func enable_attack():
 	for i in attack_list:
 		attack_list[i].enable_attack()
-	restart_combo()
-	current_attack=attack_list[combo_index]
+	set_index(0)
 	for child in get_children():
 		if child is SoundPlayer:
 			child.stop()
@@ -173,7 +184,7 @@ func can_move():
 	return current_attack.can_move
 
 func can_attack():
-	return current_attack.can_attack
+	return current_attack.can_attack and attack_list[combo_sets[current_combo][-1]].can_attack
 
 func reach(index=-1):
 	if index>-1 and index<len(attack_list):

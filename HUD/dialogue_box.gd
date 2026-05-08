@@ -2,6 +2,7 @@
 extends Control
 class_name DialogueBox
 
+@export var cutscene=false
 signal exited
 var index=1
 var text=""
@@ -19,9 +20,14 @@ var currently_interruptable=true
 var death_change=-1
 var loop_last=false
 var held_for=0
+var min_time=2
 @onready var portrait=$PanelContainer/MarginContainer/HBoxContainer/Portrait
 @onready var label=$PanelContainer/MarginContainer/HBoxContainer/Dialogue
 @onready var timer=$Timer
+
+func _ready():
+	if cutscene:
+		min_time=2
 
 func enter(data,section,t=false,interrupt=false,interruptable=true,change_on_death=-1,loop=false):
 	if current_section!="":
@@ -49,7 +55,6 @@ func exit(clear_queue=false):
 		if heard_name[-1].is_valid_int():
 			heard_name=heard_name.substr(0,len(heard_name)-1)
 		var play_number=Global.get_permanent_data("heard_dialogue",heard_name)
-		print(heard_name)
 		if (!loop_last or death_change==0) and play_number and play_number==death_change:
 			Global.set_permanent_data("heard_dialogue",heard_name,play_number+1)
 	if do_timer:
@@ -79,7 +84,7 @@ func display(data:ConfigFile,section):
 		index=1
 		current_section=section
 	if do_timer and current_data:
-		timer.wait_time=max((current_data.get_value(current_section,str(index)).count(" ")+1)/3.0,1.5)
+		timer.wait_time=max((current_data.get_value(current_section,str(index)).count(" ")+min_time*3/4)/3.0,min_time)
 		timer.start()
 	if data.has_section_key(section,str(index)):
 		text=data.get_value(section,str(index))+"     "
@@ -102,6 +107,8 @@ func reveal_text():
 func _process(delta):
 	if not $PanelContainer/MarginContainer/HBoxContainer/Dialogue.is_node_ready():
 		await ready
+	if !cutscene and !Engine.is_editor_hint() and min_time!=1/Global.load_config("game","dialogue_speed"):
+		min_time=1/Global.load_config("game","dialogue_speed")
 	if !visible or !current_data:
 		return
 	step+=delta*50*speed

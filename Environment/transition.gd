@@ -64,6 +64,7 @@ func change_scene(body=null):
 		main.save_objects()
 	for node in get_tree().get_nodes_in_group("objs_to_load"):
 		node.remove_from_group("objs_to_load")
+	Global.set_permanent_data("global","player_dead",false)
 	main.call_deferred("exit")
 	scene=load("res://Maps/"+scene_name+".tscn").instantiate()
 	scene.scene_name=scene_name.substr(scene_name.find("/")+1)
@@ -86,6 +87,7 @@ func change_scene(body=null):
 	set_main(inventory)
 	#inventory.hud.dialogue_box.exit(true)
 	scene.player=player
+	player.healing.connect(scene.player_healed.emit)
 	scene.inventory=inventory
 	inventory.update_camera()
 	player.call_deferred("make_scarf")

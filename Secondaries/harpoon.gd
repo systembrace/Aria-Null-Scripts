@@ -61,7 +61,7 @@ func hit(object=null):
 	if is_instance_valid(object) and object.grappleable:
 		if object==previous_enemy:
 			return
-		if !"control" in object or object.control.health.hp>hitbox.damage:
+		if (!"control" in object or object.control.health.hp>hitbox.damage) and (!"hp" in object or object.hp>hitbox.damage):
 			enemy=object
 			enemy.call_deferred("add_status_effect",self)
 			stuck_in_enemy=true
@@ -77,11 +77,13 @@ func hit(object=null):
 			$FreeTimer.stop()
 		else:
 			return
+	elif is_instance_valid(object) and object is Entity:
+		return
 	velocity=Vector2.ZERO
 	stuck=true
 	if !stuck_in_enemy:
 		$FreeTimer.start()
-		sprite.texture=load("res://assets/Art/guns/harpoon/harpoon_mask.png")
+		sprite.texture=load("res://Assets/Art/guns/harpoon/harpoon_mask.png")
 		sprite.clip_children=CLIP_CHILDREN_ONLY
 		timer.start()
 		$HitWall.play()
@@ -127,7 +129,10 @@ func deflect(attack,charged=false):
 func hit_enemy(attack=null, _parry=false):
 	if !stuck_in_enemy or attack.targetparent is Harpoon:
 		return
-	enemy.control.health.take_damage(hitbox,false)
+	if "control" in enemy:
+		enemy.control.health.take_damage(hitbox,false)
+	elif "hp" in enemy and enemy is Chair:
+		enemy.hit(hitbox)
 	$Mask/End.play("hit")
 	var sfx=$Activate.duplicate()
 	get_tree().get_root().get_node("Main").add_child(sfx)
@@ -144,7 +149,7 @@ func retract():
 	collider.set_deferred("disabled",true)
 	hitbox.set_collision_mask_value(2,false)
 	hitbox.enable_hitbox()
-	if is_instance_valid(enemy):
+	if is_instance_valid(enemy) and "control" in enemy:
 		if enemy.control.hitstun.posture_threshold<3:
 			enemy.control.hitstun.stun()
 		enemy.velocity=velocity/2
@@ -189,7 +194,8 @@ func _physics_process(delta):
 		hitbox.position=hitbox.position.move_toward(sprite.position,8*delta*60)
 	
 	if !coll and stuck and not stuck_in_enemy:
-		retract()
+		pass
+		#retract()
 	elif coll and not (stuck and not stuck_in_enemy):
 		if coll.get_normal().y<=0 and collider.position.y==0:
 			collider.position.y=-19

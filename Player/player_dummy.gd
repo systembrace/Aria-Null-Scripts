@@ -50,6 +50,7 @@ func create_player(tessa):
 	player.tessa=tessa
 	main.add_child(player)
 	main.player=player
+	player.healing.connect(main.player_healed.emit)
 	queue_free()
 
 func death_throes():

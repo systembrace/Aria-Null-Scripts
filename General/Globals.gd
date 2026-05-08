@@ -52,12 +52,14 @@ var defaults={
 	"inventory":"Tab",
 	"back":"Escape",
 	"pause":"Escape",
+	"master":0,
 	"sfx":-2.4987,
 	"music":-2.4987,
 	"brightness":1.0,
 	"screenshake":1.0,
 	"hitstop":1.0,
-	"window_mode":0
+	"window_mode":0,
+	"dialogue_speed":1.0
 }
 
 func snap_vector_angle(vec:Vector2, snap:float=PI/2):
@@ -65,10 +67,6 @@ func snap_vector_angle(vec:Vector2, snap:float=PI/2):
 
 func _ready():
 	seed(23017031)
-	for file in DirAccess.get_files_at("res://"):
-		if file.ends_with(".tscn"):
-			var node=load(file).instantiate()
-			node.queue_free()
 	if not FileAccess.file_exists("user://last_flags.dat"):
 		flags={"endlesshs":0,"version":version}
 		save_flags(true)
@@ -87,6 +85,7 @@ func _ready():
 		load_config("game","shoot_to_cursor")
 		load_config("game","damage_values")
 		load_config("game","arena_with_cherry")
+		load_config("game","dialogue_speed")
 		load_config("bindings","left")
 		load_config("bindings","right")
 		load_config("bindings","up")
@@ -104,6 +103,7 @@ func _ready():
 		load_config("bindings","back")
 		load_config("bindings","pause")
 		load_config("bindings","hologram")
+		load_config("audio","master")
 		load_config("audio","sfx")
 		load_config("audio","music")
 		load_config("video","brightness")
@@ -118,7 +118,7 @@ func _ready():
 	else:
 		permanent_data.load("user://permanent_data.ini")
 	set_input_map(load_keybinds())
-	change_window_mode()
+	change_window_mode(true)
 	environment=Environment.new()
 	environment.background_mode=Environment.BG_CANVAS
 	environment.adjustment_enabled=true
@@ -258,6 +258,10 @@ func save_data(data,scene_path,checkpoint=false,autosave=false):
 	file.store_string(scene_path)
 	file.close()
 
+func reset_permanent_data():
+	permanent_data.clear()
+	permanent_data.load("user://permanent_data.ini")
+
 func set_permanent_data(section,field,value):
 	permanent_data.set_value(section,field,value)
 	if field=="deaths" or field=="player_dead":
@@ -316,7 +320,7 @@ func format_keybind(text):
 			keybind=InputMap.action_get_events(action)[0].as_text().to_upper()
 		else:
 			keybind=format_keybind("{up}{left}{down}{right}")
-		text=text.replace("{"+action+"}",keybind)
+		text=text.replace("{"+action+"}",keybind).replace("(Physical)","")
 	return text
 
 func hitstop(duration,bypass=false):
@@ -353,14 +357,14 @@ func stopshake():
 func can_create_particle():
 	return num_particles<load_config("game","max_particles")
 
-func change_window_mode():
+func change_window_mode(force=false):
 	var mode=load_config("video","window_mode")
 	var viewport=get_window()
-	if mode==0 and DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
+	if mode==0 and (force or DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN):
 		viewport.content_scale_stretch=Window.CONTENT_SCALE_STRETCH_INTEGER
 		viewport.unresizable=true
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
-	elif mode==1 and DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_WINDOWED:
+	elif mode==1 and (force or DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_WINDOWED):
 		viewport.content_scale_stretch=Window.CONTENT_SCALE_STRETCH_FRACTIONAL
 		viewport.unresizable=false
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
@@ -370,10 +374,10 @@ func change_window_mode():
 		viewport.position=(DisplayServer.screen_get_size()-viewport.size)/2
 
 func _process(delta):
-	if slow_down_to_zero and Engine.time_scale>0:
-		Engine.time_scale=move_toward(Engine.time_scale,0,.000001/delta*90/(Engine.time_scale+1)*slow_down_speed)
-	elif !slow_down_to_zero and Engine.time_scale<1.0:
-		Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60*slow_down_speed)
+	#if slow_down_to_zero and Engine.time_scale>0:
+	#	Engine.time_scale=move_toward(Engine.time_scale,0,.00006*60*delta*210/(Engine.time_scale+1)*slow_down_speed)
+	#elif !slow_down_to_zero and Engine.time_scale<1.0:
+	#	Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60*slow_down_speed)
 	
 	if wind_dir!=0:
 		wind_speed_step+=delta*.7

@@ -3,35 +3,50 @@ class_name RolyPoly
 
 @export var hitbox: Hitbox
 @export var sprite: AnimatedSprite2D
+@export var bounce_amount=0.9
+@export var change_sides_on_hit=true
+signal bounced
 var dh=0
 var gravity=30
 @onready var trail=$AnimationController/AnimatedSprite2D/Trail
 
 func _ready():
 	super._ready() 
-	$Health.dead.connect(die)
+	$Health.took_damage.connect(hit)
 	trail.clear_points()
 	trail.add_point(Vector2.ZERO)
 	trail.add_point(Vector2.ZERO)
 
-func die(_area=null):
+func hit(area=null):
+	if !change_sides_on_hit or $Health.hp>0 or (area and area.destructive and area.targetparent is RolyPoly):
+		return
 	hurtbox.set_collision_layer_value(2,false)
-	hitbox.set_collision_layer_value(4,false)
-	hitbox.set_collision_layer_value(3,true)
-	hitbox.set_collision_mask_value(2,true)
-	hitbox.set_collision_mask_value(5,true)
+	if hitbox:
+		hitbox.set_collision_layer_value(4,false)
+		hitbox.set_collision_layer_value(3,true)
+		hitbox.set_collision_mask_value(2,true)
+		hitbox.set_collision_mask_value(5,true)
+	#get_tree().create_timer(0.5,false).timeout.connect(reenable)
+
+func reenable():
+	hurtbox.set_collision_layer_value(2,true)
+	if hitbox:
+		hitbox.set_collision_layer_value(4,true)
+		hitbox.set_collision_layer_value(3,false)
+		hitbox.set_collision_mask_value(2,false)
+		hitbox.set_collision_mask_value(5,true)
 
 func bounce():
 	if velocity.length()<128:
 		return
 	dh=min(3*velocity.length()/max_speed,3)
-	if sprite.position.y!=0:
+	if sprite and sprite.position.y!=0:
 		dh*=(64-min(abs(sprite.position.y),64))/64
 	
 func _physics_process(delta):
 	entity_physics_process(delta)
 	$Roll.play()
-	$Roll.setVolume(min(-(max_speed-velocity.length())/max_speed*30,0))
+	$Roll.set_volume(min(-(max_speed-velocity.length())/max_speed*30,0))
 	var chance=0
 	if $Chirp.is_playing():
 		chance=2
@@ -42,14 +57,16 @@ func _physics_process(delta):
 		$Chirp.play()
 		$Bounce.play()
 		bounce()
-		set_deferred("velocity",velocity.bounce(coll.get_normal())*.9)
+		set_deferred("velocity",velocity.bounce(coll.get_normal())*bounce_amount)
+		bounced.emit()
 	var prev=trail.global_position
 	move_and_slide()
-	sprite.position.y-=dh
-	if int(sprite.position.y)<0:
-		dh-=gravity*delta
-	else:
-		dh=0
-		sprite.position.y=0
+	if sprite:
+		sprite.position.y-=dh
+		if int(sprite.position.y)<0:
+			dh-=gravity*delta
+		else:
+			dh=0
+			sprite.position.y=0
 	trail.remove_point(1)
 	trail.add_point(trail.to_local(prev)*8)

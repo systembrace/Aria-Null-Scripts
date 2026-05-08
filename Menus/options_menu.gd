@@ -16,40 +16,46 @@ func _ready():
 	$PanelContainer/MarginContainer/OptionsMenu/Keybinds.pressed.connect(sfx_confirm.play)
 	$PanelContainer/MarginContainer/OptionsMenu/Audio.pressed.connect(sfx_confirm.play)
 	$PanelContainer/MarginContainer/OptionsMenu/Back.pressed.connect(go_back)
-	$PanelContainer/MarginContainer/GameMenu/AttackCursor.toggled.connect(attack_cursor_toggled)
-	$PanelContainer/MarginContainer/GameMenu/DashCursor.toggled.connect(dash_cursor_toggled)
-	$PanelContainer/MarginContainer/GameMenu/ShootCursor.toggled.connect(shoot_cursor_toggled)
-	$PanelContainer/MarginContainer/GameMenu/ParticlesContainer/Particles.value_changed.connect(parts_changed)
-	$PanelContainer/MarginContainer/GameMenu/DamageValues.toggled.connect(damage_values_toggled)
+	$PanelContainer/MarginContainer/KeybindsMenu/ScrollContainer/InputList/AttackCursor.toggled.connect(attack_cursor_toggled)
+	$PanelContainer/MarginContainer/KeybindsMenu/ScrollContainer/InputList/DashCursor.toggled.connect(dash_cursor_toggled)
+	$PanelContainer/MarginContainer/KeybindsMenu/ScrollContainer/InputList/ShootCursor.toggled.connect(shoot_cursor_toggled)
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/ParticlesContainer/Particles.value_changed.connect(parts_changed)
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/DamageValues.toggled.connect(damage_values_toggled)
 	$PanelContainer/MarginContainer/GameMenu/Cherry.toggled.connect(cherry_toggled)
 	$PanelContainer/MarginContainer/GameMenu/Back.pressed.connect(go_back)
 	$PanelContainer/MarginContainer/GameMenu/DeleteSave.pressed.connect(switch_menus.bind("ConfirmDeleteMenu"))
 	$PanelContainer/MarginContainer/GameMenu/DeleteSave.pressed.connect(sfx_confirm.play)
+	$PanelContainer/MarginContainer/GameMenu/DialogueContainer/DiaSpeed.value_changed.connect(dialogue_changed)
 	$PanelContainer/MarginContainer/ConfirmDeleteMenu/HBoxContainer/Confirm.pressed.connect(delete_save)
 	$PanelContainer/MarginContainer/ConfirmDeleteMenu/HBoxContainer/Back.pressed.connect(go_back)
-	$PanelContainer/MarginContainer/VideoMenu/WindowMode.item_selected.connect(window_mode_changed)
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/WindowMode.item_selected.connect(window_mode_changed)
 	$PanelContainer/MarginContainer/VideoMenu/Confirm.pressed.connect(go_back)
-	$PanelContainer/MarginContainer/VideoMenu/ShakeContainer/Shake.value_changed.connect(shake_changed)
-	$PanelContainer/MarginContainer/VideoMenu/StopContainer/Hitstop.value_changed.connect(hitstop_changed)
-	$PanelContainer/MarginContainer/VideoMenu/BrightnessContainer/Brightness.value_changed.connect(brightness_changed)
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/ShakeContainer/Shake.value_changed.connect(shake_changed)
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/StopContainer/Hitstop.value_changed.connect(hitstop_changed)
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/BrightnessContainer/Brightness.value_changed.connect(brightness_changed)
 	$PanelContainer/MarginContainer/KeybindsMenu/HBoxContainer/Reset.pressed.connect(reset_keybinds)
 	$PanelContainer/MarginContainer/KeybindsMenu/HBoxContainer/Cancel.pressed.connect(cancel_keybinds)
 	$PanelContainer/MarginContainer/KeybindsMenu/HBoxContainer/Confirm.pressed.connect(confirm_keybinds)
 	$PanelContainer/MarginContainer/AudioMenu/Confirm.pressed.connect(go_back)
-	$PanelContainer/MarginContainer/GameMenu/AttackCursor.button_pressed=Global.load_config("game","attack_to_cursor")
-	$PanelContainer/MarginContainer/GameMenu/DashCursor.button_pressed=Global.load_config("game","dash_to_cursor")
-	$PanelContainer/MarginContainer/GameMenu/ShootCursor.button_pressed=Global.load_config("game","shoot_to_cursor")
-	$PanelContainer/MarginContainer/GameMenu/DamageValues.button_pressed=Global.load_config("game","damage_values")
+	$PanelContainer/MarginContainer/KeybindsMenu/ScrollContainer/InputList/AttackCursor.button_pressed=Global.load_config("game","attack_to_cursor")
+	$PanelContainer/MarginContainer/KeybindsMenu/ScrollContainer/InputList/DashCursor.button_pressed=Global.load_config("game","dash_to_cursor")
+	$PanelContainer/MarginContainer/KeybindsMenu/ScrollContainer/InputList/ShootCursor.button_pressed=Global.load_config("game","shoot_to_cursor")
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/DamageValues.button_pressed=Global.load_config("game","damage_values")
 	$PanelContainer/MarginContainer/GameMenu/Cherry.button_pressed=Global.load_config("game","arena_with_cherry")
-	$PanelContainer/MarginContainer/GameMenu/ParticlesContainer/Particles.value=Global.load_config("game","max_particles")/10
+	$PanelContainer/MarginContainer/GameMenu/DialogueContainer/DiaSpeed.value=Global.load_config("game","dialogue_speed")
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/ParticlesContainer/Particles.value=Global.load_config("game","max_particles")/10
+	$PanelContainer/MarginContainer/AudioMenu/MasterContainer/Master.value_changed.connect(master_changed)
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/SFX.value_changed.connect(sfx_changed)
 	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.value_changed.connect(music_changed)
-	$PanelContainer/MarginContainer/VideoMenu/WindowMode.selected=Global.load_config("video","window_mode")
-	$PanelContainer/MarginContainer/VideoMenu/BrightnessContainer/Brightness.value=Global.load_config("video","brightness")*100
-	$PanelContainer/MarginContainer/VideoMenu/ShakeContainer/Shake.value=Global.load_config("video","screenshake")*100
-	$PanelContainer/MarginContainer/VideoMenu/StopContainer/Hitstop.value=Global.load_config("video","hitstop")*100
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/WindowMode.selected=Global.load_config("video","window_mode")
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/BrightnessContainer/Brightness.value=Global.load_config("video","brightness")*100
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/ShakeContainer/Shake.value=Global.load_config("video","screenshake")*100
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/StopContainer/Hitstop.value=Global.load_config("video","hitstop")*100
+	$PanelContainer/MarginContainer/AudioMenu/MasterContainer/Master.value=db_to_linear(Global.load_config("audio","master"))*100
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/SFX.value=db_to_linear(Global.load_config("audio","sfx")+2.4987)*100
 	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.value=db_to_linear(Global.load_config("audio","music")+2.4987)*100
+	$PanelContainer/MarginContainer/AudioMenu/MasterContainer/Master.drag_started.connect(sfx_confirm.play)
+	$PanelContainer/MarginContainer/AudioMenu/MasterContainer/Master.drag_ended.connect(sfx_confirm.play.unbind(1))
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/SFX.drag_started.connect(sfx_confirm.play)
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/SFX.drag_ended.connect(sfx_confirm.play.unbind(1))
 	$PanelContainer/MarginContainer/AudioMenu/MusicContainer/Music.drag_started.connect($MusicTest.play)
@@ -70,16 +76,19 @@ func disable_menu(node,disabled=true):
 			disable_menu(child,disabled)
 
 func switch_menus(menu_name):
+	if (pause_menu and menu_name=="GameMenu") or !FileAccess.file_exists("user://last_scene.dat"):
+		$PanelContainer/MarginContainer/GameMenu/DeleteSave.hide()
+	if pause_menu and menu_name=="VideoMenu":
+		$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/SubViewportContainer.hide()
+		#$PanelContainer/MarginContainer/VideoMenu/ScrollContainer.custom_minimum_size.y=100
+	if pause_menu and !Global.endless:
+		$PanelContainer/MarginContainer/GameMenu/Cherry.hide()
 	var menu=find_child(menu_name)
 	current_menu.hide()
 	disable_menu(current_menu,true)
 	current_menu=menu
 	current_menu.show()
 	disable_menu(current_menu,false)
-	if (pause_menu and menu_name=="GameMenu") or !FileAccess.file_exists("user://last_scene.dat"):
-		$PanelContainer/MarginContainer/GameMenu/DeleteSave.hide()
-	if pause_menu and menu_name=="VideoMenu":
-		$PanelContainer/MarginContainer/VideoMenu/SubViewportContainer.hide()
 
 func open_options():
 	visible=true
@@ -115,8 +124,12 @@ func window_mode_changed(index):
 	Global.save_config("video","window_mode",index)
 	Global.change_window_mode()
 
+func dialogue_changed(value):
+	$PanelContainer/MarginContainer/GameMenu/DialogueContainer/Label.text="Auto dialogue speed "+str(value)
+	Global.save_config("game","dialogue_speed",value)
+
 func brightness_changed(value):
-	$PanelContainer/MarginContainer/VideoMenu/BrightnessContainer/Label.text="Brightness "+str(int(value))+"%"
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/BrightnessContainer/Label.text="Brightness "+str(int(value))+"%"
 	Global.save_config("video","brightness",value/100.0)
 	Global.environment.adjustment_brightness=value/100.0
 	Global.environment_updated.emit()
@@ -126,8 +139,12 @@ func shake_changed(value):
 	Global.save_config("video","screenshake",value/100.0)
 
 func hitstop_changed(value):
-	$PanelContainer/MarginContainer/VideoMenu/StopContainer/Label.text="Hitstop "+str(int(value))+"%"
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/StopContainer/Label.text="Hitstop "+str(int(value))+"%"
 	Global.save_config("video","hitstop",value/100.0)
+
+func master_changed(value):
+	$PanelContainer/MarginContainer/AudioMenu/MasterContainer/Label.text="Master volume "+str(int(value))+"%"
+	Global.save_config("audio","master",linear_to_db(value/100.0))
 
 func sfx_changed(value):
 	$PanelContainer/MarginContainer/AudioMenu/SFXContainer/Label.text="Sound effects "+str(int(value))+"%"

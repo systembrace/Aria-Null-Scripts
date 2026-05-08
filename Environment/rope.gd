@@ -3,6 +3,7 @@ class_name Rope
 
 @export var weight=1.0
 @export var stiffness=1.0
+@export var background=false
 var curve
 var wind=Vector2.ZERO
 var point_out
@@ -10,6 +11,8 @@ var point_in
 @onready var end=$End
 
 func _ready():
+	if background:
+		z_index=2
 	global_position+=Vector2(1,1)
 	curve=Curve2D.new()
 	curve.add_point(Vector2.ZERO)

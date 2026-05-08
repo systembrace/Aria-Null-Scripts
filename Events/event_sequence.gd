@@ -33,6 +33,8 @@ func set_active(loaded_name):
 	if !is_node_ready():
 		await ready
 	print("trying to load "+loaded_name)
+	if loaded_name==events[0].name:
+		return
 	if loaded_name=="None":
 		print("skipping all events")
 		events[len(events)-1].skip(true)

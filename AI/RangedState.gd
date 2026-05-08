@@ -2,6 +2,7 @@ extends LockonState
 class_name RangedState
 
 @export var gun: Gun
+@export var min_shoot_dist=80
 @export var delay_time=0.5
 @export var lock_time=0.25
 @export var recharge_time=3.0
@@ -49,7 +50,8 @@ func _ready():
 func enter():
 	gun.equip(body)
 	super.enter()
-	reload()
+	if body.ammo<=60.0/gun.numshots:
+		reload()
 	if randf()<spread_chance:
 		spread=true
 		var dir=randi_range(0,1)*2-1
@@ -83,7 +85,7 @@ func try_shoot():
 			gun.always_show=false
 		gun.readying=false
 	
-	if gun.can_use() and targetdist>64 and can_see_target() and body.ammo>=60.0/gun.numshots and (delay_time==0 or delay.is_stopped()):
+	if gun.can_use() and targetdist>min_shoot_dist and can_see_target() and body.ammo>=60.0/gun.numshots and (delay_time==0 or delay.is_stopped()):
 		if delay_time>0:
 			if body.ammo==60.0:
 				delay.wait_time=delay_time

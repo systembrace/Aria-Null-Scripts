@@ -103,8 +103,10 @@ func physics_update():
 	if not attackpush and combo.is_damaging():
 		attackpush=true
 		body.velocity=combo.attack_push()
+		navigator.nav_agent.avoidance_enabled=false
 	elif not combo.is_damaging():
 		attackpush=false
+		navigator.nav_agent.avoidance_enabled=true
 
 func exit():
 	#body.velocity=Vector2.ZERO

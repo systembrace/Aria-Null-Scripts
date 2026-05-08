@@ -26,7 +26,7 @@ func init_dividers():
 		dividers.append(divider)
 
 func _process(delta):
-	if not inventory:
+	if not inventory or !visible:
 		return
 	if !Global.get_flag("roly_poly"):
 		hide()

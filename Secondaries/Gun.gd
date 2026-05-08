@@ -45,7 +45,7 @@ func _ready():
 	if "cherry_" in gun_name:
 		soundname=gun_name.substr(gun_name.find("_")+1)
 	$Sprite/Gunshot.db=shot_volume
-	$Sprite/Gunshot/SFX.stream=load("res://assets/SFX/"+soundname+".wav")
+	$Sprite/Gunshot/SFX.stream=load("res://Assets/SFX/"+soundname+".wav")
 
 func equip(parent):
 	super.equip(parent)

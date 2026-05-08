@@ -2,7 +2,7 @@ extends HSlider
 class_name SnapSlider
 
 @export var snap_point=0
-@export var snap_size=10
+@export var snap_size=10.0
 
 func _process(_delta):
 	if visible:

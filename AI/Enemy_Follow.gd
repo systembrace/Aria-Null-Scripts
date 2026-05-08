@@ -12,18 +12,20 @@ var accel
 func enter():
 	speed=body.max_speed
 	accel=body.accel
-	target=body.target
+	target=null
+	if is_instance_valid(body.target):
+		target=body.target
 
 func update():
-	if target!=body.target:
-		target=body.target
-	if not is_instance_valid(target):
+	if not is_instance_valid(body.target):
 		transition.emit(self,"Wander")
 		return
+	if target!=body.target:
+		target=body.target
 	if target is Enemy and speed==body.max_speed:
 		speed+=16
 	var targetdist=body.global_position.distance_to(target.global_position)
-	if (targetdist<attack_dist and (not body is Ally or target.target==body)) or (body is Ally and targetdist<24):
+	if (targetdist<attack_dist and (not body is Ally or target.target==body)) or (body is Ally and targetdist<32):
 		transition.emit(self,"Attack")
 		direction=Vector2.ZERO
 	else:
