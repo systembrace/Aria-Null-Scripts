@@ -27,6 +27,7 @@ func dead_knockback():
 func take_knockback(area, parry_reciever:Hitbox=null):
 	if !stunned and !dead and parry_reciever is Attack and parry_reciever.redirect_when_parried:
 		get_parent().velocity=get_parent().velocity.length()*area.knockback_vector(get_parent().global_position).normalized()
+		parry_reciever.look_at(get_parent().velocity)
 		return
 	if combo_unstoppable and !combo_unstoppable.current_attack.allow_knockback and combo_unstoppable.is_damaging():
 		return

@@ -16,7 +16,6 @@ signal ended_attack
 signal fully_charged
 
 func _ready():
-	var current_combo=0
 	for child in get_children():
 		if child is Attack:
 			attack_list[child.combo_index]=child
@@ -39,6 +38,7 @@ func _ready():
 				combo_sets[current_combo]=[child.combo_index]
 			elif !child.is_special:
 				combo_sets[current_combo].append(child.combo_index)
+	current_combo=0
 	current_attack=attack_list[combo_index]
 	push=current_attack.push
 
@@ -58,13 +58,13 @@ func emit_parry(parried_by=null):
 			hurtbox_for_rally.cancel_damage()
 	parry.emit(parried_by)
 
-func emit_ready(attack=null):
+func emit_ready(_attack=null):
 	started_ready.emit()
 
 func emit_attack():
 	started_attack.emit()
 
-func emit_end(attack=null):
+func emit_end(_attack=null):
 	ended_attack.emit()
 
 func emit_charged():

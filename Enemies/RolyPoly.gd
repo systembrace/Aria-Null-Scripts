@@ -5,6 +5,7 @@ class_name RolyPoly
 @export var sprite: AnimatedSprite2D
 @export var bounce_amount=0.9
 @export var change_sides_on_hit=true
+@export var charge_attack:Attack
 signal bounced
 var dh=0
 var gravity=30
@@ -57,7 +58,10 @@ func _physics_process(delta):
 		$Chirp.play()
 		$Bounce.play()
 		bounce()
-		set_deferred("velocity",velocity.bounce(coll.get_normal())*bounce_amount)
+		var new_vel=velocity.bounce(coll.get_normal())*bounce_amount
+		set_deferred("velocity",new_vel)
+		if charge_attack:
+			charge_attack.call_deferred("look_at",new_vel)
 		bounced.emit()
 	var prev=trail.global_position
 	move_and_slide()

@@ -4,8 +4,10 @@ class_name BounceAttack
 @export var combo: Combo
 var bounces=0
 var in_state=false
+@onready var particles=$GPUParticles2D
 
 func enter():
+	particles.emitting=true
 	bounces=0
 	if !body.bounced.is_connected(bounce):
 		body.bounced.connect(bounce)
@@ -27,4 +29,5 @@ func physics_update():
 	body.velocity=body.velocity.move_toward(Vector2.ZERO,body.accel/2)
 
 func exit():
+	particles.emitting=false
 	in_state=false

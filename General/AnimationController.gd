@@ -192,7 +192,7 @@ func _process(delta):
 		direction=gun.dir
 	direction=direction.normalized()
 	#if vertical_sprites_enabled and abs(direction.y)>abs(direction.x) and !curr_anim_name.ends_with("_long"):
-	if (vertical_sprites_enabled or prefix=="ooc_") and abs(direction.y)>abs(direction.x)+.25:
+	if (vertical_sprites_enabled or prefix=="ooc_") and abs(direction.y)>abs(direction.x):
 		sprite.flip_h=false
 		if direction.y<0:
 			curr_anim_name+="_up"
