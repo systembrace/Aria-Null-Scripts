@@ -1,9 +1,11 @@
 extends Node2D
+class_name Explosion
 
 @export var hitbox_time=.32
 @export var damage=2
 @export var player_damage=0
 var smalls=[]
+var rubble_type="none"
 @onready var basesmall=$BaseSmall
 @onready var timer=$Timer
 @onready var hitboxtimer=$HitboxTimer
@@ -17,6 +19,7 @@ func _ready():
 	$DustPuff.emitting=true
 	$DustPuff.global_position=global_position
 	$DustPuff.reparent(get_parent())
+	$CustomParticleSpawner.rubble_type=rubble_type
 	$CustomParticleSpawner.spawn(false,global_position,1.5)
 	for i in range(0,16):
 		var small=basesmall.duplicate()

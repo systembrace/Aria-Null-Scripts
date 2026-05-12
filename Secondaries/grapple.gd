@@ -148,7 +148,7 @@ func _process(delta):
 	harpoon.visible=true
 	if retracting or pulling:
 		harpoon.dir=travel_vec.normalized()
-		if (retracting and travel_vec.length()<8) or (pulling and (travel_vec.length()<16 or pull_timer.is_stopped())):
+		if (retracting and travel_vec.length()<8) or (pulling and (travel_vec.length()<24 or pull_timer.is_stopped())):
 			if targetparent.control.combo.is_damaging() and is_instance_valid(harpoon.enemy):
 				harpoon.visible=false
 				return

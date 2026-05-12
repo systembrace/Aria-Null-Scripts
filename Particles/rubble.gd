@@ -3,8 +3,11 @@ class_name Rubble
 
 var vel_mod=1
 var step2=0
+var type="none"
 
 func _ready():
+	if type!="none":
+		sprite.animation=type
 	super._ready()
 	if !Global.can_create_particle():
 		return

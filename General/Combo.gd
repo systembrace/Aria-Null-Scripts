@@ -96,6 +96,7 @@ func attack():
 	elif combo_index>=len(attack_list):
 		return false
 	elif combo_index==current_combo and !attack_list[combo_sets[current_combo][-1]].can_attack:
+		restart_combo()
 		return false
 	current_attack=attack_list[combo_index]
 	if combo_index==current_combo:

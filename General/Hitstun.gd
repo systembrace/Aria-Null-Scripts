@@ -25,7 +25,7 @@ func _ready():
 		hurtbox.take_hit.connect(stun)
 	
 func stun(area=null, parry=null):
-	if stunning or (combo and !combo.current_attack.stunnable):
+	if stunning or (combo and !combo.is_done_attacking() and !combo.current_attack.stunnable):
 		return 
 	if area:
 		var posture=area.posture

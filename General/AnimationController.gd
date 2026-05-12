@@ -119,17 +119,24 @@ func _process(delta):
 		idle_time=0
 	
 	if combo:
+		var attacking=false
 		if combo.is_damaging():
 			anim=attackname
 			curr_anim_name=attackname
+			attacking=true
 		
 		if combo.is_readying():
 			anim=readyattackname
 			curr_anim_name=readyattackname
+			attacking=true
 			
 		if combo.current_attack.has_recovery and ((body is Player and combo.is_recovering()) or (combo.is_done_attacking() and !combo.can_move())):
 			anim=recovername
 			curr_anim_name=recovername
+			attacking=true
+		
+		if attacking and combo.current_attack.h_anim_only:
+			vertical_sprites_enabled=false
 	
 	if body.falling and has_fall:
 		anim=fallname
@@ -212,7 +219,7 @@ func _process(delta):
 	
 	if runspeed>0 and anim==runname:
 		sprite.speed_scale=min(1,body.velocity.length()/body.max_speed*runspeed)
-		if hastarget and body.velocity.angle_to(direction)>PI/4:
+		if hastarget and abs(body.velocity.angle_to(direction))>PI/4:
 			sprite.speed_scale*=-1
 	elif sprite.speed_scale!=1:
 		sprite.speed_scale=1

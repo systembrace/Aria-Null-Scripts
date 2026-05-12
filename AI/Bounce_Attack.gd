@@ -5,8 +5,17 @@ class_name BounceAttack
 var bounces=0
 var in_state=false
 @onready var particles=$GPUParticles2D
+@onready var ring1:CPUParticles2D=$Ring1
+@onready var ring2:CPUParticles2D=$Ring2
+@onready var timer=$Timer
+
+func _ready():
+	timer.timeout.connect(particles.set.bind("emitting",false))
 
 func enter():
+	ring1.emitting=true
+	ring2.restart()
+	particles.restart()
 	particles.emitting=true
 	bounces=0
 	if !body.bounced.is_connected(bounce):
@@ -29,5 +38,8 @@ func physics_update():
 	body.velocity=body.velocity.move_toward(Vector2.ZERO,body.accel/2)
 
 func exit():
-	particles.emitting=false
+	timer.start()
+	ring1.restart()
+	ring2.emitting=true
 	in_state=false
+	body.bounce(3)

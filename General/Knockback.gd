@@ -6,6 +6,8 @@ class_name Knockback
 @export var hitstun: Hitstun
 @export var knockback_modifier=1.0
 @export var combo_unstoppable:Combo
+@export var death_const_mod=false
+@export var inc_mod_on_stun=false
 var dead=false
 var effect_mod=1
 var stunned=false
@@ -32,8 +34,12 @@ func take_knockback(area, parry_reciever:Hitbox=null):
 	if combo_unstoppable and !combo_unstoppable.current_attack.allow_knockback and combo_unstoppable.is_damaging():
 		return
 	effect_mod=1
+	if dead and death_const_mod:
+		knockback_modifier=-125
 	if stunned or dead or area.targetparent is Earthshaker:
 		effect_mod=2
+		if stunned and knockback_modifier<1 and inc_mod_on_stun:
+			effect_mod*=1.5
 		stunned=false
 		dead=false
 	if area.damage>1:

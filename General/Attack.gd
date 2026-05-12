@@ -28,6 +28,7 @@ class_name Attack
 @export var allow_melee_attacks_while_damaging=true
 @export var allow_knockback=true
 @export var parry_bullets=true
+@export var h_anim_only=false
 signal parry(area)
 var target: Node2D
 @onready var attack_timer=$AttackTimer

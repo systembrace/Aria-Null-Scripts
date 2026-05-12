@@ -5,7 +5,7 @@ class_name Hitbox
 @export var damage=1.0
 @export var base_posture=1.0
 @export var base_knockback=0
-@export var player_damage=0
+@export var player_damage=-1
 @export var start_enabled=false
 @export var always_hittable=false
 @export var disable_on_parried=true
@@ -63,7 +63,9 @@ func _process(_delta):
 func _on_area_entered(area):
 	if monitor and is_area_hittable(area) and area.monitor:
 		if area is Hurtbox:
-			if player_damage>0 and area.get_parent() is Player or area.get_parent() is Ally:
+			if player_damage>-1 and (area.get_parent() is Player or area.get_parent() is Ally):
+				if player_damage==0:
+					return
 				var temp=damage
 				damage=player_damage
 				area.hit(self)

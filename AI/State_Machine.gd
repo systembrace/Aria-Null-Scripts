@@ -11,7 +11,7 @@ var ray: RayCast2D
 @export var health: Health
 @export var dodge=0.0
 @export var can_retarget=false
-@onready var body: CharacterBody2D = get_parent()
+@export var friction_dying=true
 var current_state: State
 var states={}
 var stunned=false
@@ -21,6 +21,7 @@ var out_of_combat=true
 var timer
 var paused=false
 var dont_notice=false
+@onready var body: CharacterBody2D = get_parent()
 
 func _ready():
 	if can_retarget:
@@ -114,13 +115,15 @@ func _process(_delta):
 	elif (stunned or dying) and combo:
 		combo.enable_attack()
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	if dead:
 		return
 	if (stunned or dying) and body.on_floor:
-		body.velocity=body.velocity.move_toward(Vector2.ZERO,16)
-		if dying and body.velocity.length()<.1:
+		if (!dying and stunned) or friction_dying:
+			body.velocity=body.velocity.move_toward(Vector2.ZERO,16)
+		if dying and (body.velocity.length()<.1 or body.move_and_collide(body.velocity*delta,true)):
 			die()
+		return
 	elif current_state:
 		current_state.physics_update()
 	body.nav_agent.set_velocity(body.velocity)

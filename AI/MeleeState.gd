@@ -28,7 +28,7 @@ func _ready():
 	try_timer.timeout.connect(try_attacking)
 	try_timer.wait_time=attack_frequency
 	if hurtbox_retaliation:
-		hurtbox_retaliation.take_hit.connect(attack)
+		hurtbox_retaliation.take_hit.connect(retaliate)
 
 func enter():
 	super.enter()
@@ -41,7 +41,11 @@ func enter():
 		parry_timer.one_shot=true
 		parry_timer.timeout.connect(attack)
 	
-func attack(_attack=null, _parry=false):
+func retaliate(_attack=null, _parry=false):
+	if combo.can_attack() and !combo.is_readying() and combo.is_done_attacking():
+		attack()
+	
+func attack():
 	must_attack=true
 	
 func capable_of_attack():

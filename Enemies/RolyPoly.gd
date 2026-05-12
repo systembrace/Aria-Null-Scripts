@@ -2,13 +2,13 @@ extends Enemy
 class_name RolyPoly
 
 @export var hitbox: Hitbox
-@export var sprite: AnimatedSprite2D
+@export var sprite: AnimationController
 @export var bounce_amount=0.9
-@export var change_sides_on_hit=true
 @export var charge_attack:Attack
+@export var bounce_ds=3.0
+@export var gravity=30
 signal bounced
 var dh=0
-var gravity=30
 @onready var trail=$AnimationController/AnimatedSprite2D/Trail
 
 func _ready():
@@ -17,9 +17,11 @@ func _ready():
 	trail.clear_points()
 	trail.add_point(Vector2.ZERO)
 	trail.add_point(Vector2.ZERO)
+	if control.explode_on_death:
+		hitbox.hit_hurtbox.connect(control.die.unbind(1))
 
 func hit(area=null):
-	if !change_sides_on_hit or $Health.hp>0 or (area and area.destructive and area.targetparent is RolyPoly):
+	if $Health.hp>0 or (area and area.destructive and area.targetparent is RolyPoly):
 		return
 	hurtbox.set_collision_layer_value(2,false)
 	if hitbox:
@@ -27,6 +29,8 @@ func hit(area=null):
 		hitbox.set_collision_layer_value(3,true)
 		hitbox.set_collision_mask_value(2,true)
 		hitbox.set_collision_mask_value(5,true)
+		if !hitbox.monitor:
+			hitbox.enable_hitbox()
 	#get_tree().create_timer(0.5,false).timeout.connect(reenable)
 
 func reenable():
@@ -37,10 +41,12 @@ func reenable():
 		hitbox.set_collision_mask_value(2,false)
 		hitbox.set_collision_mask_value(5,true)
 
-func bounce():
-	if velocity.length()<128:
+func bounce(amt=0.0):
+	if velocity.length()<128 or (amt==0 and bounce_ds==0):
 		return
-	dh=min(3*velocity.length()/max_speed,3)
+	if amt==0:
+		amt=bounce_ds
+	dh=min(amt*velocity.length()/max_speed,amt)
 	if sprite and sprite.position.y!=0:
 		dh*=(64-min(abs(sprite.position.y),64))/64
 	

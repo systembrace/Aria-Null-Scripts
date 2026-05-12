@@ -22,7 +22,7 @@ func _ready():
 	dh=randf_range(3,4)
 	bounce=(dh-3)*.03+.1
 	velocity=Vector2(randf_range(-1,1),randf_range(-1,1)).normalized()*randf_range(48,96)
-	sprite.frame=randi_range(0,sprite.sprite_frames.get_frame_count("default")-1)
+	sprite.frame=randi_range(0,sprite.sprite_frames.get_frame_count(sprite.animation)-1)
 	sprite.flip_h=randi_range(0,1)
 	timer.wait_time=randf_range(7,15)
 	timer.timeout.connect(startshrink)

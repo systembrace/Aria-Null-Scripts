@@ -4,8 +4,8 @@ class_name Endless
 signal started
 var wave:int=0
 var wavepoints=0
-var add_wave=[1,4,7,15]
-var possibleenemies={"giant_roly":1,"enemy":3,"gunman":5,"elite":20}
+var add_wave=[1,4,7,12,18]
+var possibleenemies={"roly_poly":1,"enemy":3,"gunman":5,"giant_roly":20,"elite":25}
 var maxindex=-1
 var highscore:int=0
 var spawning=false
