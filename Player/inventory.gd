@@ -61,6 +61,7 @@ func _ready():
 		player.control.call_deferred("pause")
 		Global.dialogue_ended.connect(death_scene_over)
 		hud.dialogue("post_death","Death"+str(Global.get_permanent_data("global","deaths")),false,true)
+	$AudioListener2D.make_current()
 
 func death_scene_over():
 	Global.dialogue_ended.disconnect(death_scene_over)

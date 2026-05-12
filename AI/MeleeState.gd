@@ -56,10 +56,13 @@ func try_attacking():
 		return
 	if randf()*circling_time/2*60/(attack_chance*1.5)<still_time:
 		must_attack=true
+		if randf()<=specialchance:
+			special=specialindex[randi_range(0,len(specialindex)-1)]
+			combo.set_index(special)
 		return
 	var attack_roll=randf()
 	var should_attack=attack_roll<=attack_chance or (target.control.stunned and attack_roll<=attack_chance*1.5)
-	if should_attack and (combo.current_combo==combo.combo_index or combo.end_of_combo()) and !combo.current_attack.combo_index in specialindex and randf()<=specialchance:
+	if should_attack and (combo.current_combo==combo.combo_index or combo.end_of_combo()) and !combo.prev_index in specialindex and randf()<=specialchance:
 		special=specialindex[randi_range(0,len(specialindex)-1)]
 		combo.set_index(special)
 	must_attack = capable_of_attack() and (should_attack or target is RolyPoly)

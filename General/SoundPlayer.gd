@@ -10,12 +10,16 @@ class_name SoundPlayer
 signal finished
 var sounds=[]
 var fade=false
+var fade_temp=false
+var fade_scale=1
 var timer: Timer
 var time_scale=1.0
 var pitch_scale=1.0
+var init_db=0
 @onready var global_volume=Global.load_config("audio","sfx")+Global.load_config("audio","master")
 
 func _ready():
+	init_db=db
 	if time_between_plays>0:
 		timer=find_child("Timer")
 		timer.wait_time=time_between_plays
@@ -43,22 +47,34 @@ func is_playing():
 	return false
 
 func set_volume(vol=-99):
+	if vol!=-99:
+		db=vol
+		init_db=db
 	for sound in sounds:
-		if vol!=-99:
-			db=vol
-		sound.volume_db=db+Global.load_config("audio","sfx")+Global.load_config("audio","master")
+		sound.volume_db=db+global_volume
 
 func play(playback_position=0, temp_db=0):
+	if fade_temp:
+		set_volume(init_db)
+		fade_temp=false
+		fade=false
 	if time_between_plays==0 or timer.is_stopped():
 		var sound=sounds[randi_range(0,len(sounds)-1)]
 		sound.pitch_scale=(randf_range(-amt,amt)+pitchlevel)*pitch_scale
-		sound.volume_db=db+Global.load_config("audio","sfx")+temp_db+Global.load_config("audio","master")
+		sound.volume_db=db+temp_db+global_volume
 		if playback_position==-1:
 			sound.play(randf_range(0,get_length()))
 		else:
 			sound.play(playback_position)
 		if time_between_plays>0:
 			timer.start()
+
+func temp_fade(new_scale=2):
+	if !is_playing():
+		return
+	fade=true
+	fade_temp=true
+	fade_scale=new_scale
 
 func stop():
 	for sound in sounds:
@@ -80,10 +96,17 @@ func _process(delta):
 	#		sound.pitch_scale=1.0
 	
 	if fade and db>-60:
-		db-=delta*12
+		db-=delta*12*fade_scale
 		set_volume()
 	elif fade:
-		queue_free()
+		if fade_temp:
+			stop()
+			set_volume(init_db)
+			fade_temp=false
+			fade=false
+			fade_scale=1
+		else:
+			queue_free()
 	if global_volume!=Global.load_config("audio","sfx")+Global.load_config("audio","master"):
 		global_volume=Global.load_config("audio","sfx")+Global.load_config("audio","master")
 		set_volume()

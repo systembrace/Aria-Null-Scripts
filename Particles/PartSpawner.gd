@@ -4,7 +4,7 @@ class_name PartSpawner
 @export var bullet=false
 @export var particles={}
 var main
-var rubble_type
+var rubble_type="none"
 
 func _ready():
 	main=get_tree().get_root().get_node("Main")

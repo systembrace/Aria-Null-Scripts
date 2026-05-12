@@ -32,6 +32,7 @@ func release():
 func attack():
 	if released:
 		enable_hitbox()
+		started_attack.emit()
 		released=false
 		attacking=true
 		done_attacking=false

@@ -5,6 +5,7 @@ extends Node2D
 @export var charged=false
 @export var parry=false
 @export var animation: AnimationController
+@export var footstep_particles=false
 @export var dash: Dash
 @export var partspawner:PartSpawner
 @onready var body=get_parent()
@@ -47,8 +48,9 @@ func _ready():
 		combo.parry.connect(on_parry)
 	if animation:
 		sfx_footsteps=find_child("Footsteps")
-		footstep1=find_child("Footstep1")
-		footstep2=find_child("Footstep1")
+		if footstep_particles:
+			footstep1=find_child("Footstep1")
+			footstep2=find_child("Footstep2")
 		animation.step.connect(on_step)
 	if dash:
 		sfx_dash=find_child("Dash")
@@ -113,6 +115,8 @@ func on_parry(_parried_by=false):
 
 func on_step():
 	sfx_footsteps.play()
+	if !footstep_particles:
+		return
 	if curr_step==1:
 		footstep2.restart()
 		footstep1.process_material.direction=Vector3(-body.velocity.normalized().x,-.5,0)

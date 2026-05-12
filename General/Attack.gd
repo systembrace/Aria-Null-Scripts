@@ -102,6 +102,7 @@ func start_attack():
 		
 func attack():
 	enable_hitbox()
+	started_attack.emit()
 	readying=false
 	attacking=true
 	done_attacking=false
@@ -118,7 +119,6 @@ func enable_hitbox():
 	super.enable_hitbox()
 	damaging=true
 	parriable=true
-	started_attack.emit()
 	parry_timer.start()
 	if hitbox_flicker:
 		$Flicker.start()
@@ -145,13 +145,13 @@ func stop_attack():
 	if finished_time!=0:
 		finishedtimer.start()
 	disable_hitbox()
+	ended_attack.emit()
 
 func disable_hitbox():
 	if hitbox_flicker:
 		$Flicker.stop()
 	super.disable_hitbox()
 	can_attack=false
-	ended_attack.emit()
 	buffer.start()
 
 func finish_attack():

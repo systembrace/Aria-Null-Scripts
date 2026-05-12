@@ -35,6 +35,9 @@ func take_knockback(area, parry_reciever:Hitbox=null):
 		return
 	effect_mod=1
 	if dead and death_const_mod:
+		if area.targetparent is Bullet or area.targetparent is Harpoon:
+			get_parent().velocity=Vector2.ZERO
+			return
 		knockback_modifier=-125
 	if stunned or dead or area.targetparent is Earthshaker:
 		effect_mod=2

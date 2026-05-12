@@ -32,7 +32,7 @@ class_name AnimationController
 @export var has_vertical_sprites=false
 @export var out_of_combat_anims=false
 @export var flicker_iframes=false
-@export var footsteps=-1
+@export var footsteps_per_cycle=0
 @export var parent_controller: AnimationController
 var cutscene_anim="none"
 var body
@@ -42,6 +42,7 @@ var direction=Vector2.DOWN
 var anim="idle"
 var idle_time=0.0
 var y_offset=0
+var footsteps=99
 signal step
 
 func _ready():
@@ -235,10 +236,10 @@ func _process(delta):
 		else:
 			sprite.play(curr_anim_name)
 			
-	if footsteps>-1:
+	if footsteps_per_cycle>0:
 		if anim==runname or anim==walkname:
-			var cycle=sprite.sprite_frames.get_frame_count(sprite.animation)/2
-			if (sprite.frame==1 or sprite.frame==cycle+1) and sprite.frame!=footsteps:
+			var cycle=sprite.sprite_frames.get_frame_count(sprite.animation)/footsteps_per_cycle
+			if sprite.frame%cycle==0 and sprite.frame!=footsteps and (not body is RolyPoly or body.sprite.position.y==0):
 				footsteps=sprite.frame
 				step.emit()
 		elif anim!=prevanim:

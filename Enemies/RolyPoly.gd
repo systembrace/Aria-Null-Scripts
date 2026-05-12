@@ -5,10 +5,13 @@ class_name RolyPoly
 @export var sprite: AnimationController
 @export var bounce_amount=0.9
 @export var charge_attack:Attack
+@export var spin_attack:Attack
 @export var bounce_ds=3.0
 @export var gravity=30
 signal bounced
 var dh=0
+var bounce_sfx
+var attacking=false
 @onready var trail=$AnimationController/AnimatedSprite2D/Trail
 
 func _ready():
@@ -19,6 +22,30 @@ func _ready():
 	trail.add_point(Vector2.ZERO)
 	if control.explode_on_death:
 		hitbox.hit_hurtbox.connect(control.die.unbind(1))
+	bounce_sfx=find_child("Bounce",false)
+	if charge_attack and spin_attack:
+		$DustTimer.timeout.connect($Dust.set.bind("emitting",false))
+		charge_attack.started_attack.connect(attack_started)
+		charge_attack.ended_attack.connect(attack_ended)
+		spin_attack.started_attack.connect(attack_started)
+		spin_attack.ended_attack.connect(attack_ended)
+
+func attack_started():
+	attacking=true
+	$Ring1.emitting=true
+	$Ring2.restart()
+	$Dust.restart()
+	$Dust.emitting=true
+	
+func attack_ended():
+	if !attacking:
+		return
+	attacking=false
+	$Chirp.play()
+	$DustTimer.start()
+	$Ring1.restart()
+	$Ring2.emitting=true
+	bounce(3)
 
 func hit(area=null):
 	if $Health.hp>0 or (area and area.destructive and area.targetparent is RolyPoly):
@@ -62,7 +89,8 @@ func _physics_process(delta):
 	var coll=move_and_collide(velocity*delta,true)
 	if coll:
 		$Chirp.play()
-		$Bounce.play()
+		if bounce_sfx:
+			bounce_sfx.play()
 		bounce()
 		var new_vel=velocity.bounce(coll.get_normal())*bounce_amount
 		set_deferred("velocity",new_vel)
