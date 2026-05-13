@@ -123,6 +123,8 @@ func save_objects(checkpoint=false):
 			config.set_value(scene_name,"current waypoint",waypoint_name)
 		elif obj is RepeatingEvent:
 			config.set_value(scene_name,obj.name,obj.current)
+		elif obj is Pickup:
+			config.set_value(scene_name,obj.name,obj.visible)
 		else:
 			print("idk how to save this "+obj.name)
 	config.set_value(scene_name,"Visited",true)
@@ -166,6 +168,11 @@ func load_objects():
 					obj.set_broken()
 				elif obj is RepeatingEvent:
 					obj.current=config.get_value(scene_name,obj.name)
+				elif obj is Pickup:
+					obj.visible=config.get_value(scene_name,obj.name)
+					if obj.visible:
+						obj.settle()
+						obj.reparent(self)
 			else:
 				print("idk how to load this "+obj.name)
 	else:

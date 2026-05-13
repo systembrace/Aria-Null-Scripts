@@ -30,7 +30,7 @@ var wobble_t=0
 @onready var healtimer=$HealTimer
 
 func _ready():
-	process_mode=Node.PROCESS_MODE_ALWAYS
+	#process_mode=Node.PROCESS_MODE_ALWAYS
 	max_speed=body.max_speed
 	min_speed=body.min_speed
 	accel=body.accel
@@ -301,6 +301,9 @@ func _process(delta):
 			body.velocity+=wobble*(cos(wobble_t*2)+1)*speed*delta*3
 			body.velocity*=.9
 	else:
-		body.velocity=body.velocity.move_toward(Vector2.ZERO,accel*30*delta)
+		var temp_accel=accel
+		if combo.is_damaging() and combo.current_attack.low_friction:
+			temp_accel/=3
+		body.velocity=body.velocity.move_toward(Vector2.ZERO,temp_accel*30*delta)
 		if inventory.secondary is Shield:
 			inventory.secondary.deactivate()

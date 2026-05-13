@@ -10,15 +10,16 @@ var dh=0
 var gravity=.3
 var bounce=.5
 var accel=24
-var settled=false
+var settled=true
 @onready var sprite=$Interactable/AnimatedSprite2D
 @onready var interact_area=$Interactable
 
 func _ready():
-	if !is_instance_valid(enemy):
-		return
 	main=get_tree().get_root().get_node("Main")
 	interact_area.interacted.connect(interacted)
+	if !is_instance_valid(enemy):
+		settle()
+		return
 	hide()
 	if enemy is Spawner:
 		enemy.spawned.connect(set_death_connection)
@@ -32,9 +33,21 @@ func set_death_connection(node=enemy):
 func spawn():
 	global_position=enemy.global_position
 	show()
+	settled=false
 	dh=randf_range(4,5)
 	bounce=(dh-4)*.05+.6
 	velocity=Vector2(randf_range(-1,1),randf_range(-1,1)).normalized()*randf_range(56,96)
+
+func settle():
+	if !is_node_ready():
+		call_deferred("settle")
+		return
+	sprite.position.y=0
+	settled=true
+	sprite.animation="settled"
+	sprite.play()
+	interact_area.activate()
+	global_position=global_position.round()+Vector2(.5,.5)
 
 func interacted(_node):
 	picked_up.emit()
@@ -60,11 +73,7 @@ func _process(delta):
 	if velocity!=Vector2.ZERO and dh==0 and h<=0:
 		velocity=velocity.move_toward(Vector2.ZERO,accel*60*delta)
 	if h==0 and velocity==Vector2.ZERO:
-		sprite.position.y=0
-		settled=true
-		sprite.animation="settled"
-		interact_area.activate()
-		global_position=global_position.round()+Vector2(.5,.5)
+		settle()
 
 func _physics_process(delta):
 	if velocity!=Vector2.ZERO:

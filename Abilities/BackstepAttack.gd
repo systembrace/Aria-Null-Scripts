@@ -1,7 +1,6 @@
 extends Attack
 class_name BackstepAttack
 
-@export var numshots=12
 @export var dash: Dash
 
 func can_use():

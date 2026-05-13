@@ -2,6 +2,7 @@ extends Enemy
 class_name RolyPoly
 
 @export var hitbox: Hitbox
+@export var hitstun: Hitstun
 @export var sprite: AnimationController
 @export var bounce_amount=0.9
 @export var charge_attack:Attack
@@ -23,12 +24,13 @@ func _ready():
 	if control.explode_on_death:
 		hitbox.hit_hurtbox.connect(control.die.unbind(1))
 	bounce_sfx=find_child("Bounce",false)
-	if charge_attack and spin_attack:
+	if charge_attack and spin_attack and hitstun:
 		$DustTimer.timeout.connect($Dust.set.bind("emitting",false))
 		charge_attack.started_attack.connect(attack_started)
 		charge_attack.ended_attack.connect(attack_ended)
 		spin_attack.started_attack.connect(attack_started)
 		spin_attack.ended_attack.connect(attack_ended)
+		hitstun.stunned.connect(attack_ended)
 
 func attack_started():
 	attacking=true
@@ -95,7 +97,7 @@ func _physics_process(delta):
 		var new_vel=velocity.bounce(coll.get_normal())*bounce_amount
 		set_deferred("velocity",new_vel)
 		if charge_attack:
-			charge_attack.call_deferred("look_at",new_vel)
+			charge_attack.call_deferred("look_at",to_global(new_vel))
 		bounced.emit()
 	var prev=trail.global_position
 	move_and_slide()

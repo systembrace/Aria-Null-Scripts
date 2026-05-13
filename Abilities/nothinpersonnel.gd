@@ -3,16 +3,9 @@ class_name NothinPersonnel
 
 @export var overshoot=1
 @export var trail: Line2D
-var numshots=3
 @onready var ray=$RayCast2D
 @onready var check_area=$CheckArea
 @onready var sprite=$Destination
-
-func can_use():
-	return can_attack
-
-func use():
-	get_parent().attack_index(combo_index)
 
 func teleport(teldir,ovr=1):
 	ray.global_rotation=0

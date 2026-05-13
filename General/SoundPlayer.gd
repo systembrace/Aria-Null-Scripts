@@ -69,7 +69,7 @@ func play(playback_position=0, temp_db=0):
 		if time_between_plays>0:
 			timer.start()
 
-func temp_fade(new_scale=2):
+func temp_fade(new_scale=4):
 	if !is_playing():
 		return
 	fade=true

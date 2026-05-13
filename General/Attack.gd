@@ -29,6 +29,8 @@ class_name Attack
 @export var allow_knockback=true
 @export var parry_bullets=true
 @export var h_anim_only=false
+@export var low_friction=false
+@export var numshots=3
 signal parry(area)
 var target: Node2D
 @onready var attack_timer=$AttackTimer
@@ -73,6 +75,12 @@ func _ready():
 		$Flicker.timeout.connect(flicker_hitbox)
 	area_entered.connect(_on_area_entered)
 	disable_hitbox()
+
+func can_use():
+	return can_attack
+
+func use():
+	get_parent().attack_index(combo_index)
 
 func look_target():
 	if not is_instance_valid(target):

@@ -89,8 +89,8 @@ func set_offset():
 		z_index=parent_controller.z_index
 		var new_offset=parent_controller.sprite.offset.y-parent_controller.y_offset
 		sprite.offset.y=y_offset+new_offset
-		if get_parent() is Sprite2D and get_parent().name=="Mask":
-			get_parent().offset.y=-32+new_offset
+		#if get_parent() is Sprite2D and get_parent().name=="Mask" and not body.control.paused:
+		#	get_parent().offset.y=-32+new_offset
 
 func _process(delta):
 	var curr_anim_name=idlename

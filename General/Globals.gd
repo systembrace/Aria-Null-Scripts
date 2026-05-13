@@ -187,7 +187,8 @@ func reset_game():
 	Engine.time_scale=1.0
 	Global.slow_down_to_zero=false
 	get_tree().paused=false
-	#Music.eject()
+	if endless:
+		Music.eject()
 	var main=get_tree().get_root().get_node("Main")
 	get_tree().get_root().call_deferred("remove_child",main)
 	get_tree().call_deferred("change_scene_to_packed",load("res://Scenes/General/game_start.tscn"))
@@ -374,10 +375,10 @@ func change_window_mode(force=false):
 		viewport.position=(DisplayServer.screen_get_size()-viewport.size)/2
 
 func _process(delta):
-	#if slow_down_to_zero and Engine.time_scale>0:
-	#	Engine.time_scale=move_toward(Engine.time_scale,0,.00006*60*delta*210/(Engine.time_scale+1)*slow_down_speed)
-	#elif !slow_down_to_zero and Engine.time_scale<1.0:
-	#	Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60*slow_down_speed)
+	if slow_down_to_zero and Engine.time_scale>0:
+		Engine.time_scale=move_toward(Engine.time_scale,0,.00006*60*delta*210/(Engine.time_scale+1)*slow_down_speed)
+	elif !slow_down_to_zero and Engine.time_scale<1.0:
+		Engine.time_scale=move_toward(Engine.time_scale,1,1.0/60*slow_down_speed)
 	
 	if wind_dir!=0:
 		wind_speed_step+=delta*.7

@@ -108,7 +108,7 @@ func _process(delta):
 		dir=veldir
 	
 	if !original_player and mask.offset.y!=-32:
-		mask.offset.y=move_toward(mask.offset.y,-32,64*delta)
+		mask.offset.y=move_toward(mask.offset.y,-32,delta*128)
 		if mask.offset.y==-32:
 			control.paused=false
 	

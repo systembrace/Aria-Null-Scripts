@@ -48,8 +48,8 @@ func hide_save():
 func reset():
 	if health and hpbar:
 		hpbar.health=health
-		#if not hpbar.updatepip in health.hpchanged.get_connections():
-		health.hpchanged.connect(hpbar.updatepip)
+		if not health.hpchanged.is_connected(hpbar.updatepip):
+			health.hpchanged.connect(hpbar.updatepip)
 		hpbar.hpcountupdated(health.maxhp)
 		hpbar.updatepip()
 	if ammoclip and inventory:
