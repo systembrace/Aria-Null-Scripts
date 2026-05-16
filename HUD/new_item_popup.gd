@@ -5,9 +5,8 @@ var directions={
 	"roly_poly":"(PRESS {hologram} TO USE)"
 }
 var descriptions={
-	"roly_poly":"Creates a controllable hard-light hologram.\n
-				When the user's shell is destroyed, the hologram is used to gather sufficient nanomachines for a complete regeneration.\n
-				Only one regeneration is possible per charge.",
+	"roly_poly":"Requires energy.\n
+	\"Looks like this'll help me out... I'll connect Tessa and I. Seems like it'll be more useful if she holds onto it.\"",
 }
 
 func _ready():

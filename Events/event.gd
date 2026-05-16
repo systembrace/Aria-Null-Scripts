@@ -9,6 +9,7 @@ class_name Event
 @export var only_branch_here_backwards=false
 @export var branch_when_skipped: Event
 @export var ignore_when_event_completed: Event
+@export var branch_when_ignored: Event
 @export var save_when_completed=false
 @export var pause_player=false
 signal activated
@@ -49,12 +50,17 @@ func _ready():
 	if save_when_completed:
 		just_completed.connect(main.save_data.bind(true))
 
+func should_ignore():
+	return ignore_when_event_completed and (ignore_when_event_completed.completed or (ignore_when_event_completed is DialogueEvent and ignore_when_event_completed.playing_dialogue)) and not ignore_when_event_completed.skipped and (not ignore_when_event_completed.branch or ignore_when_event_completed.branched_here)
+
 func activate():
 	if active or completed:
 		return
-	if branch or (ignore_when_event_completed and ignore_when_event_completed.completed and not ignore_when_event_completed.skipped):
+	if branch or should_ignore():
 		active=true
 		complete()
+		if branch_when_ignored and should_ignore():
+			branch_when_ignored.branch_here(self)
 		return
 	if pause_player:
 		main.player.control.call_deferred("pause")
@@ -91,7 +97,7 @@ func complete():
 	completed=true
 	active=false
 	just_completed.emit()
-	if next and !skipped:
+	if next and !skipped and not (branch_when_ignored and should_ignore()):
 		next.activate()
 	elif !next and not get_parent() is RepeatingEvent:
 		print("finished with all events!")
@@ -121,6 +127,7 @@ func branch_here(branched_from=null):
 	branch=false
 	branched_here=branched_from
 	active=false
+	skipped=false
 	activate()
 	
 func skip(trueskip=false):

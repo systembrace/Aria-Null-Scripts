@@ -22,9 +22,7 @@ func activate():
 	super.activate()
 
 func jump():
-	jump_event.branch=false
-	jump_event.completed=false
-	jump_event.activate()
+	jump_event.branch_here(self)
 
 func finish_task():
 	if main.player.control.health.hplost.is_connected(jump):

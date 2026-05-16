@@ -60,6 +60,8 @@ func change_scene(body=null):
 	player.set_process_input(false)
 	main.hide()
 	main.name="old_main"
+	if "Cherry" in main.npcs and Global.get_flag("With_Cherry") and main.current_waypoint:
+		player.inventory.hud.dialogue("cherry","leave_room_"+str(randi_range(1,4)),true,false,true)
 	if main.save_object_status:
 		main.save_objects()
 	for node in get_tree().get_nodes_in_group("objs_to_load"):
@@ -92,4 +94,5 @@ func change_scene(body=null):
 	inventory.update_camera()
 	player.call_deferred("make_scarf")
 	player.call_deferred("create_tessa")
+	
 	Global.num_particles=0

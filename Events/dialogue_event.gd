@@ -9,14 +9,17 @@ class_name DialogueEvent
 @export var perm_equals=0.0
 var heard_name
 var play_number
+var playing_dialogue=false
 
 func activate():
 	heard_name=main.scene_name+"_"+name
 	if change_on_death>=0:
 		play_number=Global.get_permanent_data("heard_dialogue",heard_name)
-	if (change_on_death>=0 and play_number!=null and (play_number>change_on_death or change_on_death==0)) or branch or (ignore_when_event_completed and ignore_when_event_completed.completed and not ignore_when_event_completed.skipped)  or (skip_if_perm!="" and ((Global.get_permanent_data("global",skip_if_perm)==null and !perm_equals) or (Global.get_permanent_data("global",skip_if_perm)!=null and float(int(Global.get_permanent_data("global",skip_if_perm)))==perm_equals))):
+	if (change_on_death>=0 and play_number!=null and (play_number>change_on_death or change_on_death==0)) or branch or should_ignore() or (skip_if_perm!="" and ((Global.get_permanent_data("global",skip_if_perm)==null and !perm_equals) or (Global.get_permanent_data("global",skip_if_perm)!=null and float(int(Global.get_permanent_data("global",skip_if_perm)))==perm_equals))):
 		active=true
 		complete()
+		if branch_when_ignored and should_ignore():
+			branch_when_ignored.branch_here(self)
 		return
 	if active or completed or skipped or (branched_here and branched_here.load_skip):
 		return
@@ -35,6 +38,7 @@ func activate():
 		Global.set_permanent_data("heard_dialogue",heard_name,play_number)
 	if !pause_player and main.player.control.paused:
 		main.inventory.dialogue_indicator.show()
+	playing_dialogue=true
 	main.inventory.hud.dialogue(main.scene_name,dialogue_name,coroutine,interrupt,interruptable,change_on_death,loop_last)
 	Global.dialogue_ended.connect(dialogue_ended)
 
@@ -44,4 +48,5 @@ func dialogue_ended():
 		finish_task()
 	else:
 		complete()
+	playing_dialogue=false
 	Global.dialogue_ended.disconnect(dialogue_ended)
