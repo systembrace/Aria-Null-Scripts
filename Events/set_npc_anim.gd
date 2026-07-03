@@ -13,6 +13,8 @@ func activate():
 		complete()
 		return
 	super.activate()
-	actor=main.npcs[actor_name]
+	actor=main.player
+	if actor_name!="Player":
+		actor=main.npcs[actor_name]
 	actor.anim_controller.cutscene_anim=anim_name
 	complete()

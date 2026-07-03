@@ -12,6 +12,7 @@ class_name Event
 @export var branch_when_ignored: Event
 @export var save_when_completed=false
 @export var pause_player=false
+@export var emit_when_skip=true
 signal activated
 signal just_completed
 signal task_finished
@@ -96,7 +97,8 @@ func complete():
 		main.player.control.set_deferred("paused",false)
 	completed=true
 	active=false
-	just_completed.emit()
+	if !skipped or emit_when_skip:
+		just_completed.emit()
 	if next and !skipped and not (branch_when_ignored and should_ignore()):
 		next.activate()
 	elif !next and not get_parent() is RepeatingEvent:
@@ -157,7 +159,8 @@ func skip(trueskip=false):
 	active=true
 	complete()
 	completed=true
-	just_completed.emit()
+	if emit_when_skip:
+		just_completed.emit()
 	active=false
 	if coroutine:
 		finish_task()

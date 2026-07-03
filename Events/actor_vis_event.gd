@@ -1,6 +1,7 @@
 extends Event
 class_name ActorVisEvent
 
+@export var actor="player"
 @export var show_actor=true
 
 func activate():
@@ -11,16 +12,31 @@ func activate():
 		complete()
 		return
 	super.activate()
-	if show_actor:
-		main.player.show()
-		main.player.scarf.show()
-		main.inventory.hud.hpbar.show()
-		main.inventory.hud.portrait.show()
-		main.inventory.hud.scrapicon.show()
-	else:
-		main.player.hide()
-		main.player.scarf.hide()
-		main.inventory.hud.hpbar.hide()
-		main.inventory.hud.portrait.hide()
-		main.inventory.hud.scrapicon.hide()
+	execute()
 	complete()
+
+func execute():
+	if show_actor:
+		if actor=="player":
+			main.player.show()
+			main.player.scarf.show()
+			main.inventory.hud.hpbar.show()
+			main.inventory.hud.portrait.show()
+			main.inventory.hud.scrapicon.show()
+		else:
+			print("show")
+			main.npcs[actor].show()
+	else:
+		if actor=="player":
+			main.player.hide()
+			main.player.scarf.hide()
+			main.inventory.hud.hpbar.hide()
+			main.inventory.hud.portrait.hide()
+			main.inventory.hud.scrapicon.hide()
+		else:
+			print("hide")
+			main.npcs[actor].hide()
+
+func skip(trueskip=false):
+	super.skip(trueskip)
+	execute()
