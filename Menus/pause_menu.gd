@@ -6,6 +6,7 @@ signal open_inv
 var main
 var exit=false
 var options=false
+var triple_confirm=0
 @onready var current_menu=$PanelContainer/MarginContainer/StartMenu
 @onready var sfx_confirm=$SFXConfirm
 @onready var sfx_back=$SFXBack
@@ -16,6 +17,8 @@ func _ready():
 	$PanelContainer/MarginContainer/StartMenu/Options.pressed.connect(sfx_confirm.play)
 	$PanelContainer/MarginContainer/StartMenu/Checkpoint.pressed.connect(switch_menus.bind("CheckpointMenu"))
 	$PanelContainer/MarginContainer/StartMenu/Checkpoint.pressed.connect(sfx_confirm.play)
+	$PanelContainer/MarginContainer/StartMenu/Save.pressed.connect(save)
+	$PanelContainer/MarginContainer/StartMenu/Save.pressed.connect(sfx_confirm.play)
 	$PanelContainer/MarginContainer/StartMenu/Quit.pressed.connect(open_quit)
 	$PanelContainer/MarginContainer/StartMenu/Exit.pressed.connect(open_quit.bind(true))
 	$PanelContainer/MarginContainer/QuitMenu/HBoxContainer/Quit.pressed.connect(quit)
@@ -68,6 +71,11 @@ func reset():
 	main.fade_out()
 	get_tree().create_timer(1).timeout.connect(Global.reset_game)
 
+func save():
+	triple_confirm+=1
+	if triple_confirm==3:
+		main.save_data(true)
+
 func open_quit(ex=false):
 	exit=ex
 	if exit:
@@ -91,6 +99,7 @@ func open_quit(ex=false):
 	switch_menus("QuitMenu")
 
 func resume():
+	triple_confirm=0
 	if visible:
 		resume_game.emit()
 
