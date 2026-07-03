@@ -42,12 +42,12 @@ func test_next_section(data):
 func _draw():
 	if shoulders:
 		draw_texture(shoulders,Vector2.ZERO)
+	if eyes:
+		draw_texture(eyes,Vector2.ZERO)
 	if mouth:
 		draw_texture(mouth,Vector2.ZERO)
 	if eyebrows:
 		draw_texture(eyebrows,eyebrows_offset)
-	if eyes:
-		draw_texture(eyes,Vector2.ZERO)
 
 func draw_portrait(current_data=null,current_section=null,index=1):
 	if !test_face or !Engine.is_editor_hint():

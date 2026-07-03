@@ -1,26 +1,18 @@
-extends Entity
+extends NPC
 class_name Ally
 
-@export var actor=false
-@export var max_speed: float
-@export var accel: float
 @export var target: Node2D
-@export var can_speak_to=false
 @export var tessa=false
-var main
 var min_speed
 var ammo=60.0
 var kneeling=false
 var jump_point:Area2D=null
-@onready var anim_controller=$AnimationController
 @onready var control=$AI
 @onready var nav_agent=$Navigator.nav_agent
 
 func _ready():
+	super._ready()
 	min_speed=max_speed/2
-	main=get_tree().get_root().get_node("Main")
-	if actor:
-		main.npcs[name]=self
 	if !Global.endless and tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
 		if !is_instance_valid(main.npcs["Cherry"]):
 			queue_free()
@@ -28,10 +20,6 @@ func _ready():
 		global_position=main.npcs["Cherry"].global_position
 	if nav_agent.avoidance_enabled:
 		nav_agent.velocity_computed.connect(nav_velocity_computed)
-	super._ready()
-
-func interact(_interacted=null):
-	pass
 
 func _process(delta):
 	if main.dark and !$Lamp.enabled:
