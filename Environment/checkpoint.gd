@@ -6,6 +6,7 @@ signal exited_without_connecting
 signal exited_with_connecting
 signal bought_something
 signal didnt_buy
+signal exited
 @onready var shop=$CanvasLayer/Shop
 
 func _ready():
@@ -63,9 +64,10 @@ func exit_shop():
 		didnt_buy.emit()
 	shop.tried_connecting=false
 	shop.bought_something=false
+	exited.emit()
 	save_data()
 
 func save_data():
-	main.save_data(true)
+	main.save_data()#true)
 	#if $Glowy.animation!="small" and main.scene_file_path==Global.checkpoint_scene:
 		#disable_refill()

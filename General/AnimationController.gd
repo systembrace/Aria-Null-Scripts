@@ -58,9 +58,10 @@ func _ready():
 		hurtbox.hurtboxenabled.connect(disableflicker)
 	if has_fall:
 		body.fell.connect(update_fall)
-	flicker=$Flicker
-	flicker.timeout.connect(hitflash)
-	flicker.wait_time=.15
+	flicker=find_child("Flicker")
+	if flicker:
+		flicker.timeout.connect(hitflash)
+		flicker.wait_time=.15
 	var start_anim=idlename
 	if has_vertical_sprites:
 		if direction.y<0:

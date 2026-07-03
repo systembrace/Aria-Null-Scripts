@@ -7,8 +7,8 @@ var near_interactor=false
 @onready var sprite=$AnimatedSprite2D
 
 func _ready():
-	area_entered.connect(entered)
-	area_exited.connect(exited)
+	area_entered.connect(entered_area)
+	area_exited.connect(exited_area)
 	if can_interact:
 		activate()
 	else:
@@ -20,20 +20,20 @@ func interact(node):
 func activate():
 	can_interact=true
 	if near_interactor:
-		entered()
+		entered_area()
 
 func deactivate():
 	can_interact=false
 	var temp=near_interactor
-	exited()
+	exited_area()
 	near_interactor=temp
 
-func entered(_area=null):
+func entered_area(_area=null):
 	near_interactor=true
 	if can_interact and sprite.material.get_shader_parameter("width")==0:
 		sprite.material.set_shader_parameter("width",1)
 		
-func exited(_area=null):
+func exited_area(_area=null):
 	near_interactor=false
 	if sprite.material.get_shader_parameter("width")==1:
 		sprite.material.set_shader_parameter("width",0)

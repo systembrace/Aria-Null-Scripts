@@ -60,7 +60,8 @@ func hit(area=null):
 		hitbox.set_collision_mask_value(5,true)
 		if !hitbox.monitor:
 			hitbox.enable_hitbox()
-	#get_tree().create_timer(0.5,false).timeout.connect(reenable)
+	#if !charge_attack:
+	#	get_tree().create_timer(0.5,false).timeout.connect(reenable)
 
 func reenable():
 	hurtbox.set_collision_layer_value(2,true)

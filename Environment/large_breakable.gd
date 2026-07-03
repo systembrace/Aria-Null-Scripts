@@ -11,6 +11,8 @@ func create_smaller_breakables():
 		breakable.global_rotation=break_point.global_rotation
 		breakable.global_position=break_point.global_position
 		main.call_deferred("add_child",breakable)
+		breakable.name="BrokenTable"
+		breakable.add_to_group("objs_to_load")
 
 func set_broken():
 	broken=true

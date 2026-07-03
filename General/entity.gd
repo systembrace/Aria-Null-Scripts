@@ -7,7 +7,7 @@ class_name Entity
 @export var can_jump=false
 @export var size=1.0
 @export var grappleable=false
-@export var body_sprite:Node2D
+@export var body_sprite:AnimatedSprite2D
 signal started_falling
 signal fell
 var initial_fall_buffer=true

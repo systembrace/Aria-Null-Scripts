@@ -121,7 +121,7 @@ func _physics_process(delta):
 	if (stunned or dying) and body.on_floor:
 		if (!dying and stunned) or friction_dying:
 			body.velocity=body.velocity.move_toward(Vector2.ZERO,16)
-		if dying and (body.velocity.length()<.1 or body.move_and_collide(body.velocity*delta,true)):
+		if dying and (body.velocity.length()<.1 or (!friction_dying and body.move_and_collide(body.velocity*delta,true))):
 			die()
 		return
 	elif current_state:
