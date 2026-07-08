@@ -191,6 +191,7 @@ func reset_game():
 		Music.eject()
 	var main=get_tree().get_root().get_node("Main")
 	get_tree().get_root().call_deferred("remove_child",main)
+	main.call_deferred("queue_free")
 	get_tree().call_deferred("change_scene_to_packed",load("res://Scenes/General/game_start.tscn"))
 
 func save_area_data():
