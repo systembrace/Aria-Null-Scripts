@@ -165,7 +165,11 @@ func load_objects():
 						obj.turn_on()
 						obj.turn_off()
 				elif obj is Breakable and config.get_value(scene_name,obj.name)=="broken":
-					obj.set_broken()
+					var new_breakables=obj.set_broken()
+					if new_breakables:
+						for breakable in new_breakables:
+							if breakable.name in config.get_section_keys(scene_name) and config.get_value(scene_name,breakable.name)=="broken":
+								breakable.set_broken()
 				elif obj is RepeatingEvent:
 					obj.current=config.get_value(scene_name,obj.name)
 				elif obj is Pickup:

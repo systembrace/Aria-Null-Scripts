@@ -5,6 +5,8 @@ class_name Breakable
 var broken=false
 
 func _ready():
+	if broken:
+		return
 	super._ready()
 	$Hurtbox.take_hit.connect(hit)
 
