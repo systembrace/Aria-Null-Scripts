@@ -1,5 +1,5 @@
-extends VBoxContainer
-class_name HelpDesk
+extends MenuTab
+class_name TalkTab
 
 var anims=[
 	"   ...   ",
@@ -11,7 +11,7 @@ var anims=[
 	" ...     "
 ]
 var pings=0
-signal finished_connecting
+signal talked
 @onready var connect_button=$MarginContainer/CenterContainer/Connect
 @onready var status=$MarginContainer/CenterContainer/Status
 @onready var static_effect=$MarginContainer/Static
@@ -20,12 +20,11 @@ signal finished_connecting
 @onready var back=$Back
 
 func _ready():
-	hidden.connect(reset)
 	timer.wait_time=.2
 	timer.timeout.connect(move_anim)
 	connect_button.pressed.connect(try_connect)
-	
-func reset():
+
+func exit_tab():
 	connect_button.show()
 	status.hide()
 	status.text=""
@@ -33,6 +32,7 @@ func reset():
 	timer.stop()
 
 func try_connect():
+	select_sfx.emit()
 	timer.start()
 	connect_button.hide()
 	status.show()
@@ -47,4 +47,4 @@ func _process(_delta):
 		status.text="Connection failed."
 		static_effect.show()
 		pings=0
-		finished_connecting.emit()
+		talked.emit()

@@ -1,37 +1,31 @@
-extends Control
-class_name Shop
+extends MenuTab
+class_name ShopTab
 
+signal bought_something
 var purchasefuncs = {"Nanos":buy_nano}
 var sellfuncs = {"Nanos":sell_nano}
 var inventoryvar = {"Nanos":"heals"}
 var inventoryvarmax = {"Nanos":"maxheals"}
 var player: Player
 var selected: ShopItem
-var tried_connecting=false
-var bought_something=false
-signal exited
-@onready var items = $PanelContainer/MarginContainer/VBoxContainer/TabContainer/Supply/HBoxContainer/VScrollBar/ItemList
-@onready var description = $PanelContainer/MarginContainer/VBoxContainer/TabContainer/Supply/HBoxContainer/Description
-@onready var purchase = $PanelContainer/MarginContainer/VBoxContainer/TabContainer/Supply/HBoxContainer2/Purchase
-@onready var exit = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/Exit
-@onready var sell = $PanelContainer/MarginContainer/VBoxContainer/TabContainer/Supply/HBoxContainer2/Sell
-@onready var select = $Select
-@onready var back = $Back
-@onready var help_desk=$"PanelContainer/MarginContainer/VBoxContainer/TabContainer/Help Desk"
+@onready var items = $HBoxContainer/VScrollBar/ItemList
+@onready var description = $HBoxContainer/Description
+@onready var purchase = $HBoxContainer2/Purchase
+@onready var sell = $HBoxContainer2/Sell
 
 func _ready():
-	for item in items.get_children():
-		item.pressed.connect(item_selected.bind(item))
-		if item.name in Global.items_list and !Global.get_flag(item.name):
-			item.hide()
+	for child in get_children():
+		if child is ShopItem:
+			child.reparent(items)
+			child.pressed.connect(item_selected.bind(child))
+			if child.name in Global.items_list and !Global.get_flag(child.name):
+				child.hide()
 	purchase.disabled=true
 	purchase.pressed.connect(purchase_selected)
-	exit.pressed.connect(exit_menu)
 	if !Global.endless:
 		sell.hide()
 	sell.disabled=true
 	sell.pressed.connect(sell_selected)
-	help_desk.finished_connecting.connect(set.bind("tried_connecting",true))
 
 func get_item_count(item=selected):
 	if !item.name in inventoryvar:
@@ -59,10 +53,10 @@ func item_selected(item):
 	description.show()
 	var cost=selected.cost
 	if is_instance_valid(player) and cost>player.inventory.scrap or get_item_count()>=get_item_max():
-		back.play()
+		back_sfx.emit()
 		purchase.disabled=true
 	else:
-		select.play()
+		select_sfx.emit()
 		purchase.disabled=false
 	if get_item_count()>0:
 		sell.disabled=false
@@ -79,12 +73,12 @@ func purchase_selected():
 		else:
 			result = purchasefuncs[itemname].call(cost)
 		if not result:
-			back.play()
+			back_sfx.emit()
 			return
 		sell.disabled=false
 		if cost>player.inventory.scrap:
 			purchase.disabled=true
-		select.play()
+		select_sfx.emit()
 
 func sell_selected():
 	if visible and is_instance_valid(selected) and is_instance_valid(player):
@@ -98,23 +92,7 @@ func sell_selected():
 			purchase.disabled=false
 		if get_item_count()==0:
 			sell.disabled=true
-		select.play()
-
-func exit_menu(immediate=false):
-	if visible:
-		back.play()
-		if !immediate:
-			player.inventory.hud.scrapicon.hide()
-			player.control.set_deferred("paused",false)
-			set_deferred("visible",false)
-		else:
-			player.control.paused=false
-			visible=false
-		player.inventory.call_deferred("set","in_shop",false)
-		player=null
-		exited.emit()
-		for item in items.get_children():
-			item.button_pressed=false
+		select_sfx.emit()
 		
 func buy_nano(cost):
 	if ((player.inventory.heals<player.inventory.maxheals or player.inventory.maxheals==0) and !Global.endless) or (Global.endless and player.inventory.heals<3):
@@ -124,7 +102,7 @@ func buy_nano(cost):
 		player.inventory.scrap-=cost
 		if (not Global.endless and player.inventory.heals>=player.inventory.maxheals) or (Global.endless and player.inventory.heals>=3):
 			purchase.disabled=true
-		bought_something=true
+		bought_something.emit()
 		return true
 	return false
 	
@@ -140,7 +118,7 @@ func buy_item(cost,item):
 		player.inventory.scrap-=cost
 		if player.inventory.find_child(item).num>=player.inventory.find_child(item).limit:
 			purchase.disabled=true
-		bought_something=true
+		bought_something.emit()
 		return true
 	return false
 
@@ -150,21 +128,17 @@ func sell_item(cost,item):
 		player.inventory.find_child(item).max_amt-=1
 		player.inventory.scrap+=cost
 
+func exit_tab():
+	selected=null
+	purchase.disabled=true
+	sell.disabled=true
+	description.text=""
+	description.hide()
+	for item in items.get_children():
+		item.button_pressed=false
+
 func _process(_delta):
-	if !visible:
-		return
-	player.inventory.in_shop=true
-	player.inventory.hud.scrapicon.show()
-	if !player.inventory.hud.scrapicon.find_child("Timer").is_stopped():
-		player.inventory.hud.scrapicon.find_child("Timer").stop()
-	if Input.is_action_just_pressed("back") or Input.is_action_just_pressed("inventory"):
-		exit_menu(Input.is_action_just_pressed("inventory"))
-		selected=null
-		purchase.disabled=true
-		sell.disabled=true
-		description.text=""
-		description.hide()
-		tried_connecting=false
+	if !open or !get_parent().visible:
 		return
 	for item in items.get_children():
-		item.num.text="x"+str(get_item_count(item))
+		item.num.text="("+str(get_item_count(item))+")"

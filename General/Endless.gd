@@ -43,7 +43,7 @@ func open_shop():
 		next_wave()
 		return
 	$CanvasLayer/Shop.visible=true
-	$CanvasLayer/Shop.player=player
+	$CanvasLayer/Shop.set_player(player)
 	player.control.set_deferred("paused",true)
 
 func next_wave():

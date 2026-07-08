@@ -2,10 +2,10 @@ extends Interactable
 
 var main
 var can_refill=true
-signal exited_without_connecting
-signal exited_with_connecting
 signal bought_something
 signal didnt_buy
+signal exited_talked
+signal exited_didnt_talk
 signal exited
 @onready var shop=$CanvasLayer/Shop
 
@@ -44,7 +44,7 @@ func interact(player):
 			$Activate.emitting=true
 			disable_refill()
 		player.control.set_deferred("paused",true)
-		$CanvasLayer/Shop.player=player
+		$CanvasLayer/Shop.set_player(player)
 		$CanvasLayer/Shop.set_deferred("visible",true)
 	#else:
 		#var new_player=load("res://Scenes/Allies/player.tscn").instantiate()
@@ -54,15 +54,15 @@ func interact(player):
 		#call_deferred("interact",new_player)
 
 func exit_shop():
-	if shop.tried_connecting:
-		exited_with_connecting.emit()
+	if shop.talked:
+		exited_talked.emit()
 	else:
-		exited_without_connecting.emit()
+		exited_didnt_talk.emit()
 	if shop.bought_something:
 		bought_something.emit()
 	else:
 		didnt_buy.emit()
-	shop.tried_connecting=false
+	shop.talked=false
 	shop.bought_something=false
 	exited.emit()
 	save_data()
