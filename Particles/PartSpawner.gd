@@ -3,8 +3,9 @@ class_name PartSpawner
 
 @export var bullet=false
 @export var particles={}
+@export var height=0
+@export var rubble_type="none"
 var main
-var rubble_type="none"
 
 func _ready():
 	main=get_tree().get_root().get_node("Main")
@@ -38,6 +39,8 @@ func spawn_spec(pname,pos=get_parent().global_position,parry=false,mod=1,blood_f
 			instance.vel_mod=mod
 			if pname=="rubble" and rubble_type!="none":
 				instance.type=rubble_type
+			if height!=0:
+				instance.h=height
 		main.call_deferred("add_child",instance)
 
 func heal_corpse():

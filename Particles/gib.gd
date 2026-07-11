@@ -19,6 +19,7 @@ func _ready():
 		return
 	Global.num_particles+=1
 	super._ready()
+	sprite.position.y=-h
 	dh=randf_range(3,4)
 	bounce=(dh-3)*.03+.1
 	velocity=Vector2(randf_range(-1,1),randf_range(-1,1)).normalized()*randf_range(48,96)

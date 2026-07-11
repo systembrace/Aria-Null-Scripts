@@ -24,7 +24,6 @@ func execute():
 			main.inventory.hud.portrait.show()
 			main.inventory.hud.scrapicon.show()
 		else:
-			print("show")
 			main.npcs[actor].show()
 	else:
 		if actor=="player":
@@ -34,7 +33,6 @@ func execute():
 			main.inventory.hud.portrait.hide()
 			main.inventory.hud.scrapicon.hide()
 		else:
-			print("hide")
 			main.npcs[actor].hide()
 
 func skip(trueskip=false):
