@@ -11,6 +11,7 @@ class_name Player
 @export var virtual=false
 @export var mask: Sprite2D
 @export var anim_controller:AnimationController
+@export var holo_type="none"
 signal collision
 var speed=min_speed
 var inventory: Inventory

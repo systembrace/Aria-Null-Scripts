@@ -6,50 +6,54 @@ var dividers=[]
 var inventory: Inventory
 var shake=0
 var shake_offset=Vector2.ZERO
-@onready var full=$Full
+@onready var full=$Secondary/Full
 @onready var basedivider=$Divider
-@onready var count=$CBack/MarginContainer/Count
+@onready var count=$Secondary/CBack/MarginContainer/Count
 	
 func init_dividers():
 	for divider in dividers:
-		remove_child(divider)
+		$Secondary.remove_child(divider)
 	dividers.clear()
 	ammo=-1
 	numshots=inventory.numshots
 	var dx=60.0/numshots
 	for i in range(1,numshots):
 		var divider=basedivider.duplicate()
-		add_child(divider)
+		$Secondary.add_child(divider)
 		divider.position.x=dx-1
 		dx+=60.0/numshots
 		divider.visible=true
 		dividers.append(divider)
 
 func _process(delta):
-	if not inventory or !visible:
+	if not inventory:
 		return
-	if !Global.get_flag("roly_poly"):
-		hide()
-		return
-	elif not inventory.secondary:
+	if inventory.secondary:
 		show()
-		$TrueAmmo.scale.x=floor(inventory.ammo)
-		animation="none"
-		$Backdrop.scale.y=3
-		$Empty.hide()
-		full.hide()
-		for divider in dividers:
-			divider.hide()
-		$CBack.hide()
-		return
-	elif animation=="none":
 		$Backdrop.scale.y=11
-		$Empty.show()
-		full.show()
-		for divider in dividers:
-			divider.show()
-		$CBack.show()
+		$Secondary.show()
 		get_parent().visible=true
+	else:
+		var has_revive=false
+		for enemy in Global.revives_list:
+			if enemy=="none":
+				continue
+			if Global.get_flag(enemy):
+				has_revive=true
+				break
+		if has_revive:
+			show()
+			$TrueAmmo/TrueAmmo.scale.x=floor(inventory.ammo)
+			animation="none"
+			$Secondary.hide()
+			$Backdrop.scale.y=3
+		else:
+			hide()
+			$TrueAmmo.hide()
+			$Secondary.hide()
+			animation="none"
+			return
+		
 	if shake>0:
 		shake-=delta
 		shake_offset=Vector2(randi_range(-1,1),randi_range(-1,1))
@@ -57,7 +61,10 @@ func _process(delta):
 		shake_offset=Vector2.ZERO
 	position=Vector2(30,17)+shake_offset
 	
-	$TrueAmmo.scale.x=floor(inventory.ammo)
+	$TrueAmmo/TrueAmmo.scale.x=floor(inventory.ammo)
+	
+	if !inventory.secondary:
+		return
 	
 	if numshots!=inventory.numshots:
 		init_dividers()

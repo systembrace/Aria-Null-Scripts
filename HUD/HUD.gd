@@ -10,10 +10,10 @@ var control: PlayerControl
 #@onready var speedometer=$Speedometer
 @onready var ammoclip=$AmmoClip
 @onready var scraplabel=$VBoxContainer/Control2/ScrapIcon/ScrapLabel
-@onready var healorb=$HealLabel/HealOrb
-@onready var heallabel=$HealLabel
-@onready var equipicon=$EquipLabel/EquipIcon
-@onready var equiplabel=$EquipLabel
+@onready var healorb=$VBoxContainer2/HealLabel/HealOrb
+@onready var heallabel=$VBoxContainer2/HealLabel
+@onready var equipicon=$VBoxContainer2/EquipLabel/EquipIcon
+@onready var equiplabel=$VBoxContainer2/EquipLabel
 @onready var timer=$SaveIcon/Timer
 @onready var itembar=$ItemBar
 @onready var scrapicon=$VBoxContainer/Control2/ScrapIcon
@@ -61,19 +61,19 @@ func reset():
 	#	speedometer.control=control
 	#	speedometer.start()
 
-func show_notice(text=""):
+func show_notice(text="",listen=false):
 	if text=="":
 		notice.hide()
 		return
 	notice.show()
-	notice_label.text=Global.format_keybind(text).to_upper()
+	notice_label.text=Global.format_keybind(text,listen).to_upper()
 
 func _process(_delta):
 	if is_instance_valid(control):
 		if control.healing:
-			healorb.position=Vector2(randi_range(-1,1),randi_range(-1,1))
+			healorb.position=Vector2(randi_range(-1,1),randi_range(7,9))
 		else:
-			healorb.position=Vector2.ZERO
+			healorb.position=Vector2(0,8)
 		
 	if is_instance_valid(inventory) and is_instance_valid(inventory.player) and inventory.player is Player:
 		if inventory.player.original_player and inventory.can_revive and portrait.animation!="default":
@@ -109,7 +109,7 @@ func _process(_delta):
 		
 		if heallabel.text!="x"+str(inventory.heals):
 			heallabel.text="x"+str(inventory.heals)
-			$HealLabel/Backdrop.scale.x=len(heallabel.text)*9+1
+			$VBoxContainer2/HealLabel/Backdrop.scale.x=len(heallabel.text)*9+1
 		
 		if !inventory.item:
 			if equiplabel.visible:
@@ -130,16 +130,22 @@ func _process(_delta):
 				equipicon.animation=inventory.item.name.to_lower()
 			if equiplabel.text!="x"+str(inventory.item.num):
 				equiplabel.text="x"+str(inventory.item.num)
-				$EquipLabel/Backdrop.scale.x=len(equiplabel.text)*9+1
+				$VBoxContainer2/EquipLabel/Backdrop.scale.x=len(equiplabel.text)*9+1
 				
 			if inventory.item.chargetime>0 and inventory.charge>=inventory.item.chargetime:
-				equipicon.position=Vector2(randi_range(-1,1),randi_range(-1,1))
+				equipicon.position=Vector2(randi_range(-1,1),randi_range(7,9))
 			else:
-				equipicon.position=Vector2.ZERO
+				equipicon.position=Vector2(0,8)
 		
 		if inventory.secondary and inventory.secondary is Gun or inventory.secondary is Shield:
 			$VBoxContainer/Control.visible=true
 			var gun_name=inventory.secondary.name.to_lower()
+			if "rental" in gun_name:
+				gun_name=gun_name.replace("rental","") 
+				$VBoxContainer/Control/Icon/RentalShots.text=str(inventory.secondary.shots_remaining)
+				$VBoxContainer/Control/Icon/RentalShots.show()
+			else:
+				$VBoxContainer/Control/Icon/RentalShots.hide()
 			icon.animation=gun_name
 			$VBoxContainer/Control/Icon/Backdrop.scale.x=icon.sprite_frames.get_frame_texture(gun_name,0).get_width()+2
 		else:

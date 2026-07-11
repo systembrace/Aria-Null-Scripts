@@ -167,6 +167,11 @@ func refill_items():
 	for node in items:
 		node.num=node.max_amt
 
+func increase_max(item_name):
+	find_child(item_name).max_amt+=1
+	if find_child(item_name).max_amt==1:
+		Global.set_flag(item_name,true)
+
 func equip_item():
 	if itemindex>=0:
 		item=items[itemindex]
@@ -286,7 +291,8 @@ func save_data():
 		"earthshakermax":$Earthshaker.max_amt,
 		"ammo":ammo,
 		"secondaryindex":secondaryindex,
-		"itemindex":itemindex
+		"itemindex":itemindex,
+		"rentalshotgun":$RentalShotgun.shots_remaining
 	}
 	return data
 
@@ -318,3 +324,5 @@ func load_data(data):
 		secondaryindex=data["secondaryindex"]
 	if "itemindex" in data.keys():
 		itemindex=int(data["itemindex"])
+	if "rentalshotgun" in data.keys():
+		$RentalShotgun.shots_remaining=int(data["rentalshotgun"])

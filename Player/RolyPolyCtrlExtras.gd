@@ -4,11 +4,12 @@ extends Node2D
 @export var hurtbox: Hurtbox
 @export var combo: Combo
 @export var charge: Attack
+@export var attack: Attack
 var dh=0
 var gravity=15
 var disabled_hurtbox=false
 var init_collision
-var attacking=false
+var charging=false
 var bounces=0
 @onready var body: Player=get_parent()
 
@@ -17,8 +18,8 @@ func _ready():
 	await body.ready
 	combo.started_attack.connect(disable_hurtbox)
 	combo.ended_attack.connect(enable_hurtbox)
-	combo.started_attack.connect(body.jump)
-	combo.ended_attack.connect(body.land)
+	attack.started_attack.connect(body.jump)
+	attack.ended_attack.connect(body.land)
 	init_collision=body.collision_mask
 	body.set_collision_mask_value(9,false)
 	hurtbox.hurtboxenabled.connect(set_collision)
@@ -27,8 +28,9 @@ func _ready():
 	charge.ended_attack.connect(charge_ended)
 
 func charge_started():
+	body.set_collision_mask_value(18,false)
 	body.set_collision_mask_value(9,false)
-	attacking=true
+	charging=true
 	$Ring1.emitting=true
 	$Ring2.restart()
 	$Dust.restart()
@@ -36,10 +38,11 @@ func charge_started():
 	bounces=0
 	
 func charge_ended():
-	if !attacking:
+	if !charging:
 		return
+	body.set_collision_mask_value(18,true)
 	body.set_collision_mask_value(9,true)
-	attacking=false
+	charging=false
 	$DustTimer.start()
 	$Ring1.restart()
 	$Ring2.emitting=true
@@ -60,7 +63,7 @@ func set_collision():
 	hurtbox.hurtboxenabled.disconnect(set_collision)
 
 func bounce(coll):
-	if attacking:
+	if charging:
 		var new_vel=body.velocity.bounce(coll.get_normal())
 		body.set_deferred("velocity",new_vel)
 		charge.call_deferred("look_at",to_global(new_vel))
