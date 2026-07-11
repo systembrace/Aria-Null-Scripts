@@ -48,6 +48,8 @@ func timerup():
 	collectable=true
 
 func _process(delta):
+	if h<=-96:
+		queue_free()
 	if parry:
 		if not is_instance_valid(player):
 			if corpse:
@@ -84,8 +86,8 @@ func _process(delta):
 		sprite.frame=randi_range(1,3)
 		timer.start()
 		$CollisionShape2D.disabled=true
-		floor_checker.body_exited.disconnect(left_floor)
-		floor_checker.queue_free()
+		#floor_checker.body_exited.disconnect(left_floor)
+		#floor_checker.queue_free()
 		sprite.position.y=0
 		global_position=global_position.round()
 	if shrink:

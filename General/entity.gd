@@ -8,6 +8,8 @@ class_name Entity
 @export var size=1.0
 @export var grappleable=false
 @export var body_sprite:AnimatedSprite2D
+@export var do_initial_buffer=true
+@export var fall_scale=1.0
 signal started_falling
 signal fell
 var initial_fall_buffer=true
@@ -31,7 +33,10 @@ func _ready():
 		body_sprite=find_child("AnimatedSprite2D")
 	if body_sprite:
 		body_sprite_y_offset=body_sprite.offset.y
-	get_tree().create_timer(.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
+	if do_initial_buffer:
+		get_tree().create_timer(.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
+	else:
+		initial_fall_buffer=false
 	coyote=Timer.new()
 	coyote.name="CoyoteTimer"
 	coyote.one_shot=true
@@ -172,7 +177,7 @@ func _physics_process(delta):
 	if falling:
 		z_index=-11
 		if body_sprite:
-			body_dh+=delta*10 
+			body_dh+=delta*10*size*fall_scale
 			body_sprite.offset.y+=body_dh
 		if "control" in self:
 			self.control.paused=true
