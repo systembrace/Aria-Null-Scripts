@@ -42,9 +42,7 @@ func open_shop():
 	if player.inventory.scrap<3:
 		next_wave()
 		return
-	$CanvasLayer/Shop.visible=true
-	$CanvasLayer/Shop.set_player(player)
-	player.control.set_deferred("paused",true)
+	$CanvasLayer/Shop.open_shop(player)
 
 func next_wave():
 	spawning=true

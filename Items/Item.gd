@@ -3,7 +3,7 @@ class_name Item
 
 @export var type="grenades"
 @export var num:int=0
-@export var max_amt=0
+@export var max_amt:int=0
 @export var limit=30
 @export var buffer=.5
 @export var chargetime=-1

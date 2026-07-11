@@ -125,6 +125,19 @@ func save_objects(checkpoint=false):
 			config.set_value(scene_name,obj.name,obj.current)
 		elif obj is Pickup:
 			config.set_value(scene_name,obj.name,obj.visible)
+		elif obj is NPCEventController:
+			var temp_config=ConfigFile.new()
+			var section=obj.npc_name
+			var npc_config="user://area_data/last_npcs.ini"
+			if FileAccess.file_exists(npc_config):
+				temp_config.load(npc_config)
+				if temp_config.has_section(section):
+					temp_config.erase_section(section)
+			temp_config.set_value(section,"interact_count",obj.interact_count)
+			temp_config.set_value(section,"reactions_given",var_to_str(obj.reactions_given))
+			temp_config.save("user://area_data/last_npcs.ini")
+			if checkpoint:
+				temp_config.save("user://area_data/checkpoint_npcs.ini")
 		else:
 			print("idk how to save this "+obj.name)
 	config.set_value(scene_name,"Visited",true)
@@ -142,6 +155,16 @@ func load_objects():
 			if not obj.name in config.get_section_keys(scene_name):
 				if obj is Enemy or obj is FadeTransition or obj is BreakableWall or obj is Spawner:
 					obj.queue_free()
+				if obj is NPCEventController:
+					var temp_config=ConfigFile.new()
+					var npc_config="user://area_data/last_npcs.ini"
+					if !FileAccess.file_exists(npc_config):
+						continue
+					temp_config.load(npc_config)
+					if !temp_config.has_section(obj.npc_name):
+						continue
+					obj.interact_count=temp_config.get_value(obj.npc_name,"interact_count")
+					obj.reactions_given=str_to_var(temp_config.get_value(obj.npc_name,"reactions_given"))
 			elif obj.name in config.get_section_keys(scene_name):
 				if obj is Enemy or obj is FadeTransition or obj is Spawner:
 					continue

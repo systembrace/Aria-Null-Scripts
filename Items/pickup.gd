@@ -55,6 +55,11 @@ func interacted(_node):
 		Global.set_flag(item,true)
 		if main.inventory.revival=="none":
 			main.inventory.revival=item
+	else:
+		Global.set_flag(item,true)
+		var secondary=main.inventory.find_child(item)
+		main.inventory.secondaryindex=main.inventory.secondaries.find(secondary)
+		main.inventory.equip_secondary()
 	main.inventory.hud.item_popup.display(item)
 	queue_free()
 

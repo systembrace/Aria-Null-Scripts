@@ -42,10 +42,9 @@ func interact(player):
 			player.control.inventory.ammo=60
 			player.control.inventory.refill_items()
 			$Activate.emitting=true
+			Global.erase_heard_dialogue()
 			disable_refill()
-		player.control.set_deferred("paused",true)
-		$CanvasLayer/Shop.set_player(player)
-		$CanvasLayer/Shop.set_deferred("visible",true)
+		$CanvasLayer/Shop.open_shop(player)
 	#else:
 		#var new_player=load("res://Scenes/Allies/player.tscn").instantiate()
 		#main.add_child(new_player)

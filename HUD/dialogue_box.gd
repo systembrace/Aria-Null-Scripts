@@ -140,12 +140,12 @@ func _process(delta):
 		held_for+=delta
 		if speed==1 and held_for>.5:
 			speed=4
+		if held_for>2 and speed<8:
+			speed=8
 	elif held_for>0:
 		held_for=0
 		if speed==8:
 			speed=4
-	if held_for>2 and speed<8:
-		speed=8
 	
 	if len(text)<=0:
 		$PanelContainer/MarginContainer/HBoxContainer/Next.show()
@@ -155,5 +155,5 @@ func _process(delta):
 				speed=1
 				held_for=0
 		return
-	if speaker!="eigon" and (Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack")):
+	if len(text)<len(current_data.get_value(current_section,str(index))+"     ") and speaker!="eigon" and (Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack")):
 		speed=4

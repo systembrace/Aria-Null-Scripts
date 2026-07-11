@@ -27,6 +27,7 @@ var in_combat=false
 var items_list=["Grenades","Earthshaker"]
 var guns_list=["Shield","Pistol","Shotgun","Harpoon"]
 var revives_list=["roly_poly","elite","none"]
+var listen_for_action=null
 
 var defaults={
 	"max_particles":1000,
@@ -260,6 +261,12 @@ func save_data(data,scene_path,checkpoint=false,autosave=false):
 	file.store_string(scene_path)
 	file.close()
 
+func erase_heard_dialogue():
+	if Global.endless or !permanent_data.has_section("heard_dialogue"):
+		return
+	permanent_data.erase_section("heard_dialogue")
+	permanent_data.save("user://permanent_data.ini")
+
 func reset_permanent_data():
 	permanent_data.clear()
 	permanent_data.load("user://permanent_data.ini")
@@ -312,7 +319,7 @@ func set_input_map(bindings):
 			event.keycode=OS.find_keycode_from_string(event_str)
 		InputMap.action_add_event(action,event)
 
-func format_keybind(text):
+func format_keybind(text,listen=false):
 	while "{" in text:
 		var start=text.find("{")
 		var end=text.find("}")
@@ -320,6 +327,8 @@ func format_keybind(text):
 		var keybind
 		if action!="move":
 			keybind=InputMap.action_get_events(action)[0].as_text().to_upper()
+			if listen:
+				listen_for_action=action
 		else:
 			keybind=format_keybind("{up}{left}{down}{right}")
 		text=text.replace("{"+action+"}",keybind).replace("(Physical)","")
@@ -396,3 +405,8 @@ func _process(delta):
 		get_viewport().get_camera_2d().offset=Vector2(randi_range(-shakeamt*shake_mod,shakeamt*shake_mod),randi_range(-shakeamt*shake_mod,shakeamt*shake_mod))
 	elif get_viewport().get_camera_2d():
 		get_viewport().get_camera_2d().offset=Vector2(.1,0)
+	
+	if listen_for_action:
+		if Input.is_action_just_released(listen_for_action):
+			listen_for_action=null
+			get_tree().get_root().get_node("Main").inventory.hud.show_notice("")
