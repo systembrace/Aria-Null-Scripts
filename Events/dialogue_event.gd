@@ -1,6 +1,7 @@
 extends Event
 class_name DialogueEvent
 
+@export var dialogue_file="default"
 @export var interrupt=false
 @export var interruptable=true
 @export var change_on_death=-1
@@ -39,7 +40,9 @@ func activate():
 	if !pause_player and main.player.control.paused:
 		main.inventory.dialogue_indicator.show()
 	playing_dialogue=true
-	main.inventory.hud.dialogue(main.scene_name,dialogue_name,coroutine,interrupt,interruptable,change_on_death,loop_last)
+	if dialogue_file=="default":
+		dialogue_file=main.scene_name
+	main.inventory.hud.dialogue(dialogue_file,dialogue_name,coroutine,interrupt,interruptable,change_on_death,loop_last)
 	Global.dialogue_ended.connect(dialogue_ended)
 
 func dialogue_ended():

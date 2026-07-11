@@ -1,7 +1,9 @@
 extends Event
 class_name RewardEvent
 
-@export var scrap=20
+@export var item="scrap"
+@export var item_num=1
+@export var increase_max=false
 var step=0
 
 func activate():
@@ -14,12 +16,20 @@ func activate():
 	super.activate()
 	if !main.is_node_ready():
 		await main.ready
+	if item!="scrap":
+		main.player.inventory.itemindex=0
+		main.player.inventory.equip_item()
 
 func _process(delta):
 	step+=60*delta
 	if active and step>=1:
 		step-=1
-		main.player.control.collect_scrap()
-		scrap-=1
-		if scrap<=0:
+		if item=="scrap":
+			main.player.control.collect_scrap()
+		else:
+			main.player.inventory.find_child(item).num+=1
+			if increase_max:
+				main.player.inventory.increase_max(item)
+		item_num-=1
+		if item_num<=0:
 			complete()

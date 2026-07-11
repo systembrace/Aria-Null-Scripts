@@ -5,6 +5,8 @@ class_name NPC
 @export var accel: float
 @export var actor=false
 @export var can_speak_to=false
+@export var interactions: NPCEventController
+@export var shop: ShopMenu
 var main
 var fall_anim=false
 var gravity=6
@@ -16,9 +18,12 @@ func _ready():
 	main=get_tree().get_root().get_node("Main")
 	if actor:
 		main.npcs[name]=self
+	if can_speak_to:
+		$Shadow.interacted.connect(interactions.interact.unbind(1))
 
-func interact(_interacted=null):
-	pass
+func open_shop():
+	if main.player.original_player:
+		shop.open_shop(main.player)
 
 func do_fall_anim(height=96):
 	visible=true

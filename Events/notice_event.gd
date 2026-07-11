@@ -2,6 +2,7 @@ extends Event
 class_name NoticeEvent
 
 @export var notice=""
+@export var listen=false
 
 func activate():
 	if active or completed:
@@ -11,5 +12,5 @@ func activate():
 		complete()
 		return
 	super.activate()
-	main.inventory.hud.show_notice(notice)
+	main.inventory.hud.show_notice(notice,listen)
 	complete()

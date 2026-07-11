@@ -25,7 +25,7 @@ func activate():
 		active=true
 		complete()
 		return
-	if active or completed or current>=len(start_events):
+	if active or (!loop and completed) or current>=len(start_events):
 		return
 	super.activate()
 	start_events[current].activate()
