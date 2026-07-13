@@ -1,5 +1,5 @@
-extends MenuTab
-class_name TalkTab
+extends TalkTab
+class_name HelpDesk
 
 var anims=[
 	"   ...   ",
@@ -11,7 +11,6 @@ var anims=[
 	" ...     "
 ]
 var pings=0
-signal talked
 @onready var connect_button=$MarginContainer/CenterContainer/Connect
 @onready var status=$MarginContainer/CenterContainer/Status
 @onready var static_effect=$MarginContainer/Static

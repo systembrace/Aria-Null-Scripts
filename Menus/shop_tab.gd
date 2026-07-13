@@ -169,6 +169,7 @@ func buy_secondary(cost,item,rented=false):
 		return
 	player.inventory.find_child("Rental"+item).buy()
 	player.inventory.scrap-=cost
+	bought_something.emit()
 
 func exit_tab():
 	open=false

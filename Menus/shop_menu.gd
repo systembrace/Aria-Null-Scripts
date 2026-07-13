@@ -75,6 +75,7 @@ func exit_menu(immediate=false):
 			exited_bought.emit()
 		else:
 			exited_didnt_buy.emit()
+	bought_something=false
 
 func _process(_delta):
 	if !visible or !player:
