@@ -15,6 +15,7 @@ func reset_charge():
 		charged=false
 		damage/=2
 		push/=1.5
+		heavy=false
 
 func start_attack():
 	super.start_attack()
@@ -61,3 +62,4 @@ func _process(delta):
 		push*=1.5
 		charged=true
 		charging=false
+		heavy=true

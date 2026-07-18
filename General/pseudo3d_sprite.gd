@@ -2,23 +2,26 @@
 extends AnimatedSprite2D
 class_name Pseudo3DSprite
 
-@export var dynamic_rotation=true
+@export var dynamic_rotation=false
 @export var flip=false
+@export var similarity=2
+@export var round_pos=Vector2.ZERO
+@export var parent:Node2D=get_parent()
 var num_sides=1
 var num_anims=1
-@onready var parent:Node2D=get_parent()
 
 func _ready():
 	num_anims=len(sprite_frames.get_animation_names())
 	num_sides=num_anims
-	if num_sides<4:
-		num_sides*=2
+	num_sides*=similarity
 	update()
 	
 func update():
 	if !sprite_frames:
 		return
 	global_rotation=0
+	if round_pos!=Vector2.ZERO:
+		position=get_parent().to_local((get_parent().global_position+round_pos.rotated(get_parent().global_rotation)).round())
 	var rot=parent.rotation
 	while rot<0:
 		rot+=2*PI
@@ -34,4 +37,4 @@ func update():
 
 func _process(_delta):
 	if dynamic_rotation:
-		pass#update()
+		update()
