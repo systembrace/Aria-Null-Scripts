@@ -11,6 +11,7 @@ var gravity=.3
 var bounce=.5
 var accel=24
 var settled=true
+var step=0
 @onready var sprite=$Interactable/AnimatedSprite2D
 @onready var interact_area=$Interactable
 

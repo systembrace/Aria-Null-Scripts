@@ -5,11 +5,12 @@ var dir=Vector2.RIGHT
 var dh=0
 var gravity=8
 var deploying=true
-var done=false
-var fading=false
+var waiting=false
 var charged=false
+var main_charged=false
 var init_speed=18
 var step=0
+var activations=0
 @onready var hitbox=$Hitbox
 @onready var particles=$Particles
 @onready var part_spawner=$Particles/PartSpawner
@@ -24,51 +25,75 @@ func _ready():
 	super._ready()
 	if charged:
 		hitbox.damage=1
-		sprite.visible=false
-		$Shadow.visible=false
-	else:
+		if !main_charged:
+			sprite.visible=false
+			$Shadow.queue_free()
+	if !charged or main_charged:
 		sprite.flip_h=randi_range(0,1)
 		$Throw.play()
+	coll1.shape=coll1.shape.duplicate()
+	coll2.shape=coll2.shape.duplicate()
+	coll2.shape=coll3.shape.duplicate()
 	wave.rotation=dir.angle()
 	particles.process_material.emission_sphere_radius=10
 	$Hitbox.rotation=dir.angle()
-	particles.finished.connect(particles.queue_free)
+	particles.finished.connect(reset_particles)
 	remove_child(particles)
 	get_tree().get_root().get_node("Main").add_child(particles)
-	timer.wait_time=randf_range(10,20)
-	timer.timeout.connect(set_deferred.bind("fading",true))
+	timer.wait_time=1.5
+	if charged:
+		timer.wait_time=2.5
+	timer.timeout.connect(attack)
+
+func attack():
+	sprite.animation="emit"
+	sprite.play()
+	wave.visible=true
+	hitbox.enable_hitbox()
+	if !charged or main_charged:
+		$SFX.play()
+	waiting=false
+	activations+=1
+	particles.global_position=global_position+dir*8
+
+func reset():
+	hitbox.disable_hitbox()
+	coll1.shape.radius=12
+	coll2.shape.radius=8
+	coll3.shape.radius=8
+	coll1.position=Vector2.ZERO
+	coll2.position=Vector2.ZERO
+	coll3.position=Vector2.ZERO
+	wave.visible=false
+	wave.scale=Vector2(0.1,0.1)
+	wave.position=Vector2(0,0)
+	waiting=true
+
+func reset_particles():
+	particles.emitting=false
+	particles.process_material.emission_sphere_radius=10
+	particles.global_position=global_position
 
 func _process(delta):
 	step+=1*60*delta
-	if fading:
-		if step>=6:
-			step=0
-			sprite.scale=sprite.scale.move_toward(Vector2.ZERO,.25*60*delta)
-			sprite.rotation=randf_range(-PI/4,PI/4)
-			$Shadow.scale=Vector2(1,1)*max(sprite.scale.length()-.25,0)
-	if sprite.scale.length()<=.1:
-		queue_free()
 	if not falling and not on_floor and sprite.position.y>=0:
 		fall()
 
 func _physics_process(delta):
 	super._physics_process(delta)
 	move_and_slide()
-	if done:
+	if waiting:
 		return
 	if deploying:
 		dh+=gravity*delta
 		sprite.position.y+=dh
 		if sprite.position.y>=0 and on_floor:
+			global_position=global_position.round()
 			sprite.position.y=0
-			particles.global_position=global_position+dir*8
 			velocity=Vector2.ZERO
 			deploying=false
-			sprite.play()
-			wave.visible=true
-			hitbox.enable_hitbox()
-			if !charged:
-				$SFX.play()
+			timer.start()
+			attack()
 		return
 	if !particles.emitting:
 		particles.emitting=true
@@ -89,12 +114,13 @@ func _physics_process(delta):
 		particles.process_material.emission_sphere_radius=20
 		coll3.position.x+=speed/4
 	else:
-		hitbox.queue_free()
-		wave.visible=false
-		done=true
-		timer.start()
+		reset()
+		if activations>=3:
+			timer.stop()
+			sprite.animation="dead"
 	particles.global_position+=dir*speed/3.5
-	part_spawner.spawn()
+	if randf()<0.25:
+		part_spawner.spawn()
 	if wave.scale.x!=1:
 		wave.scale=wave.scale.move_toward(Vector2(1,1),.2)
 	wave.global_position=particles.global_position+dir*16

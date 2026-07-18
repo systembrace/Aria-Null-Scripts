@@ -50,4 +50,7 @@ func use_earthshaker(charge):
 		if i>0:
 			earthshaker.dir=earthshaker.dir.rotated(i*2*PI/dup)
 			earthshaker.charged=true
+		elif dup>1:
+			earthshaker.main_charged=true
+			earthshaker.charged=true
 		main.call_deferred("add_child",earthshaker)

@@ -4,6 +4,7 @@ class_name Spawner
 @export var enemy_name="default"
 @export var spawn_time=3.0
 @export var flipped=false
+@export var change_health=0
 signal spawned
 var activated=false
 @onready var timer=$Timer
@@ -41,6 +42,8 @@ func spawn():
 	instance.global_position=global_position
 	if spawn_time<=0:
 		instance.dont_notice=true
+	if change_health!=0:
+		instance.find_child("Health").hp=change_health
 	get_parent().call_deferred("add_child",instance)
 	spawned.emit(instance)
 	if enemy_name!="roly_poly":

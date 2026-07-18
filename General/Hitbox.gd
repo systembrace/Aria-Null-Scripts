@@ -9,7 +9,9 @@ class_name Hitbox
 @export var start_enabled=false
 @export var always_hittable=false
 @export var disable_on_parried=true
+@export var heavy=false
 @export var destructive=false
+@export var multiple_colls=false
 var posture=base_posture
 var knockback=base_knockback
 var monitor=true
@@ -32,10 +34,18 @@ func knockback_vector(pos):
 
 func enable_hitbox():
 	hitbox.set_deferred("disabled",false)
+	if multiple_colls:
+		for child in get_children():
+			if child is CollisionShape2D:
+				child.set_deferred("disabled",false)
 	monitor=true
 	
 func disable_hitbox():
 	hitbox.set_deferred("disabled",true)
+	if multiple_colls:
+		for child in get_children():
+			if child is CollisionShape2D:
+				child.set_deferred("disabled",true)
 	monitor=false
 
 func is_area_hittable(area):

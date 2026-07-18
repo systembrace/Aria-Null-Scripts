@@ -154,12 +154,12 @@ func _physics_process(delta):
 			reentered_floor()
 		if !jumping and on_floor:
 			prev_location=floor_checker.global_position-velocity.normalized()*4
-		if shadow_sprite:
+		if is_instance_valid(shadow_sprite) and !shadow_sprite.visible:
 			shadow_sprite.visible=true
 	elif is_instance_valid(floor_checker):
 		if on_floor:
 			left_floor()
-		if shadow_sprite:
+		if is_instance_valid(shadow_sprite) and shadow_sprite.visible:
 			shadow_sprite.visible=false
 		if !jumping and coyote.is_stopped() and not falling:
 			coyote.start()

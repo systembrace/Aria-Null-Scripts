@@ -190,11 +190,15 @@ func _process(delta):
 		var main=get_tree().get_root().get_node("Main")
 		var active_enemies=main.waves[main.wave].get_children()
 		var to_mouse=body.to_local(body.target.global_position)
+		var facing=false
 		for enemy in active_enemies:
 			if not enemy is Enemy:
 				continue 
-			if abs(to_mouse.angle_to(body.to_local(enemy.global_position)))>PI/6:
-				return
+			if abs(to_mouse.angle_to(body.to_local(enemy.global_position)))<=PI/6:
+				facing=true
+				break
+		if !facing:
+			return
 		Global.slow_down_to_zero=false
 		Global.slow_down_speed=1
 		parry_moment=false

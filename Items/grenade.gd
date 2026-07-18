@@ -43,7 +43,7 @@ func _ready():
 func got_hit(area):
 	if area.targetparent is Bullet and sprite.position.y>-30:
 		$Bounce.play()
-		Global.hitstop(.1,true)
+		Global.hitstop(.05,true)
 		$Bounce.pitchlevel+=.2
 		bonusdamage+=area.damage*2
 		area.targetparent.hit()

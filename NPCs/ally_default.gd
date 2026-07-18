@@ -100,6 +100,8 @@ func physics_update():
 					temp_target(jump_point)
 				else:
 					temp_target(player)
+			else:
+				return
 			dash.go_to="Wander"
 			transition.emit(self,"Dodge")
 			return

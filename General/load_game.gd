@@ -1,7 +1,7 @@
 extends Node2D
 
 func _draw():
-	get_tree().create_timer(0.1).timeout.connect(load)
+	get_tree().create_timer(0.2).timeout.connect(load)
 
 func load():
 	for folder in DirAccess.get_directories_at("res://Scenes/"):
