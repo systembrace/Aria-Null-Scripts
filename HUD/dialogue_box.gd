@@ -65,7 +65,7 @@ func exit(clear_queue=false):
 	current_section=""
 	label.text=""
 	exited.emit()
-	if !Engine.is_editor_hint():
+	if !Engine.is_editor_hint() and len(dialogue_queue)==0:
 		Global.dialogue_ended.emit()
 	if clear_queue:
 		dialogue_queue.clear()

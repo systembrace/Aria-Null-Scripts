@@ -12,32 +12,33 @@ var mod=1
 var turning: RailTile
 @onready var hurtbox=$Hurtbox
 @onready var tileswapper=$CollisionShape2D
+@onready var body_checker=$BodyChecker
 
 func _ready():
 	var main=get_tree().get_root().get_node("Main")
-	if main.dark:
-		$LockRotation/Light.enabled=true
 	hurtbox.take_hit.connect(hit)
+	if main.dark:
+		$SpriteGroup/LockRotation/Light.enabled=true
 	if !up_on:
-		$LockPosition/UpOn.hide()
+		$SpriteGroup/LockPosition/UpOn.hide()
 	if !right_on:
-		$LockPosition/RightOn.hide()
+		$SpriteGroup/LockPosition/RightOn.hide()
 	if !left_on:
-		$LockPosition/LeftOn.hide()
+		$SpriteGroup/LockPosition/LeftOn.hide()
 	if !down_on:
-		$LockPosition/DownOn.hide()
+		$SpriteGroup/LockPosition/DownOn.hide()
 
 func bump(hit_dir):
 	$SpriteGroup.global_position=global_position+hit_dir*4
 
 func hit(area:Hitbox):
 	var hit_dir=area.knockback_vector(self.global_position).normalized()
+	$Hit.play()
 	if !area.heavy:
 		bump(hit_dir)
 		return
 	if area.destructive:
 		mod=2
-	$Hit.play()
 	var result=occupying.try_move_obj(hit_dir)
 	if !result:
 		bump(hit_dir)
@@ -49,9 +50,19 @@ func hit(area:Hitbox):
 func stop():
 	$Hit.play()
 	$Roll.stop()
+	velocity=Vector2.ZERO
 	bump(dir)
+	dir=Vector2.ZERO
+	mod=1
 
 func _process(delta):
+	body_checker.global_position=global_position+dir*8
+	$RayCast2D.target_position=$RayCast2D.to_local(global_position+dir*12)
+	if body_checker.has_overlapping_bodies():
+		$RayCast2D.force_raycast_update()
+		if $RayCast2D.is_colliding():
+			for body in body_checker.get_overlapping_bodies():
+				body.global_position=global_position
 	if $SpriteGroup.position!=Vector2.ZERO:
 		$SpriteGroup.position=$SpriteGroup.position.move_toward(Vector2.ZERO,60*delta)
 	if !turning:
@@ -66,3 +77,6 @@ func _process(delta):
 		turning=null
 		if occupying.rotate!=0:
 			turning=occupying
+
+func can_save():
+	return dir==Vector2.ZERO and velocity==Vector2.ZERO

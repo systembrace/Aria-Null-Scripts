@@ -138,6 +138,10 @@ func save_objects(checkpoint=false):
 			temp_config.save("user://area_data/last_npcs.ini")
 			if checkpoint:
 				temp_config.save("user://area_data/checkpoint_npcs.ini")
+		elif obj is PushBlock:
+			config.set_value(scene_name,obj.name+"_rot",obj.rotation)
+			config.set_value(scene_name,obj.name+"_pos",var_to_str(obj.global_position))
+			config.set_value(scene_name,obj.name,obj.occupying.get_path())
 		else:
 			print("idk how to save this "+obj.name)
 	config.set_value(scene_name,"Visited",true)
@@ -200,6 +204,12 @@ func load_objects():
 					if obj.visible:
 						obj.settle()
 						obj.reparent(self)
+				elif obj is PushBlock:
+					obj.occupying.occ_by=null
+					obj.rotation=config.get_value(scene_name,obj.name+"_rot")
+					obj.global_position=str_to_var(config.get_value(scene_name,obj.name+"_pos"))
+					obj.occupying=get_tree().get_root().get_node(config.get_value(scene_name,obj.name))
+					obj.occupying.occ_by=obj
 			else:
 				print("idk how to load this "+obj.name)
 	else:
@@ -217,6 +227,9 @@ func num_enemies(active=false):
 	return res
 
 func can_save():
+	for node in get_tree().get_nodes_in_group("prevent_save"):
+		if !node.can_save():
+			return false
 	return num_enemies(true)==0 and not Global.get_permanent_data("global","player_dead") and inventory.hud.dialogue_box.current_section==""
 
 func save_data(checkpoint=false, autosave=false):

@@ -101,8 +101,6 @@ func receive(obj):
 func stop_occ():
 	occ_by.global_position=global_position
 	occ_by.stop()
-	occ_by.dir=Vector2.ZERO
-	occ_by.mod=1
 	occ_by.tileswapper.swap()
 
 func _physics_process(delta):

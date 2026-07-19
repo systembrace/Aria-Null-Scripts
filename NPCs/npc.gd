@@ -7,6 +7,7 @@ class_name NPC
 @export var can_speak_to=false
 @export var interactions: NPCEventController
 @export var shop: ShopMenu
+signal exit_shop
 var main
 var fall_anim=false
 var gravity=6
@@ -20,6 +21,8 @@ func _ready():
 		main.npcs[name]=self
 	if can_speak_to:
 		$Shadow.interacted.connect(interactions.interact.unbind(1))
+	if shop:
+		shop.exited.connect(call_deferred.bind("emit_signal","exit_shop"))
 
 func open_shop():
 	if main.player.original_player:

@@ -95,7 +95,7 @@ func open_quit(ex=false):
 	elif main.inventory.hud.dialogue_box.current_section!="":
 		$PanelContainer/MarginContainer/QuitMenu/Label.text="Save and quit?\nOnly your recent progress\n will be saved."
 	else:
-		$PanelContainer/MarginContainer/QuitMenu/Label.text="Warning:\nQuitting now will\nrestart the encounter.\nQuit?"
+		$PanelContainer/MarginContainer/QuitMenu/Label.text="Warning:\nQuitting now will\nnot save. Quit?"
 	switch_menus("QuitMenu")
 
 func resume():
