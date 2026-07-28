@@ -25,7 +25,7 @@ func _ready():
 	y_sort_enabled=true
 	if dark:
 		canvasmod=CanvasModulate.new()
-		canvasmod.color="3e3d3f"
+		canvasmod.color="3f3e4a"
 		add_child(canvasmod)
 	Global.wind_dir=wind_dir
 	var started_game=false

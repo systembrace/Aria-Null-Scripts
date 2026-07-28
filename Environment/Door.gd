@@ -49,10 +49,16 @@ func _ready():
 		side1.texture.diffuse_texture=load("res://Assets/Art/environment/door_horizontal.png")
 		side1.texture.normal_texture=load("res://Assets/Art/environment/door_horizontal_normal.png")
 		side2.texture=side1.texture
-		closed_1=Vector2(closed_1.y-height/2-4,closed_1.x+width/2)
-		open_1=Vector2(open_1.y-height/2-4,open_1.x+width/2)
-		closed_2=Vector2(closed_2.y-height/2-4,closed_2.x+width/2)
-		open_2=Vector2(open_2.y-height/2-4,open_2.x+width/2)
+		side1.offset.x=height/2
+		side2.offset.x=height/2
+		closed_1=Vector2(-height/2-4,closed_1.x+width/2)
+		open_1=Vector2(-height/2-4,open_1.x+width/2)
+		closed_2=Vector2(-height/2-4,closed_2.x+width/2)
+		open_2=Vector2(-height/2-4,open_2.x+width/2)
+		$Side1/Dust.position.x=height
+		$Side1/StopDust.position.x=height
+		$Side2/Dust.position.x=height
+		$Side2/StopDust.position.x=height
 	
 	side1.position=closed_1
 	side2.position=closed_2

@@ -18,6 +18,7 @@ func _ready():
 	if floodlight:
 		$Sprite2D.texture=load("res://Assets/Art/environment/floodlight.png")
 		$PointLight2D.texture=load("res://Assets/Art/environment/floodlight.png")
+		$PointLight2D.texture_scale=1
 	$Sprite2D.modulate.a=sprite_alpha
 
 func switch_light(_body=null,mask=5):
@@ -36,4 +37,4 @@ func _process(delta):
 	if !is_instance_valid(player):
 		player=main.find_child("Player",true,false)
 		return
-	$PointLight2D.energy=clamp(to_local(player.global_position+Vector2(0,36)).length(),0,64)/64.0*energy
+	#$PointLight2D.energy=clamp(to_local(player.global_position+Vector2(0,36)).length(),0,64)/64.0*energy

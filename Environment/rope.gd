@@ -1,3 +1,4 @@
+@tool
 extends Node2D
 class_name Rope
 
@@ -13,7 +14,6 @@ var point_in
 func _ready():
 	if background:
 		z_index=2
-	global_position+=Vector2(1,1)
 	curve=Curve2D.new()
 	curve.add_point(Vector2.ZERO)
 	curve.add_point(Vector2.ZERO)
@@ -31,6 +31,8 @@ func recalc():
 	curve.set_point_in(1,point_in+wind)
 
 func _process(_delta):
+	if Engine.is_editor_hint():
+		return
 	if Global.wind_dir==0:
 		return
 	wind=Vector2(5*Global.wind_dir,-5)+Vector2(cos(Global.wind_step)*10*Global.wind_speed+5*Global.wind_dir,sin(Global.wind_step)*1.25*Global.wind_speed)

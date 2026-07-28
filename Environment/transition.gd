@@ -59,11 +59,11 @@ func change_scene(body=null):
 		return
 	player.set_process_input(false)
 	main.hide()
-	main.name="old_main"
 	if "Cherry" in main.npcs and Global.get_flag("With_Cherry") and main.current_waypoint:
 		player.inventory.hud.dialogue("cherry","leave_room_"+str(randi_range(1,4)),true,false,true)
 	if main.save_object_status:
 		main.save_objects()
+	main.name="old_main"
 	for node in get_tree().get_nodes_in_group("objs_to_load"):
 		node.remove_from_group("objs_to_load")
 	Global.set_permanent_data("global","player_dead",false)

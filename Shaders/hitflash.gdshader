@@ -13,24 +13,32 @@ void fragment() {
 	if (flash_value==1.0){
 		COLOR*=100.0;
 	}
-    COLOR.a = texture_color.a;
 	if (flash_value==0.0){
-		COLOR.a*=alpha;
 		if (COLOR.a>0.0){
 			COLOR = mix(COLOR, tint_color, tint_amt);
 		}
 	}
-	else{
-		NORMAL=vec3(0.0,0.0,-1.0);
-	}
+	COLOR.a = texture_color.a * alpha;
 }
 
 void light() {
-	if (NORMAL==vec3(0.0,0.0,-1.0)){
+	if (flash_value!=0.0){
 		LIGHT=vec4(1.0,1.0,1.0,1.0);
 	}
 	else{
+		//vec4 true_color=texture(TEXTURE, UV);
+		//vec4 diff = true_color - COLOR;
 		float cNdotL = max(no_normal, dot(NORMAL, LIGHT_DIRECTION));
 		LIGHT += LIGHT_COLOR * COLOR * cNdotL * LIGHT_ENERGY;
+		//LIGHT.a*=0.25;
+		//if (LIGHT.r>diff.r){
+			//LIGHT.r=diff.r;
+		//}
+		//if (LIGHT.g>diff.g){
+			//LIGHT.g=diff.g;
+		//}
+		//if (LIGHT.b>diff.b){
+			//LIGHT.b=diff.b;
+		//}
 	}
 }
