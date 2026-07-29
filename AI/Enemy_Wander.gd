@@ -12,6 +12,7 @@ var speed
 var accel
 var wait=false
 var far=false
+var avoidance=false
 @onready var timer=$WanderTime
 
 func cycle():
@@ -35,20 +36,24 @@ func enter():
 	speed=body.max_speed
 	accel=body.accel
 	chase_radius=body.chase_radius
-	cycle()
+	avoidance=body.nav_agent.avoidance_enabled
+	body.nav_agent.avoidance_enabled=false
+	timer.wait_time=randf_range(min_wander,max_wander)
+	timer.start()
 
 func update():
 	if not wait and body.global_position.distance_to(spawn)>=wander_radius*2:
 		transition.emit(self, "Return")
+		return
 	if not wait and (body.global_position+direction*accel/2).distance_to(spawn)>wander_radius:
 		far=true
 		cycle()
+
 func physics_update():
 	body.velocity=body.velocity.move_toward(direction*speed/4,accel/2)
 
 func exit():
-	#body.velocity=Vector2.ZERO
-	pass
+	body.nav_agent.avoidance_enabled=avoidance
 
 func _on_timer_timeout():
 	cycle()

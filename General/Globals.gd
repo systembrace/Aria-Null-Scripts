@@ -124,9 +124,6 @@ func _ready():
 	environment.background_mode=Environment.BG_CANVAS
 	environment.adjustment_enabled=true
 	environment.adjustment_brightness=load_config("video","brightness")
-	environment.glow_enabled=true
-	environment.glow_blend_mode=Environment.GLOW_BLEND_MODE_SCREEN
-	environment.glow_hdr_threshold=1
 
 func delete_save(type):
 	if FileAccess.file_exists("user://checkpoint_"+type+".dat"):

@@ -2,6 +2,7 @@ extends State
 class_name EnemyFollow
 
 @export var attack_dist: float = 192
+@export var speed_scale=1.0
 @export var navigator:Navigator
 @export var searchfield:SearchField
 var target: Node2D
@@ -32,7 +33,7 @@ func update():
 		direction=navigator.next_direction(target.global_position)
 
 func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed,accel)
+	body.velocity=body.velocity.move_toward(direction*speed*speed_scale,accel)
 
 func exit():
 	pass

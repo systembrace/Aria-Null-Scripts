@@ -3,6 +3,7 @@ class_name CombatMain
 
 @export var num_waves=0
 @export var start_combat_wave=0
+signal combat_started
 signal combat_over
 var waves=[]
 var wave=-1
@@ -13,6 +14,9 @@ func _ready():
 		var node=find_child("Wave"+str(i+1))
 		if node is Wave:
 			waves.append(node)
+	if waves[0].enabled:
+		wave+=1
+		waves[wave].enable()
 	if num_enemies(false,true)==0:
 		combat_over.emit()
 
@@ -40,6 +44,8 @@ func _process(_delta):
 		#if num_enemies(false,true)==0:
 			#combat_over.emit()
 	if num_enemies(true)>0 and wave+1>=start_combat_wave:
+		if !Global.in_combat:
+			combat_started.emit()
 		Global.in_combat=true
 	else:
 		Global.in_combat=false

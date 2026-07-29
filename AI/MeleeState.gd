@@ -162,8 +162,8 @@ func update():
 func physics_update():
 	var tempspeed=speed
 	var tempaccel=accel
-	if combo.is_done_attacking() and targetdist<=max_dist+16 and can_see_target():
-		tempspeed/=2.0
+	if combo.is_done_attacking() and can_see_target():
+		tempspeed*=clamp(0.5,0.5*targetdist/(max_dist+16),1.0)
 	if combo.is_charging():
 		tempspeed/=4.0
 	if !combo.is_done_attacking() and combo.can_navigate():

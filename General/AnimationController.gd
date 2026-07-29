@@ -50,6 +50,8 @@ func _ready():
 	y_offset=sprite.offset.y
 	if body is RolyPoly:
 		direction=Vector2.UP
+	elif body is Enemy:
+		direction=Vector2(randf_range(-1,1),randf_range(-1,1))
 	while not body is CharacterBody2D:
 		body=body.get_parent()
 	if health and flash_anim:
@@ -69,8 +71,6 @@ func _ready():
 		elif direction.y>0:
 			start_anim+="_down"
 	sprite.animation=start_anim
-	if randomidle>=0:
-		sprite.stop()
 
 func update_fall():
 	sprite.animation=stunname
@@ -226,14 +226,15 @@ func _process(delta):
 	elif sprite.speed_scale!=1:
 		sprite.speed_scale=1
 	
-	if curr_anim_name!=sprite.animation:
+	if curr_anim_name!=sprite.animation and (not "_random" in sprite.animation or (curr_anim_name!=idlename or !sprite.is_playing())):
 		sprite.animation=curr_anim_name
 		
 		if prevanim==anim:
 			sprite.set_frame_and_progress(curr_frame,curr_prog)
 		
-		if anim==idlename and randomidle>=0 and randf()>randomidle/60:
-			sprite.stop()
+		if anim==idlename and randomidle>0 and randf()<=randomidle:
+			sprite.animation+="_random"
+			sprite.play()
 		else:
 			sprite.play(curr_anim_name)
 			

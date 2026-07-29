@@ -35,7 +35,7 @@ func _ready():
 			child.transition.connect(transition_state)
 			child.body=body
 	if initial_state:
-		initial_state.enter()
+		initial_state.call_deferred("enter")
 		current_state=initial_state
 	if hitstun:
 		hitstun.stunned.connect(stun)

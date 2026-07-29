@@ -141,6 +141,7 @@ func save_objects(checkpoint=false):
 		elif obj is PushBlock:
 			config.set_value(scene_name,obj.name+"_rot",obj.rotation)
 			config.set_value(scene_name,obj.name+"_pos",var_to_str(obj.global_position))
+			config.set_value(scene_name,obj.name+"_charged",obj.occupying.charged)
 			config.set_value(scene_name,obj.name,obj.occupying.get_path())
 		else:
 			print("idk how to save this "+obj.name)
@@ -210,6 +211,9 @@ func load_objects():
 					obj.global_position=str_to_var(config.get_value(scene_name,obj.name+"_pos"))
 					obj.occupying=get_tree().get_root().get_node(config.get_value(scene_name,obj.name))
 					obj.occupying.occ_by=obj
+					obj.occupying.charged=config.get_value(scene_name,obj.name+"_charged")
+					if obj.occupying.charged:
+						obj.occupying.connected.emit()
 			else:
 				print("idk how to load this "+obj.name)
 	else:

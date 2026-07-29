@@ -25,7 +25,9 @@ func update():
 	var rot=parent.rotation
 	while rot<0:
 		rot+=2*PI
+	var current_frame=frame
 	animation=str(int(round(rot/PI/2*num_sides))%num_anims)
+	frame=current_frame
 	if !flip:
 		return
 	if num_anims<num_sides and parent.rotation>=PI and parent.rotation<2*PI:

@@ -22,5 +22,6 @@ func count():
 func uncount():
 	num-=1
 	if num==goal-1 and enabled:
-		node.call(un_func_name)
+		if un_func_name:
+			node.call(un_func_name)
 		undo.emit()

@@ -34,7 +34,7 @@ func bump(hit_dir):
 func hit(area:Hitbox):
 	var hit_dir=area.knockback_vector(self.global_position).normalized()
 	$Hit.play()
-	if !area.heavy:
+	if !area.heavy or occupying.charged:
 		bump(hit_dir)
 		return
 	if area.destructive:
@@ -56,6 +56,21 @@ func stop():
 	mod=1
 
 func _process(delta):
+	if occupying.charged:
+		$SpriteGroup/LockPosition/UpOn.frame=2
+		$SpriteGroup/LockPosition/LeftOn.frame=2
+		$SpriteGroup/LockPosition/RightOn.frame=2
+		$SpriteGroup/LockPosition/DownOn.frame=2
+	elif velocity==Vector2.ZERO and occupying.plug_dir!=Vector2.ZERO:
+		$SpriteGroup/LockPosition/UpOn.frame=1
+		$SpriteGroup/LockPosition/LeftOn.frame=1
+		$SpriteGroup/LockPosition/RightOn.frame=1
+		$SpriteGroup/LockPosition/DownOn.frame=1
+	else:
+		$SpriteGroup/LockPosition/UpOn.frame=0
+		$SpriteGroup/LockPosition/LeftOn.frame=0
+		$SpriteGroup/LockPosition/RightOn.frame=0
+		$SpriteGroup/LockPosition/DownOn.frame=0
 	body_checker.global_position=global_position+dir*8
 	$RayCast2D.target_position=$RayCast2D.to_local(global_position+dir*12)
 	if body_checker.has_overlapping_bodies():
