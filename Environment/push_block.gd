@@ -7,6 +7,7 @@ class_name PushBlock
 @export var right_on=true
 @export var left_on=true
 @export var down_on=true
+signal moved
 var dir=Vector2.ZERO
 var mod=1
 var turning: RailTile
@@ -43,6 +44,7 @@ func hit(area:Hitbox):
 	if !result:
 		bump(hit_dir)
 		return
+	moved.emit()
 	$Roll.play()
 	if area.targetparent is Player:
 		Global.hitstop(.05)

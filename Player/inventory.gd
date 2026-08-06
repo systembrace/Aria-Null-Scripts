@@ -167,9 +167,9 @@ func refill_items():
 	for node in items:
 		node.num=node.max_amt
 
-func increase_max(item_name):
-	find_child(item_name).max_amt+=1
-	if find_child(item_name).max_amt==1:
+func increase_max(item_name, by=1):
+	find_child(item_name).max_amt+=by
+	if find_child(item_name).max_amt>=1:
 		Global.set_flag(item_name,true)
 
 func equip_item():

@@ -25,7 +25,7 @@ func _ready():
 	y_sort_enabled=true
 	if dark:
 		canvasmod=CanvasModulate.new()
-		canvasmod.color="3f3e4a"
+		canvasmod.color="484754"
 		add_child(canvasmod)
 	Global.wind_dir=wind_dir
 	var started_game=false
@@ -125,6 +125,7 @@ func save_objects(checkpoint=false):
 			config.set_value(scene_name,obj.name,obj.current)
 		elif obj is Pickup:
 			config.set_value(scene_name,obj.name,obj.visible)
+			config.set_value(scene_name,obj.name+"_picked_up",obj.was_picked_up)
 		elif obj is NPCEventController:
 			var temp_config=ConfigFile.new()
 			var section=obj.npc_name
@@ -205,6 +206,9 @@ func load_objects():
 					if obj.visible:
 						obj.settle()
 						obj.reparent(self)
+					obj.was_picked_up=config.get_value(scene_name,obj.name+"_picked_up")
+					if obj.was_picked_up:
+						obj.interacted()
 				elif obj is PushBlock:
 					obj.occupying.occ_by=null
 					obj.rotation=config.get_value(scene_name,obj.name+"_rot")

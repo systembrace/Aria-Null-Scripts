@@ -9,6 +9,7 @@ class_name ShopItem
 @export var costs_credits=false
 @export var rented=false
 @export var increase_max=false
+@export var num_buy=1
 var main: Main
 @onready var cost=round(price)
 @onready var icon=$MarginContainer/HBoxContainer/Icon

@@ -12,6 +12,7 @@ var bounce=.5
 var accel=24
 var settled=true
 var step=0
+var was_picked_up
 @onready var sprite=$Interactable/AnimatedSprite2D
 @onready var interact_area=$Interactable
 
@@ -50,8 +51,14 @@ func settle():
 	interact_area.activate()
 	global_position=global_position.round()+Vector2(.5,.5)
 
-func interacted(_node):
+func interacted(_node=null):
+	if was_picked_up:
+		for child in get_children():
+			child.queue_free()
+		hide()
+		return
 	picked_up.emit()
+	was_picked_up=true
 	if item in Global.revives_list:
 		Global.set_flag(item,true)
 		if main.inventory.revival=="none":
@@ -62,10 +69,12 @@ func interacted(_node):
 		main.inventory.secondaryindex=main.inventory.secondaries.find(secondary)
 		main.inventory.equip_secondary()
 	main.inventory.hud.item_popup.display(item)
-	queue_free()
+	for child in get_children():
+		child.queue_free()
+	hide()
 
 func _process(delta):
-	if !visible or settled:
+	if !visible or settled or was_picked_up:
 		return
 	if abs(dh)>1 or h>2:
 		dh-=gravity*60*delta

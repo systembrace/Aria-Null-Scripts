@@ -232,23 +232,31 @@ func _process(delta):
 			prevent_movement()
 		
 		if not combo.is_charging() and (!dash or not dash.dashing) and Input.is_action_just_released("hologram"):
-			if body.original_player and inventory.revival!="none" and inventory.ammo>=20:
+			if (!body.original_player and inventory.dummy) or (body.original_player and inventory.revival!="none" and inventory.ammo>=20):
 				var ray = RayCast2D.new()
 				body.add_child(ray)
-				ray.global_position=body.global_position-body.to_local(body.tessa.global_position).normalized()*8
+				ray.hit_from_inside=true
+				var other
+				if body.original_player:
+					other=body.tessa
+				else:
+					other=inventory.dummy
+				ray.global_position=body.global_position-body.to_local(other.global_position).normalized()*8
 				ray.set_collision_mask_value(1,false)
 				ray.set_collision_mask_value(23,true)
-				ray.target_position=body.to_local(body.tessa.global_position)
+				ray.set_collision_mask_value(10,true)
+				ray.target_position=body.to_local(other.global_position)
 				ray.force_raycast_update()
 				if !ray.is_colliding():
-					inventory.revive()
-					body.create_dummy()
-					body.queue_free()
+					if body.original_player:
+						inventory.revive()
+						body.create_dummy()
+						body.queue_free()
+					else:
+						body.create_tessa(false)
+						undo_dummy()
 				ray.queue_free()
-			elif !body.original_player and inventory.dummy:
-				body.create_tessa(false)
-				undo_dummy()
-			elif inventory.ammo<20:
+			elif body.original_player and inventory.ammo<20:
 				inventory.find_child("NoAmmo").play()
 				inventory.hud.ammoclip.shake=.25
 	

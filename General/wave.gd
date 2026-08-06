@@ -12,9 +12,9 @@ func _ready():
 	y_sort_enabled=true
 
 func disable():
-	#for child in get_children():
-	#	if not child is Spawner:
-	#		child.hide()
+	for child in get_children():
+		if not child is Spawner:
+			child.hide()
 	process_mode=Node.PROCESS_MODE_DISABLED
 
 func enable():
@@ -36,7 +36,7 @@ func start():
 	for child in get_children():
 		if child is Spawner:
 			child.activate()
-		#else:
-		#	child.show()
+		else:
+			child.show()
 	enabled=true
 	wave_started.emit()

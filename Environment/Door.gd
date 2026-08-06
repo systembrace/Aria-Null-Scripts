@@ -88,11 +88,13 @@ func snap_to_init(op):
 func close(_body=null):
 	if opened:
 		state="closing"
+		collision.swap(false)
 	
 func open(_body=null):
 	if not opened:
 		state="opening"
 		$PointLight2D.visible=false
+		collision.swap(true)
 
 func _process(delta):
 	if state!="":

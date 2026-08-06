@@ -9,6 +9,7 @@ class_name RolyPoly
 @export var spin_attack:Attack
 @export var bounce_ds=3.0
 @export var gravity=30
+@export var start_high=false
 signal bounced
 var dh=0
 var bounce_sfx
@@ -31,6 +32,10 @@ func _ready():
 		spin_attack.started_attack.connect(attack_started)
 		spin_attack.ended_attack.connect(attack_ended)
 		hitstun.stunned.connect(attack_ended)
+	if start_high:
+		sprite.position.y=-96
+		sprite.hide()
+		hitbox.disable_hitbox()
 
 func attack_started():
 	attacking=true
@@ -101,6 +106,8 @@ func _physics_process(delta):
 			charge_attack.call_deferred("look_at",to_global(new_vel))
 		bounced.emit()
 	var prev=trail.global_position
+	if start_high:
+		velocity=Vector2.ZERO
 	move_and_slide()
 	if sprite:
 		sprite.position.y-=dh
@@ -109,5 +116,10 @@ func _physics_process(delta):
 		else:
 			dh=0
 			sprite.position.y=0
+		if sprite.position.y>-64 and !sprite.visible:
+			sprite.show()
+		if sprite.position.y>=-4 and start_high:
+			start_high=false
+			hitbox.enable_hitbox()
 	trail.remove_point(1)
 	trail.add_point(trail.to_local(prev)*8)

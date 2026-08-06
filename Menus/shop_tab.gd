@@ -97,7 +97,7 @@ func purchase_selected():
 		var itemname=selected.name
 		var result
 		if !itemname in inventoryvar.keys() and !itemname in secondaries:
-			result = buy_item(cost,itemname,selected.rented,selected.increase_max)
+			result = buy_item(cost,itemname,selected.rented,selected.increase_max,selected.num_buy)
 		else:
 			result = purchasefuncs[itemname].call(cost,itemname,selected.rented)
 		if not result:
@@ -139,7 +139,7 @@ func sell_nano(cost):
 		player.inventory.heals-=1
 		player.inventory.scrap+=cost
 
-func buy_item(cost,item,rented=false,increase_max=false):
+func buy_item(cost,item,rented=false,increase_max=false,by=1):
 	var item_num=get_item_count()
 	var item_max=get_item_max()
 	if increase_max or Global.endless:
@@ -147,12 +147,12 @@ func buy_item(cost,item,rented=false,increase_max=false):
 		if Global.endless:
 			item_num=get_item_count()
 		item_max=get_item_limit()
-	if (!rented and item_num+1<item_max) or (rented and item_num+1<item_max+5):
-		player.inventory.find_child(item).num+=1
+	if (!rented and item_num+by<item_max) or (rented and item_num+by<item_max+5):
+		player.inventory.find_child(item).num+=by
 		if increase_max or Global.endless:
-			player.inventory.increase_max(item)
+			player.inventory.increase_max(item,by)
 		player.inventory.scrap-=cost
-		if (!rented and item_num+1>=item_max) or (rented and item_num+1>=item_max+5):
+		if (!rented and item_num+by>=item_max) or (rented and item_num+by>=item_max+5):
 			purchase.disabled=true
 		bought_something.emit()
 		return true

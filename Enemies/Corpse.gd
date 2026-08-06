@@ -2,6 +2,7 @@ extends CharacterBody2D
 class_name Corpse
 
 @export var type="deco_enemy"
+@export var random_flip=true
 var spawn: Vector2
 var target=null
 var main
@@ -15,7 +16,7 @@ func _ready():
 	main=get_tree().get_root().get_node("Main")
 	global_position=global_position.round()
 	spawn=global_position
-	if randf()>.5:
+	if randf()>.5 and random_flip:
 		sprite.flip_h=true
 	if sprite.sprite_frames.has_animation(type):
 		sprite.animation=type
