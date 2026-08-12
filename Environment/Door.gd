@@ -45,7 +45,6 @@ func _ready():
 		$PointLight2D.enabled=false
 		collision.rotation=PI/2
 		clipping_check.rotation=PI/2
-		$RigidBody2D.rotation=PI/2
 		side1.texture=CanvasTexture.new()
 		side1.texture.diffuse_texture=load("res://Assets/Art/environment/door_horizontal.png")
 		side1.texture.normal_texture=load("res://Assets/Art/environment/door_horizontal_normal.png")
@@ -65,11 +64,7 @@ func _ready():
 	side2.position=closed_2
 	
 	if opened:
-		side1.position=open_1
-		side2.position=open_2
-		collision.set_deferred("disabled",true)
-		opened=true
-		$PointLight2D.visible=false
+		snap_to_init(true)
 	
 func snap_to_init(op):
 	if op:
@@ -77,12 +72,14 @@ func snap_to_init(op):
 		side2.position=open_2
 		collision.set_deferred("disabled",true)
 		opened=true
+		collision.call_deferred("swap",true)
 		$PointLight2D.visible=false
 	else:
 		side1.position=closed_1
 		side2.position=closed_2
 		collision.set_deferred("disabled",false)
 		opened=false
+		collision.call_deferred("swap",false)
 		$PointLight2D.visible=true
 	
 func close(_body=null):

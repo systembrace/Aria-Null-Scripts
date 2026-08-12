@@ -152,9 +152,9 @@ func _physics_process(delta):
 	if is_instance_valid(floor_checker) and floor_checker.has_overlapping_bodies():
 		if coyote.is_stopped() and !on_floor:
 			reentered_floor()
-		if !jumping and on_floor:
+		if !jumping and on_floor and !falling:
 			prev_location=floor_checker.global_position-velocity.normalized()*4
-		if is_instance_valid(shadow_sprite) and !shadow_sprite.visible:
+		if is_instance_valid(shadow_sprite) and !shadow_sprite.visible and !falling:
 			shadow_sprite.visible=true
 	elif is_instance_valid(floor_checker):
 		if on_floor:
@@ -164,10 +164,11 @@ func _physics_process(delta):
 		if !jumping and coyote.is_stopped() and not falling:
 			coyote.start()
 	
-	if on_floor and falling:
+	if on_floor and falling and fall_timer.time_left>.3:
 		falling=false
 		fall_timer.stop()
 		z_index=0
+		body_dh=0
 		if body_sprite:
 			body_sprite.offset.y=body_sprite_y_offset
 		if "control" in self:

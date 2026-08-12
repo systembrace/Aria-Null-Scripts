@@ -13,7 +13,7 @@ func _ready():
 
 func disable():
 	for child in get_children():
-		if not child is Spawner:
+		if child is Enemy:
 			child.hide()
 	process_mode=Node.PROCESS_MODE_DISABLED
 
@@ -36,7 +36,7 @@ func start():
 	for child in get_children():
 		if child is Spawner:
 			child.activate()
-		else:
+		elif child is Enemy:
 			child.show()
 	enabled=true
 	wave_started.emit()

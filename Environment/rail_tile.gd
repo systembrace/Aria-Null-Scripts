@@ -8,11 +8,13 @@ class_name RailTile
 @export var plug_dir=Vector2.ZERO
 @export var show_plug=false
 @export var plug_obj: Node2D
+@export var stick=true
 @export_category("Moving ____ redirects to:")
 @export var up: RailTile
 @export var left: RailTile
 @export var right: RailTile
 @export var down: RailTile
+@export var backup: RailTile
 signal connected
 signal disconnected
 var charged=false
@@ -89,7 +91,9 @@ func get_dir(node: Node2D):
 func try_move_obj(dir):
 	var snap_dir=Global.snap_vector_angle(dir).normalized().round()
 	if snap_dir in dir_map:
-		next_move=dir_map[snap_dir]
+		next_move=backup
+		if dir_map[snap_dir] and !dir_map[snap_dir].occ_by:
+			next_move=dir_map[snap_dir]
 	if next_move:
 		occ_by.tileswapper.swap(true)
 		give_to_next()
@@ -115,7 +119,9 @@ func receive(obj):
 	if rotate!=0 and !occ_by.turning:
 		occ_by.turning=self
 	if !stop:
-		next_move=dir_map[occ_by.dir]
+		next_move=backup
+		if dir_map[occ_by.dir] and !dir_map[occ_by.dir].occ_by:
+			next_move=dir_map[occ_by.dir]
 
 func stop_occ():
 	occ_by.global_position=global_position

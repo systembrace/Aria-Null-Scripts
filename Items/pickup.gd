@@ -12,7 +12,7 @@ var bounce=.5
 var accel=24
 var settled=true
 var step=0
-var was_picked_up
+var was_picked_up=false
 @onready var sprite=$Interactable/AnimatedSprite2D
 @onready var interact_area=$Interactable
 

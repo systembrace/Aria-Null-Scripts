@@ -8,9 +8,11 @@ signal hurtboxenabled
 @export var has_hitbuffer=false
 @export var hitstop=0.0
 @export var always_hittable=false
+@export var destructive_only=false
 @onready var timer=$IFrames
 @onready var hitbuffer=find_child("HitBuffer")
 @onready var hurtbox=$CollisionShape2D
+signal absorb_hit
 var attack: Hitbox
 var monitor=true
 var add_damage=0
@@ -39,6 +41,9 @@ func cancel_damage(parry=null):
 	timer.start()
 
 func get_hit():
+	if destructive_only and !attack.destructive:
+		absorb_hit.emit()
+		return
 	if attack is Attack and parent_combo and !parent_combo.current_attack.allow_melee_attacks_while_damaging and parent_combo.is_parriable():
 		return
 	if attack and (!attack.targetparent is Harpoon or attack.targetparent.previous_enemy!=get_parent()):

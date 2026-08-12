@@ -3,6 +3,7 @@ class_name Corpse
 
 @export var type="deco_enemy"
 @export var random_flip=true
+@export var num_scrap=0
 var spawn: Vector2
 var target=null
 var main
@@ -22,6 +23,8 @@ func _ready():
 		sprite.animation=type
 		#sprite.frame=randi_range(0,sprite.sprite_frames.get_frame_count())
 	$Hurtbox.take_hit.connect(die)
+	if num_scrap>0:
+		$ScrapSpawner.particles["scrap"]=Vector2(num_scrap,num_scrap)
 	if type.begins_with("deco"):
 		sprite.offset.y-=2
 		return
@@ -49,6 +52,8 @@ func die(_area=null):
 	main.add_child(sparks)
 	sparks.global_position=global_position
 	sparks.emitting=true
+	if num_scrap>0:
+		$ScrapSpawner.spawn()
 	queue_free()
 
 func _process(delta):

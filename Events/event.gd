@@ -13,7 +13,7 @@ class_name Event
 @export var save_when_completed=false
 @export var pause_player=false
 @export var emit_when_skip=true
-signal activated
+signal activated(name)
 signal just_completed
 signal task_finished
 signal sequence_finished

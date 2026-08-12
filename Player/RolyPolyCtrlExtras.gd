@@ -12,6 +12,7 @@ var init_collision
 var charging=false
 var bounces=0
 @onready var body: Player=get_parent()
+@onready var jump_timer=get_parent().find_child("JumpTimer")
 
 func _ready():
 	body.collision.connect(bounce)
@@ -19,7 +20,9 @@ func _ready():
 	combo.started_attack.connect(disable_hurtbox)
 	combo.ended_attack.connect(enable_hurtbox)
 	attack.started_attack.connect(body.jump)
-	attack.ended_attack.connect(body.land)
+	attack.started_ready.connect(jump_timer.start)
+	jump_timer.wait_time=.2
+	jump_timer.timeout.connect(body.land)
 	init_collision=body.collision_mask
 	body.set_collision_mask_value(9,false)
 	hurtbox.hurtboxenabled.connect(set_collision)
@@ -80,6 +83,12 @@ func _process(delta):
 	if bounces>=10 or (body.control.attackpush==2 and body.velocity.length()*delta<body.max_speed*1.5*delta):
 		if charge.damaging:
 			charge.stop_attack()
+	if !charge.attacking:
+		return
+	if $Dust.emitting and !body.on_floor:
+		$Dust.emitting=false
+	elif !$Dust.emitting and body.on_floor and !body.falling:
+		$Dust.emitting=true
 
 func _physics_process(delta):
 	sprite.position.y-=dh

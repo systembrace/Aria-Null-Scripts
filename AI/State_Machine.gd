@@ -21,6 +21,7 @@ var out_of_combat=true
 var timer
 var paused=false
 var dont_notice=false
+var process_physics=true
 @onready var body: CharacterBody2D = get_parent()
 
 func _ready():
@@ -124,7 +125,7 @@ func _physics_process(delta):
 		if dying and (body.velocity.length()<.1 or (!friction_dying and body.move_and_collide(body.velocity*delta,true))):
 			die()
 		return
-	elif current_state:
+	elif current_state and process_physics:
 		current_state.physics_update()
 	body.nav_agent.set_velocity(body.velocity)
 

@@ -17,18 +17,29 @@ var speed=min_speed
 var inventory: Inventory
 var dir=Vector2.DOWN
 var veldir=Vector2.DOWN
+var move_dir
 var aiming=false
 var main: Main
 var scarf
 var tessa
 var has_tessa=true
 var revive=false
+var stair_checker:Area2D=null
 signal healing
 @onready var control:PlayerControl=$Control
 
 func _ready():
 	super._ready()
 	main=get_tree().get_root().get_node("Main")
+	stair_checker=Area2D.new()
+	var stair_coll=CollisionShape2D.new()
+	stair_coll.shape=RectangleShape2D.new()
+	stair_coll.shape.size=Vector2(0,2)
+	stair_checker.add_child(stair_coll)
+	stair_checker.set_collision_layer_value(1,false)
+	stair_checker.set_collision_mask_value(1,false)
+	stair_checker.set_collision_mask_value(27,true)
+	add_child(stair_checker)
 	if virtual:
 		return
 	if original_player:
@@ -98,16 +109,6 @@ func _process(delta):
 	if name!="Player":
 		name="Player"
 	
-	aiming=Input.is_action_pressed("aim")
-	var inputdir=Input.get_vector("left","right","up","down")
-	var newdir=velocity
-	if newdir.length()>accel*2:
-		veldir=newdir.normalized()
-	if inputdir.length()!=0:
-		dir=inputdir
-	elif not aiming:
-		dir=veldir
-	
 	if !original_player and mask.offset.y!=-32:
 		mask.offset.y=move_toward(mask.offset.y,-32,delta*128)
 		if mask.offset.y==-32:
@@ -122,10 +123,34 @@ func _process(delta):
 
 func _physics_process(delta):
 	super._physics_process(delta)
+	
 	#if main.num_enemies(true)>0 and !get_collision_mask_value(23):
 		#set_collision_mask_value(23,true)
 	#elif (!Global.endless or !main.inventory.dummy) and main.num_enemies(true)==0 and get_collision_mask_value(23):
 		#set_collision_mask_value(23,false)
+	
+	aiming=Input.is_action_pressed("aim")
+	var input_dir=Input.get_vector("left","right","up","down")
+	var newdir=velocity
+	if newdir.length()>accel*2:
+		veldir=newdir.normalized()
+	if input_dir.length()!=0:
+		dir=input_dir
+		move_dir=input_dir
+	if Input.is_action_just_released("attack"):
+		if Global.load_config("game","attack_to_cursor"):
+			move_dir=to_local(target.global_position-Vector2.UP*16).normalized()
+		else:
+			move_dir=input_dir
+	elif not aiming:
+		dir=veldir
+	
+	if stair_checker.has_overlapping_areas() and velocity!=Vector2.ZERO:
+		var stair_dir=stair_checker.get_overlapping_areas()[0].direction
+		var new_dir=Vector2(move_dir.x,0)
+		new_dir=new_dir.rotated(PI/4*-stair_dir)
+		new_dir=Vector2(new_dir.x,move_dir.y+new_dir.y).normalized()
+		velocity=new_dir*velocity.length()
 	var coll = move_and_collide(velocity*delta,true)
 	if coll:
 		collision.emit(coll)

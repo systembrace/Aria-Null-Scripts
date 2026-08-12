@@ -2,6 +2,7 @@ extends Entity
 class_name Breakable
 
 @export var hp=1
+signal broke
 var broken=false
 
 func _ready():
@@ -30,7 +31,7 @@ func die():
 	if broken:
 		return
 	broken=true
-	
+	broke.emit()
 	for status in status_effects:
 		if is_instance_valid(status):
 			remove_status_effect(status)

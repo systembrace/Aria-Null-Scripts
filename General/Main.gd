@@ -96,15 +96,16 @@ func save_objects(checkpoint=false):
 			namedict[obj.name]=0
 		namedict[obj.name]+=1
 		if namedict[obj.name]>1:
-			print("Duplicate name found, fix required for enemy status to save")
-		if obj is Enemy or obj is Spawner:
+			print("Duplicate name found, fix required for "+obj.name+" status to save")
+		if obj is Enemy or obj is Spawner or obj is Corpse:
 			config.set_value(scene_name,obj.name,"alive")
 		elif obj is Ally:
 			config.set_value(scene_name,obj.name,var_to_str(obj.global_position))
 			config.set_value(scene_name,obj.name+"_dir",var_to_str(obj.find_child("AnimationController").direction))
 		elif obj is Breakable:
-			if obj.broken:
-				config.set_value(scene_name,obj.name,"broken")
+			config.set_value(scene_name,obj.name,obj.broken)
+			if obj is Chair:
+				config.set_value(scene_name,obj.name+"_pos",var_to_str(obj.global_position))
 		elif obj is BreakableWall:
 			config.set_value(scene_name,obj.name,"unbroken")
 		elif obj is FadeTransition:
@@ -159,7 +160,7 @@ func load_objects():
 			return
 		for obj in get_tree().get_nodes_in_group("objs_to_load"):
 			if not obj.name in config.get_section_keys(scene_name):
-				if obj is Enemy or obj is FadeTransition or obj is BreakableWall or obj is Spawner:
+				if obj is Enemy or obj is FadeTransition or obj is BreakableWall or obj is Spawner or obj is Corpse:
 					obj.queue_free()
 				if obj is NPCEventController:
 					var temp_config=ConfigFile.new()
@@ -172,7 +173,7 @@ func load_objects():
 					obj.interact_count=temp_config.get_value(obj.npc_name,"interact_count")
 					obj.reactions_given=str_to_var(temp_config.get_value(obj.npc_name,"reactions_given"))
 			elif obj.name in config.get_section_keys(scene_name):
-				if obj is Enemy or obj is FadeTransition or obj is Spawner:
+				if obj is Enemy or obj is FadeTransition or obj is Spawner or obj is Corpse:
 					continue
 				elif obj is Ally:
 					obj.global_position=str_to_var(config.get_value(scene_name,obj.name))
@@ -193,12 +194,14 @@ func load_objects():
 					else:
 						obj.turn_on()
 						obj.turn_off()
-				elif obj is Breakable and config.get_value(scene_name,obj.name)=="broken":
+				elif obj is Breakable and config.get_value(scene_name,obj.name):
 					var new_breakables=obj.set_broken()
 					if new_breakables:
 						for breakable in new_breakables:
-							if breakable.name in config.get_section_keys(scene_name) and config.get_value(scene_name,breakable.name)=="broken":
+							if breakable.name in config.get_section_keys(scene_name) and config.get_value(scene_name,breakable.name):
 								breakable.set_broken()
+				elif obj is Chair:
+					obj.global_position=str_to_var(config.get_value(scene_name,obj.name+"_pos"))
 				elif obj is RepeatingEvent:
 					obj.current=config.get_value(scene_name,obj.name)
 				elif obj is Pickup:

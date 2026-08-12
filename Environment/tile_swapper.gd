@@ -9,8 +9,9 @@ func _ready():
 	call_deferred("swap")
 	
 func swap(nav=false,pos=global_position):
-	if !main.is_node_ready:
-		await main.ready
+	if !main.is_node_ready():
+		main.ready.connect(swap.bind(nav,pos))
+		return
 	nav_map=main.nav_map
 	pos=round(pos)
 	var atlas_coords=Vector2i(0,1)

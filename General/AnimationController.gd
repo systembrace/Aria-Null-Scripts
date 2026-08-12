@@ -232,7 +232,7 @@ func _process(delta):
 		if prevanim==anim:
 			sprite.set_frame_and_progress(curr_frame,curr_prog)
 		
-		if anim==idlename and randomidle>0 and randf()<=randomidle:
+		if curr_anim_name==idlename and randomidle>0 and randf()<=randomidle:
 			sprite.animation+="_random"
 			sprite.play()
 		else:

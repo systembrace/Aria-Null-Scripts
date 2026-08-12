@@ -6,6 +6,8 @@ class_name RangedState
 @export var delay_time=0.5
 @export var lock_time=0.25
 @export var recharge_time=3.0
+@export var shoot_frequency=0.0
+@export var shoot_chance=1.0
 @export var has_melee=true
 @export var hitstun: Hitstun
 @export var spread_chance=0.0
@@ -20,6 +22,7 @@ var tempbuffer=0
 var lock_pos=Vector2.ZERO
 var delay:Timer=null
 var lock:Timer=null
+var try_timer:Timer=null
 var ready_sfx: SoundPlayer
 
 func _ready():
@@ -35,6 +38,12 @@ func _ready():
 	if delay_time>0.0:
 		delay.wait_time=delay_time
 		ready_sfx=$Ready
+	if shoot_frequency>0:
+		try_timer=Timer.new()
+		try_timer.one_shot=true
+		try_timer.wait_time=shoot_frequency
+		add_child(try_timer)
+		gun.buffer.timeout.connect(try_timer.start)
 		
 	if find_child("LockTimer"):
 		lock=$LockTimer
@@ -60,6 +69,7 @@ func enter():
 		gun.buffer.wait_time=gun.buffertime/gun.numshots*spread_time
 		if is_instance_valid(target):
 			lock_pos=target.global_position
+	try_timer.start()
 
 func equip_gun(gun_name):
 	if !gun_name in guns:
@@ -78,6 +88,10 @@ func lock_on():
 		lock_pos=target.global_position
 
 func try_shoot():
+	if randf()>shoot_chance:
+		if try_timer:
+			try_timer.start()
+		return
 	if !shoot_close and targetdist<=64 and delay_time>0 and !delay.is_stopped():
 		delay.stop()
 		gun.cancel_shot()
@@ -137,7 +151,8 @@ func update():
 		transition.emit(self,"Attack")
 		return
 	
-	try_shoot()
+	if !try_timer or try_timer.is_stopped():
+		try_shoot()
 	
 	super.update()
 	
@@ -154,3 +169,4 @@ func exit():
 	gun.buffer.wait_time=gun.buffertime
 	lock_pos=Vector2.ZERO
 	spread=false
+	try_timer.stop()

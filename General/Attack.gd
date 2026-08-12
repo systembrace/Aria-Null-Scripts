@@ -96,6 +96,7 @@ func look_target():
 
 func start_attack():
 	if can_attack and buffer.is_stopped():
+		buffer.stop()
 		started_ready.emit()
 		attacking=true
 		done_attacking=false

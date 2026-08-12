@@ -12,7 +12,7 @@ var min_speed=0
 var spawn: Vector2
 var ammo=60.0
 var dont_notice=false
-@onready var control=$AI
+@onready var control:EnemyStateMachine=$AI
 @onready var nav_agent=$Navigator.nav_agent
 
 func _ready():

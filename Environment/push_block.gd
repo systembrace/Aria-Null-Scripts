@@ -35,7 +35,7 @@ func bump(hit_dir):
 func hit(area:Hitbox):
 	var hit_dir=area.knockback_vector(self.global_position).normalized()
 	$Hit.play()
-	if !area.heavy or occupying.charged:
+	if !area.heavy or (occupying.stick and occupying.charged):
 		bump(hit_dir)
 		return
 	if area.destructive:

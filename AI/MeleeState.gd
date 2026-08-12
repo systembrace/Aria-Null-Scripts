@@ -61,7 +61,7 @@ func try_attacking():
 			combo.set_index(special)
 		return
 	var attack_roll=randf()
-	var should_attack=attack_roll<=attack_chance or (target.control.stunned and attack_roll<=attack_chance*1.5)
+	var should_attack=attack_roll<=attack_chance or (!target is Event and target.control.stunned and attack_roll<=attack_chance*1.5)
 	if should_attack and (combo.current_combo==combo.combo_index or combo.end_of_combo()) and !combo.prev_index in specialindex and randf()<=specialchance:
 		special=specialindex[randi_range(0,len(specialindex)-1)]
 		combo.set_index(special)
@@ -91,7 +91,7 @@ func update():
 		if is_instance_valid(target):
 			reset_dest()
 		direction=Vector2.ZERO
-	if !is_instance_valid(target) or target.control.health.hp<=0:
+	if !is_instance_valid(target) or (!target is Event and target.control.health.hp<=0):
 		if combo.can_move():
 			transition.emit(self,"Wander")
 		try_timer.stop()
@@ -100,7 +100,7 @@ func update():
 		trans_to_attack_state=true
 		transition.emit(self, combo.current_attack.transition_to)
 		return
-	if !combo.is_done_attacking() and !trying_parry:
+	if (!combo.is_done_attacking() or combo.is_readying()) and !trying_parry:
 		try_timer.stop()
 		if !combo.can_navigate() or combo.is_readying():
 			direction=Vector2.ZERO
@@ -116,7 +116,7 @@ func update():
 		attacking=true
 		return
 	
-	if is_instance_valid(target) and target.velocity.length()<.25:
+	if is_instance_valid(target) and !target is Event and target.velocity.length()<.25:
 		still_time+=1
 	else:
 		still_time=0

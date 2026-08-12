@@ -33,7 +33,7 @@ func _ready():
 		call_deferred("try_autoplay")
 
 func try_autoplay():
-	if !autoplay_if_flag or Global.get_flag(autoplay_if_flag)==flag_is_value:
+	if !autoplay_if_flag or Global.get_flag(autoplay_if_flag)==flag_is_value and (!Music.song or Music.song.name!=name):
 		call_deferred("load_track")
 
 func update_volume():

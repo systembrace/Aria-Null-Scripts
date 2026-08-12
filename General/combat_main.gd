@@ -4,12 +4,15 @@ class_name CombatMain
 @export var num_waves=0
 @export var start_combat_wave=0
 signal combat_started
+signal combat_paused
 signal combat_over
 var waves=[]
 var wave=-1
 
 func _ready():
 	super._ready()
+	if num_waves==0:
+		return
 	for i in range(0,num_waves):
 		var node=find_child("Wave"+str(i+1))
 		if node is Wave:
@@ -30,10 +33,13 @@ func num_enemies_in_wave(w=wave, active=false):
 			res+=1
 	return res
 
-func num_enemies(active=false, all_waves=false):
+func num_enemies(active=false, all_waves=false, current=true):
 	if all_waves:
 		var res=0
-		for w in range(0,len(waves)):
+		var max_wave=len(waves)
+		if current:
+			max_wave=wave+1
+		for w in range(0,max_wave):
 			res+=num_enemies_in_wave(w,active)
 		return res
 	return num_enemies_in_wave(wave,active)
@@ -43,21 +49,22 @@ func _process(_delta):
 		#check_combat_over=false
 		#if num_enemies(false,true)==0:
 			#combat_over.emit()
-	if num_enemies(true)>0 and wave+1>=start_combat_wave:
+	if num_enemies(true,true)>0 and wave+1>=start_combat_wave:
 		if !Global.in_combat:
 			combat_started.emit()
 		Global.in_combat=true
-	else:
+	elif Global.in_combat:
+		combat_paused.emit()
 		Global.in_combat=false
 	
 	if wave>=num_waves:
 		return
 	
-	var enemy_count=num_enemies()
+	var enemy_count=num_enemies(false,true,true)
 	
 	if len(waves)==0:
 		return
-	if wave<num_waves-1 and (enemy_count==0 or (wave>=0 and enemy_count==waves[wave].enemies_left_to_next_wave)):
+	if wave<num_waves-1 and (enemy_count==0 or (wave>=0 and enemy_count<=waves[wave].enemies_left_to_next_wave)):
 		wave+=1
 		waves[wave].enable()
 	elif wave==num_waves-1 and num_enemies(false,true)==0:

@@ -4,6 +4,7 @@ class_name Pseudo3DSprite
 
 @export var dynamic_rotation=false
 @export var flip=false
+@export var flip_vertical=true
 @export var similarity=2
 @export var round_pos=Vector2.ZERO
 @export var parent:Node2D=get_parent()
@@ -32,7 +33,8 @@ func update():
 		return
 	if num_anims<num_sides and parent.rotation>=PI and parent.rotation<2*PI:
 		flip_h=parent.rotation/PI/2*num_sides>num_sides/2
-		flip_v=parent.rotation/PI/2*num_sides>=num_sides/2
+		if flip_vertical:
+			flip_v=parent.rotation/PI/2*num_sides>=num_sides/2
 	else:
 		flip_h=false
 		flip_v=false
