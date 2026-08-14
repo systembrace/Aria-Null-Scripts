@@ -26,11 +26,6 @@ func enter():
 		player=main.player
 
 func update():
-	if body.jump_point:
-		direction=navigator.next_direction(body.jump_point.global_position)
-		if body.to_local(body.jump_point.global_position).length()<16:
-			body.jump_point=null
-		return
 	if look_for_waypoints:
 		if main.current_waypoint and (main.current_waypoint.active or !main.current_waypoint.clear_current) and waypoint!=main.current_waypoint:
 			waypoint=main.current_waypoint
@@ -75,36 +70,29 @@ func update():
 		body.set_collision_mask_value(20,true)
 	direction=navigator.next_direction(player.global_position)
 
-func temp_target(node):
-	var new_waypoint=Waypoint.new()
-	main.add_child(new_waypoint)
-	new_waypoint.global_position=body.global_position+Vector2.RIGHT.rotated(navigator.next_direction(node.global_position).angle())
-	get_tree().create_timer(10,false).timeout.connect(new_waypoint.queue_free)
-	body.target=new_waypoint
-
 func physics_update():
-	if dash and body.on_floor and dash.timer.is_stopped() and body.get_collision_mask_value(18):
-		ray.position=Vector2.ZERO
-		ray.target_position=direction.normalized()*8
-		ray.force_raycast_update()
-		if ray.is_colliding() and (waypoint or is_instance_valid(player)):
-			if waypoint:
-				temp_target(waypoint)
-			elif player is PlayerCorpse or player.on_floor:
-				jump_finder.position=direction.normalized()*16
-				jump_finder.target_position=direction.normalized()*dash.speed/4
-				jump_finder.force_raycast_update()
-				var jump_point=jump_finder.get_collider()
-				if is_instance_valid(jump_point):
-					body.jump_point=jump_point
-					temp_target(jump_point)
-				else:
-					temp_target(player)
-			else:
-				return
-			dash.go_to="Wander"
-			transition.emit(self,"Dodge")
-			return
+	#if dash and body.on_floor and dash.timer.is_stopped() and body.get_collision_mask_value(18):
+		#ray.position=Vector2.ZERO
+		#ray.target_position=direction.normalized()*8
+		#ray.force_raycast_update()
+		#if ray.is_colliding() and (waypoint or is_instance_valid(player)):
+			#if waypoint:
+				#temp_target(waypoint)
+			#elif player is PlayerCorpse or player.on_floor:
+				#jump_finder.position=direction.normalized()*16
+				#jump_finder.target_position=direction.normalized()*dash.speed/4
+				#jump_finder.force_raycast_update()
+				#var jump_point=jump_finder.get_collider()
+				#if is_instance_valid(jump_point):
+					#body.jump_point=jump_point
+					#temp_target(jump_point)
+				#else:
+					#temp_target(player)
+			#else:
+				#return
+			#dash.go_to="Wander"
+			#transition.emit(self,"Dodge")
+			#return
 	var tempspeed=speed
 	#if !waypoint and is_instance_valid(player) and body.global_position.distance_to(player.global_position)>128:
 	#	tempspeed*=2

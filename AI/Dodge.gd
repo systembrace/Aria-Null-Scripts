@@ -29,6 +29,14 @@ func can_dodge():
 		return false
 	return timer.is_stopped() and combo.is_done_attacking() and ((body.target.control.combo.is_damaging() and body.to_local(body.target.global_position).length()<dodge_dist) or (searchfield and searchfield.nearby_count()>3))
 
+func get_speed(dist):
+	var sum=0
+	var vel=20
+	while sum<dist:
+		sum+=vel/60
+		vel+=accel/2
+	return vel
+
 func enter():
 	body.nav_agent.avoidance_enabled=false
 	timer.start()
@@ -36,7 +44,8 @@ func enter():
 	accel=body.accel
 	target=body.target
 	if target is Waypoint:
-		body.velocity=body.to_local(target.global_position).normalized()*speed
+		var localvec=body.to_local(target.global_position)
+		body.velocity=localvec.normalized()*get_speed(localvec.length())
 		if body.can_jump:
 			body.jump()
 	elif is_instance_valid(target):

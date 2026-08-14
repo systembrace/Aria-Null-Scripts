@@ -24,7 +24,7 @@ var activations=0
 func _ready():
 	super._ready()
 	if charged:
-		hitbox.damage=1
+		hitbox.damage=0.5
 		if !main_charged:
 			sprite.visible=false
 			$Shadow.queue_free()

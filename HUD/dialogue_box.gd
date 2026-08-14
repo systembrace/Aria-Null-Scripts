@@ -84,7 +84,10 @@ func display(data:ConfigFile,section):
 		index=1
 		current_section=section
 	if do_timer and current_data:
-		timer.wait_time=max((current_data.get_value(current_section,str(index)).count(" ")+min_time*3/4)/3.0,min_time)
+		if current_data.has_section_key(current_section,str(index)+"timer"):
+			timer.wait_time=current_data.get_value(current_section,str(index)+"timer")
+		else:
+			timer.wait_time=max((current_data.get_value(current_section,str(index)).count(" ")+min_time*3/4)/3.0,min_time)
 		timer.start()
 	if data.has_section_key(section,str(index)):
 		text=data.get_value(section,str(index))+"     "
@@ -107,8 +110,8 @@ func reveal_text():
 func _process(delta):
 	if not $PanelContainer/MarginContainer/HBoxContainer/Dialogue.is_node_ready():
 		await ready
-	if !cutscene and !Engine.is_editor_hint() and min_time!=1/Global.load_config("game","dialogue_speed"):
-		min_time=1/Global.load_config("game","dialogue_speed")
+	if !cutscene and !Engine.is_editor_hint() and min_time!=1/Global.load_config("game","dialogue_speed")*1.5:
+		min_time=1/Global.load_config("game","dialogue_speed")*1.5
 	if !visible or !current_data:
 		return
 	step+=delta*50*speed
