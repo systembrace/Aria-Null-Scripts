@@ -7,6 +7,7 @@ class_name Enemy
 @export var target: Node2D
 @export var chase_radius = 256
 @export var scrap=5
+@export var override_health=0
 signal death_throes
 var min_speed=0
 var spawn: Vector2
@@ -24,6 +25,8 @@ func _ready():
 	spawn=global_position
 	if nav_agent.avoidance_enabled:
 		nav_agent.velocity_computed.connect(nav_velocity_computed)
+	if override_health>0:
+		control.health.set_hp(override_health)
 
 func _process(delta):
 	if ammo<0.0:

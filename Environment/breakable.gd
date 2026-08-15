@@ -2,6 +2,7 @@ extends Entity
 class_name Breakable
 
 @export var hp=1
+@export var shake=false
 signal broke
 var broken=false
 
@@ -35,6 +36,9 @@ func die():
 	for status in status_effects:
 		if is_instance_valid(status):
 			remove_status_effect(status)
+	
+	if shake:
+		Global.screenshake(.05)
 	
 	$PartSpawner.spawn()
 	$Die.play()

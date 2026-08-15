@@ -57,6 +57,9 @@ func _ready():
 		$Hologram.play()
 		if Global.endless and !main.player_corpse:
 			set_collision_mask_value(23,false)
+		elif main.player_corpse:
+			main.combat_paused.connect(revive_corpse)
+			main.optionals_defeated.connect(revive_corpse)
 
 func make_scarf():
 	if !original_player:
@@ -113,13 +116,14 @@ func _process(delta):
 		mask.offset.y=move_toward(mask.offset.y,-32,delta*128)
 		if mask.offset.y==-32:
 			control.paused=false
-	
-	if !Global.endless and !original_player and inventory.can_revive and main.player_corpse and main.num_enemies()==0:
+
+func revive_corpse():
+	if !Global.endless and !original_player and inventory.can_revive and main.player_corpse:
 		create_tessa(false)
 		main.player_corpse.revive(tessa)
 		name="GONE"
 		inventory.can_revive=false
-		free()
+		queue_free()
 
 func _physics_process(delta):
 	super._physics_process(delta)

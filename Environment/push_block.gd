@@ -7,6 +7,7 @@ class_name PushBlock
 @export var right_on=true
 @export var left_on=true
 @export var down_on=true
+@export var other_blocks: Array[PushBlock]
 signal moved
 var dir=Vector2.ZERO
 var mod=1
@@ -40,6 +41,9 @@ func hit(area:Hitbox):
 		return
 	if area.destructive:
 		mod=2
+	for block in other_blocks:
+		if block.velocity!=Vector2.ZERO:
+			return
 	var result=occupying.try_move_obj(hit_dir)
 	if !result:
 		bump(hit_dir)

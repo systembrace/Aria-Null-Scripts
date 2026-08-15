@@ -7,6 +7,7 @@ class_name SearchField
 @export var see_through_walls=false
 
 func _ready():
+	collision_shape.shape=collision_shape.shape.duplicate()
 	collision_shape.shape.radius=radius
 
 func raytarget(pos):

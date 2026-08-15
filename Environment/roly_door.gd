@@ -35,7 +35,7 @@ func close():
 
 func _process(_delta):
 	if stay:
-		if has_overlapping_bodies():
+		if block_player_if_big and has_overlapping_bodies():
 			for body in get_overlapping_bodies():
 				if body is Player:
 					open()

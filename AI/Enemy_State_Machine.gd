@@ -1,6 +1,7 @@
 extends StateMachine
 class_name EnemyStateMachine
 
+var did_death_throes=false
 @export var explode_on_death=false
 
 func _ready():
@@ -13,11 +14,16 @@ func take_damage(area=null, _parry=false):
 		Global.hitstop(.02)
 
 func death_throes():
+	if did_death_throes:
+		return
+	did_death_throes=true
 	$ScrapSpawner.particles["scrap"]=Vector2(body.scrap,body.scrap)
 	$ScrapSpawner.spawn(false,body.global_position)
 	super.death_throes()
 
 func die():
+	if dead:
+		return
 	dead=true
 	if !body.on_floor:
 		return
