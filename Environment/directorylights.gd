@@ -48,7 +48,7 @@ func _ready():
 func create_light(x,y):
 	var light=PointLight2D.new()
 	add_child(light)
-	light.global_position=Vector2(x,y)
+	light.global_position=Vector2(x,y).round()
 	light.texture=texture
 	light.height=64
 	light.energy=6
@@ -71,7 +71,7 @@ func create_tv(x,y):
 	var tvtexture=load("res://Assets/Art/environment/tvlight.png")
 	var light=PointLight2D.new()
 	add_child(light)
-	light.global_position=Vector2(x+3,y+1)
+	light.global_position=Vector2(x+3,y+1).round()
 	light.texture=tvtexture
 	light.height=64
 	light.energy=20

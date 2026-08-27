@@ -7,18 +7,20 @@ class_name LockonState
 @export var min_dist=32
 @export var max_dist=64
 @export var pivot_range_div=4
+@export var can_jump=true
 var dist=0
 var pivot=0
 var nextdist=0
 var nextpivot=0
 var destination:Vector2
+var dist_to_dest=0
 var target:Node2D=null
 var targetdist=99999
 var speed
 var accel
 var direction=Vector2.ZERO
 var stay_away
-@onready var ray=$RayCast2D
+@onready var ray:RayCast2D=$RayCast2D
 
 func enter():
 	if !is_instance_valid(body.target):
@@ -45,21 +47,30 @@ func reset_target():
 	direction=Vector2.ZERO
 
 func next_dest():
-	if !can_see_target():
+	if !can_see_target() or targetdist>combat_dist-16:
 		nextdist=0
 		return
 	nextdist=randf_range(min_dist,max_dist)
 	nextpivot=pivot+randf_range(PI/pivot_range_div/2,PI/pivot_range_div)*(randi_range(0,1)*2-1)
+	var tempdist=nextdist
 	while true:
-		var tempdestination=target.global_position+Vector2.RIGHT.rotated(nextpivot)*min_dist
-		raytarget(tempdestination, target.global_position)
+		var tempdestination=target.global_position+Vector2.RIGHT.rotated(nextpivot)*tempdist
+		raytarget(tempdestination)
 		if !ray.is_colliding():
 			break
-		nextpivot+=PI/16
+		tempdist=move_toward(tempdist,0.0,8)
+		if tempdist==0:
+			nextpivot+=PI/16
+			tempdist=max_dist
+	nextdist=tempdist
 	if nextpivot>=2*PI:
 		nextpivot-=2*PI
 
-func raytarget(pos, start=body.global_position):
+func raytarget(pos, start=body.global_position, inc_dashable=true):
+	if !can_jump and inc_dashable:
+		ray.set_collision_mask_value(18,true)
+	else:
+		ray.set_collision_mask_value(18,false)
 	ray.global_position=start
 	ray.target_position=pos-start
 	ray.force_raycast_update()
@@ -67,24 +78,29 @@ func raytarget(pos, start=body.global_position):
 func can_see_target():
 	if !is_instance_valid(target):
 		return false
-	raytarget(target.global_position)
+	raytarget(target.global_position, body.global_position, false)
 	return !ray.is_colliding()
 
 func update_targetdist():
 	targetdist=body.to_local(target.global_position).length()
 
+func set_dest():
+	destination=target.global_position+Vector2.RIGHT.rotated(pivot)*dist
+
 func update():
 	#circle
-	if (targetdist>max_dist+16 or (stay_away and targetdist<min_dist*.75)) and can_see_target():
+	dist_to_dest=body.to_local(destination).length()
+	if (targetdist>max_dist+16 or (stay_away and targetdist<min_dist*.75) or dist_to_dest>96) and can_see_target():
 		reset_dest()
-	elif body.to_local(destination).length()<16 or (!can_see_target() and nextdist!=0) or (nextdist==0 and can_see_target()):
+	elif dist_to_dest<16 or (!can_see_target() and nextdist!=0) or (nextdist==0 and can_see_target()):
 		next_dest()
 	if pivot!=nextpivot:
 		pivot=lerp_angle(pivot,nextpivot,.1)
 	if dist!=nextdist:
 		dist=move_toward(dist,nextdist,1)
-	destination=target.global_position+Vector2.RIGHT.rotated(pivot)*dist
-	raytarget(destination, target.global_position)
+	set_dest()
+	raytarget(destination)
 	if ray.is_colliding():
-		destination=destination+(ray.get_collision_point()-destination)*1.5
+		nextdist-=(ray.get_collision_point()-destination).length()
+	set_dest()
 	direction=navigator.next_direction(destination)

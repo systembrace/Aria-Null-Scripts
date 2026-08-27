@@ -92,6 +92,7 @@ func try_shoot():
 		if try_timer:
 			try_timer.start()
 		return
+	
 	if !shoot_close and targetdist<=64 and delay_time>0 and !delay.is_stopped():
 		delay.stop()
 		gun.cancel_shot()
@@ -151,7 +152,7 @@ func update():
 		transition.emit(self,"Attack")
 		return
 	
-	if !try_timer or try_timer.is_stopped():
+	if (delay_time<=0 or delay.is_stopped()) and (!try_timer or try_timer.is_stopped()):
 		try_shoot()
 	
 	super.update()

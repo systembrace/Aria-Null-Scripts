@@ -13,7 +13,6 @@ func _ready():
 	texture=load("res://Assets/Art/environment/spotlight.tres")
 	texture_scale=1
 	energy=1
-	height=32
 	$Hum.play()
 	if floodlight:
 		$Sprite2D.texture=load("res://Assets/Art/environment/floodlight.png")

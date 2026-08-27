@@ -163,6 +163,7 @@ func _physics_process(delta):
 			if ray.is_colliding() and (!body is NPC or (current_state is AllyDefault and (current_state.waypoint or is_instance_valid(current_state.player)))):
 				if body is NPC and current_state.waypoint:
 					temp_target(current_state.waypoint)
+					do_dash=true
 				else:
 					jump_finder.position=current_state.direction.normalized()*16
 					jump_finder.target_position=current_state.direction.normalized()*dash.speed/4
