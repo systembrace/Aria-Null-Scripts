@@ -33,10 +33,13 @@ func enter():
 	accel=body.accel
 	reset_dest()
 
+func set_dest():
+	destination=target.global_position+Vector2.RIGHT.rotated(pivot)*dist
+
 func reset_dest():
-	destination=target.to_local(body.global_position).normalized()*max_dist+target.global_position
 	pivot=target.to_local(body.global_position).angle()
 	dist=max_dist
+	set_dest()
 	nextdist=dist
 	nextpivot=pivot
 
@@ -53,6 +56,7 @@ func next_dest():
 	nextdist=randf_range(min_dist,max_dist)
 	nextpivot=pivot+randf_range(PI/pivot_range_div/2,PI/pivot_range_div)*(randi_range(0,1)*2-1)
 	var tempdist=nextdist
+	var startpivot=nextpivot
 	while true:
 		var tempdestination=target.global_position+Vector2.RIGHT.rotated(nextpivot)*tempdist
 		raytarget(tempdestination)
@@ -62,9 +66,14 @@ func next_dest():
 		if tempdist==0:
 			nextpivot+=PI/16
 			tempdist=max_dist
+			if angle_difference(nextpivot,startpivot)<0.1:
+				reset_dest()
+				return
 	nextdist=tempdist
-	if nextpivot>=2*PI:
+	while nextpivot>=2*PI:
 		nextpivot-=2*PI
+	if target.to_local(body.global_position).dot(Vector2.RIGHT.rotated(pivot))<0:
+		reset_dest()
 
 func raytarget(pos, start=body.global_position, inc_dashable=true):
 	if !can_jump and inc_dashable:
@@ -83,9 +92,6 @@ func can_see_target():
 
 func update_targetdist():
 	targetdist=body.to_local(target.global_position).length()
-
-func set_dest():
-	destination=target.global_position+Vector2.RIGHT.rotated(pivot)*dist
 
 func update():
 	#circle

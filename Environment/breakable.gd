@@ -14,8 +14,7 @@ func _ready():
 
 func set_broken():
 	broken=true
-	for child in get_children():
-		child.queue_free()
+	free_children()
 
 func hit(area):
 	hp-=area.damage
@@ -28,6 +27,12 @@ func hit(area):
 	if hp<=0:
 		die()
 
+func free_children():
+	for child in get_children():
+		if child is TileSwapper:
+			child.call_deferred("swap",true)
+		child.queue_free()
+
 func die():
 	if broken:
 		return
@@ -36,7 +41,6 @@ func die():
 	for status in status_effects:
 		if is_instance_valid(status):
 			remove_status_effect(status)
-	
 	if shake:
 		Global.screenshake(.05)
 	
@@ -46,7 +50,4 @@ func die():
 	$DustPuff.global_rotation=0
 	$DustPuff.emitting=true
 	$DustPuff.reparent(get_parent())
-	for child in get_children():
-		child.queue_free()
-		if child is TileSwapper:
-			child.swap(true)
+	free_children()
