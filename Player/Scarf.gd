@@ -10,9 +10,6 @@ var damping=3
 var sway_damping=2
 var color="e51250"
 
-func _ready():
-	pass
-
 func new_pos(gravity,sway=Vector2.ZERO,x=0,y=0):
 	x_offs=x
 	y_offs=y

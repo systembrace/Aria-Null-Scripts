@@ -30,3 +30,7 @@ func eject(speed=5.0):
 	print("ejecting "+song.name)
 	song.fade_out(speed)
 	song=null
+
+func set_mute(muted):
+	if song:
+		song.set_pause(muted)

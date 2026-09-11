@@ -3,16 +3,18 @@ class_name TalkTab
 
 @export var npc_name="elmsable"
 signal talked
+var current_option:ShopDialogueButton
 @onready var options=$Options
 @onready var dialogue_box=$Dialogue
 
 func _ready():
 	for child in get_children():
-		if child is Button:
+		if child is ShopDialogueButton:
 			child.reparent(options)
-			child.pressed.connect(play_dialogue.bind(child.name))
+			child.talk_tab=self
 
-func play_dialogue(section):
+func play_dialogue(option,section):
+	current_option=option
 	options.hide()
 	dialogue_box.show()
 	var data=ConfigFile.new()
@@ -20,5 +22,11 @@ func play_dialogue(section):
 	dialogue_box.enter(data,section,false,false,false,-1,false)
 
 func dialogue_end():
-	options.show()
-	dialogue_box.hide()
+	var done=current_option.execute()
+	if done:
+		current_option.index=0
+		for child in options.get_children():
+			if child is ShopDialogueButton:
+				child.check_flags()
+		options.show()
+		dialogue_box.hide()

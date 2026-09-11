@@ -111,7 +111,7 @@ func _process(_delta):
 			heallabel.text="x"+str(inventory.heals)
 			$VBoxContainer2/HealLabel/Backdrop.scale.x=len(heallabel.text)*9+1
 		
-		if !inventory.item:
+		if !inventory.item or !inventory.player.original_player:
 			if equiplabel.visible:
 				equiplabel.visible=false
 			if itembar.visible:

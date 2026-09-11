@@ -79,6 +79,14 @@ func stop():
 	if combat:
 		combat.stop()
 
+func set_pause(paused):
+	base.stream_paused=paused
+	if calm:
+		calm.stream_paused=paused
+	if combat:
+		combat.stream_paused=paused
+	
+
 func _process(delta):
 	if !base:
 		return

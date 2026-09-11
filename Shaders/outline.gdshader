@@ -5,6 +5,7 @@ uniform float width : hint_range(0, 10) = 1.0;
 uniform int pattern : hint_range(0, 2) = 0; // diamond, circle, square
 uniform bool inside = false;
 uniform bool add_margins = true; // only useful when inside is false
+uniform float no_normal : hint_range(0.0,1.0) = 0.0;
 
 void vertex() {
 	if (add_margins) {
@@ -50,6 +51,7 @@ void fragment() {
 			COLOR.a = 0.0;
 		} else {
 			COLOR = texture(TEXTURE, uv);
+			NORMAL_MAP=texture(NORMAL_TEXTURE, uv).xyz;
 		}
 	} else {
 		COLOR = texture(TEXTURE, uv);
@@ -58,5 +60,15 @@ void fragment() {
 	if ((COLOR.a > 0.0) == inside && hasContraryNeighbour(uv, TEXTURE_PIXEL_SIZE, TEXTURE)) {
 		COLOR.rgb = inside ? mix(COLOR.rgb, color.rgb, color.a) : color.rgb;
 		COLOR.a += (1.0 - COLOR.a) * color.a;
+	}
+}
+
+void light() {
+	if (COLOR==color){
+		LIGHT=vec4(1.0,1.0,1.0,1.0);
+	}
+	else{
+		float cNdotL = max(no_normal, dot(NORMAL, LIGHT_DIRECTION));
+		LIGHT += LIGHT_COLOR * COLOR * cNdotL * LIGHT_ENERGY;
 	}
 }

@@ -22,8 +22,8 @@ func activate():
 
 func _process(delta):
 	step+=60*delta
-	if active and step>=1:
-		step-=1
+	if active and step>=2:
+		step-=2
 		if item=="scrap":
 			main.player.control.collect_scrap()
 		else:

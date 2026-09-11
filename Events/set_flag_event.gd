@@ -5,6 +5,7 @@ class_name SetFlagEvent
 @export var value=0.0
 @export var save_flags=false
 @export var checkpoint=false
+@export var permanent=false
 var being_trueskipped=false
 
 func activate():
@@ -16,9 +17,12 @@ func activate():
 		return
 	super.activate()
 	if not being_trueskipped:
-		Global.set_flag(flag_name,value)
-		if save_flags:
-			Global.save_flags(checkpoint)
+		if permanent:
+			Global.set_permanent_data("global",flag_name,value)
+		else:
+			Global.set_flag(flag_name,value)
+			if save_flags:
+				Global.save_flags(checkpoint)
 		complete()
 
 func skip(trueskip=false):

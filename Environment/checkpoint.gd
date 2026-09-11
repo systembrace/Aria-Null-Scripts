@@ -21,7 +21,7 @@ func _ready():
 	if !main.dark:
 		$PointLight2D.blend_mode=PointLight2D.BLEND_MODE_ADD
 		$PointLight2D.energy=.5
-		$PointLight2D.texture_scale/=2
+		#$PointLight2D.texture_scale/=2
 		$Glowy/GlowLight.hide()
 	else:
 		$Glowy/GlowLight.show()
@@ -29,9 +29,9 @@ func _ready():
 
 func disable_refill():
 	can_refill=false
-	$PointLight2D.texture_scale=2
-	if !main.dark:
-		$PointLight2D.texture_scale/=2
+	#$PointLight2D.texture_scale=2
+	#if !main.dark:
+	#	$PointLight2D.texture_scale/=2
 	$Glowy.animation="small"
 	$Swirl.emitting=true
 	$Swirl2.emitting=true

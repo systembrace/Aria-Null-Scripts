@@ -6,6 +6,7 @@ class_name Door
 @export var height=8
 @export var sprite_height=56
 @export var opened=false
+@export var disabled=false
 @export var speed=.25
 @export var open_area: Area2D
 @export var close_area: Area2D
@@ -21,6 +22,8 @@ var closed_2=Vector2(0,4)
 var open_2=Vector2(width/2.0,4)
 
 func _ready():
+	if disabled:
+		$PointLight2D.hide()
 	if get_parent() is Main and get_parent().dark:
 		$PointLight2D.energy=1.5
 		$PointLight2D.color="ffe6bf"

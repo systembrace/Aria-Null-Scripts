@@ -161,21 +161,21 @@ func _physics_process(delta):
 			ray.force_raycast_update()
 			var do_dash=false
 			if ray.is_colliding() and (!body is NPC or (current_state is AllyDefault and (current_state.waypoint or is_instance_valid(current_state.player)))):
-				if body is NPC and current_state.waypoint:
-					temp_target(current_state.waypoint)
+				#if body is NPC and current_state.waypoint:
+				#	temp_target(current_state.waypoint)
+				#	do_dash=true
+				#else:
+				jump_finder.position=current_state.direction.normalized()*16
+				jump_finder.target_position=current_state.direction.normalized()*dash.speed/4
+				jump_finder.force_raycast_update()
+				var jump_point=jump_finder.get_collider()
+				if is_instance_valid(jump_point):
+					body.jump_point=jump_point
+					temp_target(jump_point)
 					do_dash=true
-				else:
-					jump_finder.position=current_state.direction.normalized()*16
-					jump_finder.target_position=current_state.direction.normalized()*dash.speed/4
-					jump_finder.force_raycast_update()
-					var jump_point=jump_finder.get_collider()
-					if is_instance_valid(jump_point):
-						body.jump_point=jump_point
-						temp_target(jump_point)
-						do_dash=true
-					elif body is NPC and (current_state.player is PlayerCorpse or current_state.player.on_floor):
-						temp_target(current_state.player)
-						do_dash=true
+					#elif body is NPC and (current_state.player is PlayerCorpse or current_state.player.on_floor):
+					#	temp_target(current_state.player)
+					#	do_dash=true
 					#else:
 					#	var new_node=Node2D.new()
 					#	new_node.global_position=body.global_position+current_state.direction*16

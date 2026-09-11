@@ -136,10 +136,10 @@ func consume_ammo():
 	if ammo<.5:
 		ammo=0
 
-func use_secondary(_amount=10):
+func use_secondary(force=false):
 	if secondary and secondary is Shield and !Input.is_action_pressed("secondary"):
 		secondary.deactivate()
-	if not secondary or (floor(ammo*numshots/60)<1 and ((secondary is Grapple and !secondary.deployed) or not secondary is Grapple)) or not secondary.can_use():
+	if not secondary or ((floor(ammo*numshots/60)<1 and not force) and ((secondary is Grapple and !secondary.deployed) or not secondary is Grapple)) or not secondary.can_use():
 		if secondary and (Input.is_action_just_pressed("secondary") or not secondary.can_use() or secondary is Grapple) and floor(ammo*numshots/60)<1:
 			$NoAmmo.play()
 			hud.ammoclip.shake=.25
@@ -148,7 +148,7 @@ func use_secondary(_amount=10):
 		secondary.durability=ammo
 		if !Input.is_action_pressed("secondary"):
 			secondary.deactivate()
-		elif Input.is_action_just_pressed("secondary"):
+		elif Input.is_action_just_pressed("secondary") or force:
 			secondary.activate()
 			if is_instance_valid(player) and player.hurtbox:
 				player.hurtbox.disable_hurtbox()
@@ -267,7 +267,7 @@ func _process(delta):
 			#	item.timer.wait_time=0.01
 			#	item.timer.start()
 			#	item.set_buffer()
-		if Input.is_action_just_released("use item"):
+		if !main.no_attack and player.original_player and Input.is_action_just_released("use item"):
 			use_item()
 			charge=0
 		elif Input.is_action_pressed("use item") and item.timer.is_stopped() and charge<item.chargetime:

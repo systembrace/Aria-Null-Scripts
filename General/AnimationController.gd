@@ -33,6 +33,7 @@ class_name AnimationController
 @export var out_of_combat_anims=false
 @export var flicker_iframes=false
 @export var footsteps_per_cycle=0
+@export var floating=0.0
 @export var parent_controller: AnimationController
 var cutscene_anim="none"
 var body
@@ -43,6 +44,7 @@ var anim="idle"
 var idle_time=0.0
 var y_offset=0
 var footsteps=99
+var float_step=0.0
 signal step
 
 func _ready():
@@ -86,9 +88,16 @@ func hitflash(dead=false):
 		flicker.start()
 
 func set_offset():
+	var new_offset=0
+	var set_offs=false
 	if parent_controller:
+		set_offs=true
 		z_index=parent_controller.z_index
-		var new_offset=parent_controller.sprite.offset.y-parent_controller.y_offset
+		new_offset=parent_controller.sprite.offset.y-parent_controller.y_offset
+	if floating>0.0:
+		set_offs=true
+		new_offset+=round(sin(float_step)*floating)
+	if set_offs:
 		sprite.offset.y=y_offset+new_offset
 		#if get_parent() is Sprite2D and get_parent().name=="Mask" and not body.control.paused:
 		#	get_parent().offset.y=-32+new_offset
@@ -100,6 +109,11 @@ func _process(delta):
 	var prevanim=anim
 	var vertical_sprites_enabled=has_vertical_sprites
 	var prefix=""
+	
+	if floating>0.0:
+		float_step+=delta*2
+		if float_step>PI*2:
+			float_step-=PI*2
 	
 	set_offset()
 	

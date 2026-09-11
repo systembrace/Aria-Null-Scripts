@@ -3,6 +3,7 @@ class_name FadeTransition
 
 @export var main_transition=true
 @export var area:Area2D
+@export var tilemap: TileMapLayer
 signal finished
 signal faded_out
 var fade=false
@@ -52,6 +53,8 @@ func _process(delta):
 		finished_emitted=true
 	if abs(modulate.a-lerp_to)<.02:
 		modulate.a=lerp_to
+		if tilemap:
+			tilemap.modulate.a=lerp_to
 		fade=false
 		if !main_transition:
 			queue_free()
@@ -59,3 +62,5 @@ func _process(delta):
 			faded_out.emit()
 		return
 	modulate.a=move_toward(modulate.a,lerp_to,delta/speed)
+	if tilemap:
+		tilemap.modulate.a=modulate.a

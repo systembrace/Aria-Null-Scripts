@@ -176,7 +176,7 @@ func _physics_process(delta):
 		return
 	
 	if falling:
-		z_index=-11
+		#z_index=-11
 		if body_sprite:
 			body_dh+=delta*10*size*fall_scale
 			body_sprite.offset.y+=body_dh

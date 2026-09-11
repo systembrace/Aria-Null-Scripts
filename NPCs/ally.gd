@@ -7,12 +7,15 @@ var min_speed
 var ammo=60.0
 var kneeling=false
 var jump_point:Area2D=null
+var lamp: PointLight2D
 @onready var control=$AI
 @onready var nav_agent=$Navigator.nav_agent
 
 func _ready():
 	super._ready()
 	min_speed=max_speed/2
+	if find_child("Lamp"):
+		lamp=$Lamp
 	if !Global.endless and tessa and !Global.get_flag("with_tessa") and "Cherry" in main.npcs:
 		if !is_instance_valid(main.npcs["Cherry"]):
 			queue_free()
@@ -22,10 +25,11 @@ func _ready():
 		nav_agent.velocity_computed.connect(nav_velocity_computed)
 
 func _process(delta):
-	if main.dark and !$Lamp.enabled:
-		$Lamp.enabled=true
-	elif !main.dark and $Lamp.enabled:
-		$Lamp.enabled=false
+	if lamp:
+		if main.dark and !lamp.enabled:
+			lamp.enabled=true
+		elif !main.dark and lamp.enabled:
+			lamp.enabled=false
 	if ammo<0.0:
 		ammo=move_toward(ammo,0.0,5*delta)
 		if ammo==0.0:

@@ -11,6 +11,7 @@ var damping=3
 var sway_damping=2
 var next:Scarf
 var time=0
+@onready var shader=load("res://Assets/Resources/no_backnormal.tres")
 
 func _ready():
 	if not parent or not is_instance_valid(parent):
@@ -31,6 +32,7 @@ func _ready():
 		new.sway_damping=sway_damping
 		next_dir+=next_dir
 		add_child(new)
+		new.material=shader
 		prev=new
 	animation=parent.find_child("AnimationController")
 

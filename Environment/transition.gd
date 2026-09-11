@@ -21,7 +21,7 @@ func _ready():
 	main=get_tree().get_root().get_node("Main")
 
 func on_body_entered(body):
-	if body is Player and is_instance_valid(main):
+	if body is Player and body.original_player and is_instance_valid(main):
 		player=body
 		inventory=player.inventory
 		player.control.set_process(false)

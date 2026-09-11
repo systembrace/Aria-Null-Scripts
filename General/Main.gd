@@ -5,6 +5,7 @@ class_name Main
 @export var save_object_status=false
 @export var dark=false
 @export var wind_dir=0
+@export var no_attack=false
 signal transitionfinished
 signal player_healed
 var config_name
@@ -18,6 +19,7 @@ var current_waypoint: Waypoint
 var transition:FadeTransition
 var canvasmod:CanvasModulate
 var worldenv:WorldEnvironment
+var showed_no_attack_dialogue=false
 @onready var nav_map=$NavMap
 
 func _ready():
@@ -145,6 +147,10 @@ func save_objects(checkpoint=false):
 			config.set_value(scene_name,obj.name+"_pos",var_to_str(obj.global_position))
 			config.set_value(scene_name,obj.name+"_charged",obj.occupying.charged)
 			config.set_value(scene_name,obj.name,obj.occupying.get_path())
+		elif obj is DropLadder:
+			config.set_value(scene_name,obj.name,obj.dropped)
+		elif obj is TransitionLadder:
+			config.set_value(scene_name,obj.name,obj.dropped)
 		else:
 			print("idk how to save this "+obj.name)
 	config.set_value(scene_name,"Visited",true)
@@ -221,6 +227,14 @@ func load_objects():
 					obj.occupying.charged=config.get_value(scene_name,obj.name+"_charged")
 					if obj.occupying.charged:
 						obj.occupying.connected.emit()
+				elif obj is DropLadder:
+					if config.get_value(scene_name,obj.name):
+						obj.set_dropped()
+				elif obj is TransitionLadder:
+					if !config.get_value(scene_name,obj.name):
+						obj.not_dropped()
+					else:
+						obj.dropped=true
 			else:
 				print("idk how to load this "+obj.name)
 	else:
@@ -278,3 +292,10 @@ func exit():
 	#if save_object_status:
 	#	save_objects()
 	queue_free()
+
+func _input(event: InputEvent):
+	if !no_attack or showed_no_attack_dialogue:
+		return
+	if event.is_action("attack") or event.is_action("secondary") or event.is_action("use item"):
+		showed_no_attack_dialogue=true
+		inventory.hud.call_deferred("dialogue","adlea","NoAttack",true)

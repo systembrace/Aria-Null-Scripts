@@ -27,9 +27,12 @@ var paused=false
 var parry_moment=false
 var wobble=Vector2.RIGHT
 var wobble_t=0
+var main:Main
+var secondary_charge=0.0
 @onready var healtimer=$HealTimer
 
 func _ready():
+	main=get_tree().get_root().get_node("Main")
 	#process_mode=Node.PROCESS_MODE_ALWAYS
 	max_speed=body.max_speed
 	min_speed=body.min_speed
@@ -180,7 +183,7 @@ func _process(delta):
 	if stunned:
 		prevent_movement()
 		prevent_attack()
-		if not dead and Input.is_action_just_pressed("attack"):
+		if !main.no_attack and not dead and Input.is_action_just_pressed("attack"):
 			parry_checker.try_parry()
 		return
 	if parry_moment:
@@ -225,14 +228,28 @@ func _process(delta):
 		#	prevent_movement()
 		#	return
 		
-		if ((not combo.is_charging() and not Input.is_action_pressed("attack") and (!dash or not dash.dashing)) or (inventory.secondary is Grapple and inventory.secondary.harpoon and inventory.secondary.harpoon.stuck_in_enemy)) and (((inventory.secondary is Gun or inventory.secondary is Shield) and not inventory.secondary is Grapple and Input.is_action_pressed("secondary")) or ((not inventory.secondary is Gun or inventory.secondary is Grapple) and Input.is_action_just_released("secondary"))) and (!inventory.secondary is Shield or combo.can_attack()):
+		if Input.is_action_pressed("secondary") and inventory.secondary and inventory.secondary.can_use() and floor(inventory.ammo*inventory.numshots/60)<1:
+			secondary_charge+=delta
+		else:
+			secondary_charge=0.0
+		if secondary_charge>=2:
+			inventory.use_secondary(true)
+			secondary_charge=0.0
+		
+		if !main.no_attack and (
+				(not combo.is_charging() and not Input.is_action_pressed("attack") and (!dash or not dash.dashing)) or 
+				(inventory.secondary is Grapple and inventory.secondary.harpoon and inventory.secondary.harpoon.stuck_in_enemy)
+			) and (
+				((inventory.secondary is Gun or inventory.secondary is Shield) and not inventory.secondary is Grapple and Input.is_action_pressed("secondary")) or 
+				((not inventory.secondary is Gun or inventory.secondary is Grapple) and Input.is_action_just_released("secondary"))
+			) and (!inventory.secondary is Shield or combo.can_attack()):
 			inventory.use_secondary()
 		
 		if (inventory.secondary is Gun or inventory.secondary is Shield) and inventory.secondary.cant_move and not combo.is_attacking():
 			prevent_movement()
 		
 		if not combo.is_charging() and (!dash or not dash.dashing) and Input.is_action_just_released("hologram"):
-			if (!body.original_player and inventory.dummy) or (body.original_player and inventory.revival!="none" and inventory.ammo>=20):
+			if (!body.original_player and inventory.dummy) or (body.original_player and inventory.revival!="none"):# and inventory.ammo>=20):
 				var ray = RayCast2D.new()
 				body.add_child(ray)
 				ray.hit_from_inside=true
@@ -256,11 +273,11 @@ func _process(delta):
 						body.create_tessa(false)
 						undo_dummy()
 				ray.queue_free()
-			elif body.original_player and inventory.ammo<20:
-				inventory.find_child("NoAmmo").play()
-				inventory.hud.ammoclip.shake=.25
+			#elif body.original_player and inventory.ammo<20:
+			#	inventory.find_child("NoAmmo").play()
+			#	inventory.hud.ammoclip.shake=.25
 	
-	if Input.is_action_just_pressed("attack") or input_buffer=="attack":
+	if !main.no_attack and Input.is_action_just_pressed("attack") or input_buffer=="attack":
 		if not combo.is_done_attacking():
 			input_buffer="attack"
 		else:

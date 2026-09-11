@@ -5,7 +5,11 @@ class_name Rope
 @export var weight=1.0
 @export var stiffness=1.0
 @export var background=false
-var curve
+@export var height=20
+@export var end_height=20
+@export var points=7
+@export var color:Color=Color.BLACK
+var curve: Curve2D
 var wind=Vector2.ZERO
 var point_out
 var point_in
@@ -18,11 +22,11 @@ func _ready():
 	curve.add_point(Vector2.ZERO)
 	curve.add_point(Vector2.ZERO)
 	if end.position.y>0:
-		point_out=Vector2(end.position.x*.25,(end.position.y/2+20)*weight)
-		point_in=Vector2(-end.position.x*.25,(end.position.y/2+20)*weight)
+		point_out=Vector2(end.position.x*.25,(end.position.y/2+end_height)*weight)
+		point_in=Vector2(-end.position.x*.25,(end.position.y/2+height)*weight)
 	else:
-		point_out=Vector2(end.position.x*.25,(-end.position.y/2+20)*weight)
-		point_in=Vector2(-end.position.x*.25,(-end.position.y/2+20)*weight)
+		point_out=Vector2(end.position.x*.25,(-end.position.y/2+end_height)*weight)
+		point_in=Vector2(-end.position.x*.25,(-end.position.y/2+height)*weight)
 	recalc()
 
 func recalc():
@@ -41,7 +45,9 @@ func _process(_delta):
 	queue_redraw()
 
 func _draw():
-	var points=curve.tessellate_even_length(7,1)
+	var points=curve.tessellate_even_length(points,1)
+	var temp_color=color
+	if Engine.is_editor_hint():
+		temp_color=Color.WHITE
 	for point in points:
-		draw_primitive([point],[Color.BLACK],[1.1])
-		
+		draw_primitive([point],[temp_color],[1.1])

@@ -57,7 +57,7 @@ func _ready():
 		$Hologram.play()
 		if Global.endless and !main.player_corpse:
 			set_collision_mask_value(23,false)
-		elif main.player_corpse:
+		elif main.player_corpse and not main is Endless:
 			main.combat_paused.connect(revive_corpse)
 			main.optionals_defeated.connect(revive_corpse)
 

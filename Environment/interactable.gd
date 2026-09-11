@@ -2,11 +2,13 @@ extends Area2D
 class_name Interactable
 
 @export var can_interact=true
-signal interacted
+@export var sprite: Node2D
+signal interacted(node)
 var near_interactor=false
-@onready var sprite=$AnimatedSprite2D
 
 func _ready():
+	if !sprite:
+		sprite=$AnimatedSprite2D
 	area_entered.connect(entered_area)
 	area_exited.connect(exited_area)
 	if can_interact:
