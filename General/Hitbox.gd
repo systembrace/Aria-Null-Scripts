@@ -72,7 +72,7 @@ func _process(_delta):
 
 func _on_area_entered(area):
 	if monitor and is_area_hittable(area) and area.monitor:
-		if area is Hurtbox:
+		if area is Hurtbox and (not targetparent is Bullet or area.allow_bullets):
 			if player_damage>-1 and (area.get_parent() is Player or area.get_parent() is Ally):
 				if player_damage==0:
 					return

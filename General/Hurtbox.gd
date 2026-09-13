@@ -17,6 +17,7 @@ var attack: Hitbox
 var monitor=true
 var add_damage=0
 var allow_melee_attacks=true
+var allow_bullets=true
 
 func _ready():
 	area_entered.connect(hit)
