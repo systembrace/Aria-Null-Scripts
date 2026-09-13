@@ -38,6 +38,7 @@ func _ready():
 	$Hitbox.enable_hitbox()
 
 func _process(delta):
+	$PointLight2D.energy=move_toward($PointLight2D.energy,0.0,delta*2)
 	if not smalls.is_empty() and not smalls[0].is_playing() and randf()>.05/(60*delta):
 		smalls[0].play()
 		smalls.remove_at(0)

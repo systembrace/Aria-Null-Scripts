@@ -15,7 +15,8 @@ void fragment() {
 		COLOR = mix(texture_color, COLOR, amt);
 	}
 }
-//void light() {
-	// Called for every pixel for every light affecting the CanvasItem.
-	// Uncomment to replace the default light processing function with this one.
-//}
+
+void light() {
+	float cNdotL = max(0.0, dot(NORMAL, LIGHT_DIRECTION));
+	LIGHT += LIGHT_COLOR * COLOR * cNdotL * LIGHT_ENERGY;
+}

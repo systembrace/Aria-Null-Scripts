@@ -4,6 +4,8 @@ class_name Health
 @export var maxhp:float=-1
 @export var hurtbox: Hurtbox
 @export var has_popups=true
+@export var low_hp_threshold=1.0
+signal lowhp
 var hp=maxhp
 var prevhp=hp
 var recent_hplost=0
@@ -72,6 +74,8 @@ func take_damage(attack, parry=false):
 		hurtbox.disable_hurtbox()
 		if has_popups:
 			make_popup()
+	elif hp<=low_hp_threshold:
+		lowhp.emit()
 
 func set_hp(new_hp):
 	hp=new_hp

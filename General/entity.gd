@@ -120,6 +120,7 @@ func stop_jump():
 
 func fall():
 	if !on_floor:
+		set_collision_mask_value(19,true)
 		falling=true
 		fall_timer.start()
 		started_falling.emit()
@@ -128,6 +129,7 @@ func end_fall():
 	if !respawn_on_fall:
 		queue_free()
 		return
+	set_collision_mask_value(19,false)
 	on_floor=true
 	falling=false
 	fell.emit()

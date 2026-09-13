@@ -6,10 +6,15 @@ class_name TransitionLadder
 @onready var climb_interact: Interactable=$ClimbInteractable
 
 func _ready():
-	if !dropped:
+	get_tree().get_root().get_node("Main").ready.connect(init_drop)
+	if !dropped and not self is DropLadder:
 		add_to_group("objs_to_load")
 	climb_interact.interacted.connect(call_transition)
 	$TransitionTimer.wait_time=0.5
+
+func init_drop():
+	if !dropped and not self is DropLadder:
+		not_dropped()
 
 func not_dropped():
 	hide()

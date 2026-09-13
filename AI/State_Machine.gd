@@ -166,7 +166,7 @@ func _physics_process(delta):
 				#	do_dash=true
 				#else:
 				jump_finder.position=current_state.direction.normalized()*16
-				jump_finder.target_position=current_state.direction.normalized()*dash.speed/4
+				jump_finder.target_position=current_state.direction.normalized()*dash.dodge_dist
 				jump_finder.force_raycast_update()
 				var jump_point=jump_finder.get_collider()
 				if is_instance_valid(jump_point):

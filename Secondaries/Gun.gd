@@ -50,7 +50,7 @@ func _ready():
 func equip(parent):
 	super.equip(parent)
 	if not targetparent is Player and not targetparent is Ally:
-		$Sprite/Flash/Light.color="f23084"
+		$Sprite/Flash/Light.color="f2cede"
 		if flash is AnimatedSprite2D:
 			flash.animation="enemy"
 

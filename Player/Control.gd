@@ -327,7 +327,7 @@ func _process(delta):
 		if Global.get_flag("wobble") and dir!=Vector2.ZERO and not dash.dashing:
 			wobble_t+=delta*2
 			wobble=wobble.rotated((sin(wobble_t)+sin(1.5*wobble_t))*delta*2)
-			body.velocity+=wobble*(cos(wobble_t*2)+1)*speed*delta*3
+			body.velocity+=wobble*(cos(wobble_t*2)+1)*speed*delta*4
 			body.velocity*=.9
 	else:
 		var temp_accel=accel

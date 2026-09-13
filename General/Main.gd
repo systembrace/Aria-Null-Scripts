@@ -6,6 +6,7 @@ class_name Main
 @export var dark=false
 @export var wind_dir=0
 @export var no_attack=false
+@export var dead_end=false
 signal transitionfinished
 signal player_healed
 var config_name
@@ -60,6 +61,8 @@ func _ready():
 		player.control.set_process(false)
 	else:
 		transition.fade_out()
+	if dead_end:
+		return
 	var temp=save_object_status
 	save_object_status=false
 	save_data(false,true)
@@ -167,6 +170,8 @@ func load_objects():
 		for obj in get_tree().get_nodes_in_group("objs_to_load"):
 			if not obj.name in config.get_section_keys(scene_name):
 				if obj is Enemy or obj is FadeTransition or obj is BreakableWall or obj is Spawner or obj is Corpse:
+					if obj is FadeTransition and obj.tilemap:
+						obj.tilemap.queue_free()
 					obj.queue_free()
 				if obj is NPCEventController:
 					var temp_config=ConfigFile.new()
@@ -258,6 +263,8 @@ func can_save():
 	return num_enemies(true)==0 and not Global.get_permanent_data("global","player_dead") and inventory.hud.dialogue_box.current_section==""
 
 func save_data(checkpoint=false, autosave=false):
+	if dead_end:
+		return
 	Global.save_flags(checkpoint,autosave)
 	if checkpoint:
 		Global.checkpoint_scene=scene_file_path

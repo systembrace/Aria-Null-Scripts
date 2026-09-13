@@ -4,7 +4,8 @@ class_name Globals
 signal saving
 signal environment_updated
 signal dialogue_ended
-var version=3
+var release_version="demo_0.2"
+var version=4 #save file version
 var death_cutscene=false
 var flags = {}
 var config=ConfigFile.new()
@@ -73,8 +74,9 @@ func _ready():
 		save_flags(true)
 	else:
 		load_flags()
-		if get_flag("version")!=version and FileAccess.file_exists("user://endless_loadout.dat"):
-			DirAccess.remove_absolute("user://endless_loadout.dat")
+		if get_flag("version")!=version and Global.get_flag("version")<4:# and FileAccess.file_exists("user://endless_loadout.dat"):
+			#DirAccess.remove_absolute("user://endless_loadout.dat")
+			Global.delete_all_save_data()
 		if not FileAccess.file_exists("user://last_scene.dat"):
 			delete_all_save_data()
 		else:
@@ -270,7 +272,7 @@ func reset_permanent_data():
 
 func set_permanent_data(section,field,value):
 	permanent_data.set_value(section,field,value)
-	if field=="deaths" or field=="player_dead":
+	if field=="deaths" or field=="player_dead" or field=="completion":
 		permanent_data.save("user://permanent_data.ini")
 
 func get_permanent_data(section,field):

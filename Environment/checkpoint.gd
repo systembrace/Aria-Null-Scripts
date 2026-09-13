@@ -71,6 +71,6 @@ func exit_shop():
 	save_data()
 
 func save_data():
-	main.save_data()#true)
+	main.save_data(true)
 	#if $Glowy.animation!="small" and main.scene_file_path==Global.checkpoint_scene:
 		#disable_refill()

@@ -23,6 +23,7 @@ class_name Attack
 @export var unique_anim=false
 @export var has_recovery=true
 @export var unique_sfx=false
+@export var sfx_fade_early=false
 @export var transition_to=""
 @export var redirect_when_parried=false
 @export var allow_melee_attacks_while_damaging=true

@@ -37,7 +37,7 @@ func activate():
 		Global.set_permanent_data("heard_dialogue",heard_name,0)
 	elif play_number and play_number<=change_on_death:
 		Global.set_permanent_data("heard_dialogue",heard_name,play_number)
-	if !pause_player and main.player.control.paused:
+	if !pause_player and main.player and main.player.control.paused:
 		main.inventory.dialogue_indicator.show()
 	playing_dialogue=true
 	if dialogue_file=="default":

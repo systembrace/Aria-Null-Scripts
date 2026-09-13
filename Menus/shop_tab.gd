@@ -147,7 +147,7 @@ func buy_item(cost,item,rented=false,increase_max=false,by=1):
 		if Global.endless:
 			item_num=get_item_count()
 		item_max=get_item_limit()
-	if (!rented and item_num+by<item_max) or (rented and item_num+by<item_max+5):
+	if (!rented and item_num+by<=item_max) or (rented and item_num+by<=item_max+5):
 		player.inventory.find_child(item).num+=by
 		if increase_max or Global.endless:
 			player.inventory.increase_max(item,by)

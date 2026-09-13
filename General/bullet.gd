@@ -18,7 +18,7 @@ func _ready():
 	main=get_tree().get_root().get_node("Main")
 	if main.dark:
 		$AnimatedSprite2D/Light.enabled=true
-		$AnimatedSprite2D/Light.energy=size
+		$AnimatedSprite2D/Light.scale*=size
 	hitbox.got_parried.connect(deflect)
 	hitbox.hit_hurtbox.connect(hit.unbind(1))
 	hitbox.hitbox.shape=CapsuleShape2D.new()
@@ -36,8 +36,11 @@ func _ready():
 	$FreeTimer.timeout.connect(queue_free)
 	$FreeTimer.start()
 	$Trail.points[1]=-dir*12
+	$Sparks.process_material.color_ramp.gradient=$Sparks.process_material.color_ramp.gradient.duplicate()
 
 func change_faction():
+	if is_queued_for_deletion():
+		return
 	var gradient=$Sparks.process_material.color_ramp.gradient
 	if faction=="player":
 		sprite.animation="player"
@@ -46,7 +49,7 @@ func change_faction():
 		gradient.set_color(2,"5975ff")
 		hitbox.set_collision_mask_value(1,false)
 		hitbox.set_collision_mask_value(2,true)
-		$AnimatedSprite2D/Light.color="87b3ff"
+		$AnimatedSprite2D/Light.color="e0ecff"
 	else:
 		sprite.animation="enemy"
 		$Trail.default_color="e51250"
@@ -54,7 +57,7 @@ func change_faction():
 		gradient.set_color(2,"e51250")
 		hitbox.set_collision_mask_value(2,false)
 		hitbox.set_collision_mask_value(1,true)
-		$AnimatedSprite2D/Light.color="f15699"
+		$AnimatedSprite2D/Light.color="f2cede"
 	sprite.frame=size*2-1
 
 func deflect(area):
@@ -109,12 +112,11 @@ func _process(_delta):
 		velocity=dir*speed
 
 func hit(coll=null):
+	if is_queued_for_deletion():
+		return
 	var sparks = $Sparks.duplicate()
-	var light=find_child("Light")
-	if light and main.dark:
-		light.energy=.5
-		$AnimatedSprite2D.remove_child(light)
-		sparks.add_child(light)
+	if main.dark:
+		$AnimatedSprite2D/Light.reparent(sparks,false)
 	main.add_child(sparks)
 	sparks.global_position=sprite.global_position+Vector2.RIGHT*dir.normalized().x
 	sparks.process_material=sparks.process_material.duplicate()

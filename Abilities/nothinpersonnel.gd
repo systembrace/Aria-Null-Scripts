@@ -28,6 +28,7 @@ func attack():
 		target=null
 		enable_attack()
 		return
+	started_attack.emit()
 	attacking=true
 	done_attacking=false
 	can_attack=false
@@ -53,6 +54,11 @@ func attack():
 	ring.modulate=Color.WHITE
 	ring.finished.connect(ring.queue_free)
 
+func enable_attack():
+	super.enable_attack()
+	trail.points[1]=Vector2.ZERO
+	sprite.visible=false
+
 func disable_hitbox():
 	super.disable_hitbox()
 	sprite.visible=false
@@ -60,7 +66,6 @@ func disable_hitbox():
 func _process(delta):
 	if !is_instance_valid(targetparent.target):
 		enable_attack()
-		trail.points[1]=Vector2.ZERO
 		return
 	super._process(delta)
 	if trail.points[1]!=Vector2.ZERO:

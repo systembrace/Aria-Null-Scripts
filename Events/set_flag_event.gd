@@ -18,7 +18,10 @@ func activate():
 	super.activate()
 	if not being_trueskipped:
 		if permanent:
-			Global.set_permanent_data("global",flag_name,value)
+			var temp=value
+			if flag_name=="completion":
+				temp=Global.release_version
+			Global.set_permanent_data("global",flag_name,temp)
 		else:
 			Global.set_flag(flag_name,value)
 			if save_flags:

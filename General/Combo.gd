@@ -29,12 +29,14 @@ func _ready():
 				if find_child("SFXReady"):
 					child.started_ready.connect(find_child("SFXReady").play)
 				child.started_attack.connect(find_child("SFXAttack").play)
-				child.ended_attack.connect(find_child("SFXAttack").temp_fade)
+				if child.sfx_fade_early:
+					child.ended_attack.connect(find_child("SFXAttack").temp_fade)
 			elif child.unique_sfx and find_child("SFXAttack_"+str(child.combo_index)):
 				if find_child("SFXReady_"+str(child.combo_index)):
 					child.started_ready.connect(find_child("SFXReady_"+str(child.combo_index)).play)
 				child.started_attack.connect(find_child("SFXAttack_"+str(child.combo_index)).play)
-				child.ended_attack.connect(find_child("SFXAttack_"+str(child.combo_index)).temp_fade)
+				if child.sfx_fade_early:
+					child.ended_attack.connect(find_child("SFXAttack_"+str(child.combo_index)).temp_fade)
 			if child.pick_weight==0.0 and !child.is_special:
 				current_combo=child.combo_index
 				combo_sets[current_combo]=[child.combo_index]
