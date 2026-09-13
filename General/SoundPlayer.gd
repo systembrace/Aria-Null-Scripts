@@ -59,7 +59,6 @@ func play(playback_position=0, temp_db=0):
 		fade_temp=false
 		fade=false
 	if time_between_plays==0 or timer.is_stopped():
-		print(name)
 		var sound=sounds[randi_range(0,len(sounds)-1)]
 		sound.pitch_scale=(randf_range(-amt,amt)+pitchlevel)*pitch_scale
 		sound.volume_db=db+temp_db+global_volume
