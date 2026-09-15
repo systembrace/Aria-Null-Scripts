@@ -379,9 +379,9 @@ func change_window_mode(force=false):
 		viewport.unresizable=false
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		viewport.size=Vector2i(480,270)
-		while viewport.size+Vector2i(480,270)<DisplayServer.screen_get_size():
+		while viewport.size+Vector2i(480,270)<DisplayServer.screen_get_size(DisplayServer.get_primary_screen()):
 			viewport.size+=Vector2i(480,270)
-		viewport.position=(DisplayServer.screen_get_size()-viewport.size)/2
+		viewport.position=(DisplayServer.screen_get_size(DisplayServer.get_primary_screen())-viewport.size)/2
 
 func _process(delta):
 	if slow_down_to_zero and Engine.time_scale>0:

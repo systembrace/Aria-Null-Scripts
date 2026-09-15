@@ -12,6 +12,7 @@ class_name Entity
 @export var fall_scale=1.0
 signal started_falling
 signal fell
+var height=0
 var initial_fall_buffer=true
 var status_effects=[]
 var prev_location=global_position
@@ -22,17 +23,15 @@ var fall_timer
 var on_floor=true
 var falling=false
 var body_dh=0
-var body_sprite_y_offset=0
 var jumping=false
 var enable_edges=false
 var hurtbox:Hurtbox
 
 func _ready():
+	platform_floor_layers=0
 	hurtbox=find_child("Hurtbox")
 	if !body_sprite:
 		body_sprite=find_child("AnimatedSprite2D")
-	if body_sprite:
-		body_sprite_y_offset=body_sprite.offset.y
 	if do_initial_buffer:
 		get_tree().create_timer(.5,false).timeout.connect(set.bind("initial_fall_buffer",false))
 	else:
@@ -115,12 +114,14 @@ func land():
 		stop_jump()
 	
 func stop_jump():
+	if !landing_checker.monitoring or landing_checker.has_overlapping_bodies():
+		return
 	set_collision_mask_value(18,true)
+	set_collision_mask_value(19,false)
 	landing_checker.set_deferred("monitoring",false)
 
 func fall():
 	if !on_floor:
-		set_collision_mask_value(19,true)
 		falling=true
 		fall_timer.start()
 		started_falling.emit()
@@ -138,7 +139,7 @@ func end_fall():
 	if player_hurtbox:
 		player_hurtbox.call_deferred("take_non_attack_damage")
 	if body_sprite:
-		body_sprite.offset.y=body_sprite_y_offset
+		height=0
 	z_index=0
 	if "control" in self:
 		self.control.paused=false
@@ -154,7 +155,7 @@ func _physics_process(delta):
 	if is_instance_valid(floor_checker) and floor_checker.has_overlapping_bodies():
 		if coyote.is_stopped() and !on_floor:
 			reentered_floor()
-		if !jumping and on_floor and !falling:
+		if !jumping and on_floor and !falling and !get_collision_mask_value(19):
 			prev_location=floor_checker.global_position-velocity.normalized()*4
 		if is_instance_valid(shadow_sprite) and !shadow_sprite.visible and !falling:
 			shadow_sprite.visible=true
@@ -168,19 +169,21 @@ func _physics_process(delta):
 	
 	if on_floor and falling and fall_timer.time_left>.3:
 		falling=false
+		set_collision_mask_value(19,false)
 		fall_timer.stop()
 		z_index=0
 		body_dh=0
 		if body_sprite:
-			body_sprite.offset.y=body_sprite_y_offset
+			height=0
 		if "control" in self:
 			self.control.paused=false
 		return
 	
 	if falling:
-		#z_index=-11
+		if height<-8:
+			z_index=-11
 		if body_sprite:
-			body_dh+=delta*10*size*fall_scale
-			body_sprite.offset.y+=body_dh
+			body_dh-=delta*10*size*fall_scale
+			height+=body_dh
 		if "control" in self:
 			self.control.paused=true

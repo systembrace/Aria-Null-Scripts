@@ -67,6 +67,6 @@ func _process(delta):
 func _physics_process(_delta):
 	var prev=trail.global_position
 	move_and_slide()
-	sprite.position.y=-h-4
+	sprite.position.y=-h
 	trail.remove_point(1)
 	trail.add_point(trail.to_local(prev)*4)

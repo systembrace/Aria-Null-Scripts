@@ -75,6 +75,6 @@ func _process(delta):
 		elif animation.direction.y<0:
 				y+=2
 	if "falling" in parent and parent.falling:
-		y+=parent.body_sprite.offset.y-parent.body_sprite_y_offset
+		y-=parent.height
 		z_index-=60*delta
 	next.new_pos(gravity,sway,x,y)

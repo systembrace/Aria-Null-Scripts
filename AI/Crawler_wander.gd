@@ -27,7 +27,7 @@ func cycle():
 	timer.start()
 	body.update_rotation()
 
-func update():
+func update(_delta):
 	if !body.on_wall:
 		transition.emit(self,"Wander")
 		return
@@ -39,8 +39,8 @@ func update():
 	else:
 		direction=Vector2.ZERO
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed,accel)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed,accel*60*delta)
 
 func exit():
 	timer.stop()

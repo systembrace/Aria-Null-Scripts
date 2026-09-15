@@ -135,7 +135,7 @@ func brightness_changed(value):
 	Global.environment_updated.emit()
 
 func shake_changed(value):
-	$PanelContainer/MarginContainer/VideoMenu/ShakeContainer/Label.text="Screenshake "+str(int(value))+"%"
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/ShakeContainer/Label.text="Screenshake "+str(int(value))+"%"
 	Global.save_config("video","screenshake",value/100.0)
 
 func hitstop_changed(value):
@@ -177,7 +177,7 @@ func shoot_cursor_toggled(value):
 	Global.save_config("game","shoot_to_cursor",value)
 
 func parts_changed(value):
-	$PanelContainer/MarginContainer/GameMenu/ParticlesContainer/Label.text="Max particles: "+str(int(value*10))
+	$PanelContainer/MarginContainer/VideoMenu/ScrollContainer/VBoxContainer/ParticlesContainer/Label.text="Max particles: "+str(int(value*10))
 	Global.save_config("game","max_particles",value*10)
 
 func damage_values_toggled(value):

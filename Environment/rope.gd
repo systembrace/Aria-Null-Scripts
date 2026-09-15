@@ -45,9 +45,9 @@ func _process(_delta):
 	queue_redraw()
 
 func _draw():
-	var points=curve.tessellate_even_length(points,1)
+	var real_points=curve.tessellate_even_length(points,1)
 	var temp_color=color
 	if Engine.is_editor_hint():
 		temp_color=Color.WHITE
-	for point in points:
+	for point in real_points:
 		draw_primitive([point],[temp_color],[1.1])

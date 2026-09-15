@@ -40,9 +40,11 @@ var target: Node2D
 @onready var delay=$DelayTimer
 @onready var targettimer=$TargetTimer
 @onready var finishedtimer=$FinishedTimer
+signal just_parried(area)
 signal started_ready
 signal started_attack
 signal ended_attack
+signal attack_enabled
 var attacking=false
 var parriable=false
 var damaging=false
@@ -170,6 +172,7 @@ func finish_attack():
 		$Flicker.stop()
 
 func enable_attack():
+	attack_enabled.emit()
 	if hitbox_flicker:
 		$Flicker.stop()
 	disable_hitbox()
@@ -211,6 +214,7 @@ func _on_area_entered(area):
 			if targetparent is Player:
 				Global.hitstop(.15)
 			parry.emit()
+			just_parried.emit(area)
 			area.parry.emit(self)
 			area.get_parried()
 		elif area is Hurtbox:

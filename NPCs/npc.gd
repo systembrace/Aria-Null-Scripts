@@ -25,23 +25,25 @@ func _ready():
 		shop.exited.connect(call_deferred.bind("emit_signal","exit_shop"))
 
 func open_shop():
-	if main.player.original_player:
+	if main.player and main.player.original_player:
 		shop.open_shop(main.player)
 
-func do_fall_anim(height=96):
-	visible=true
-	body_sprite.offset.y-=height
+func do_fall_anim(fall_height=96):
+	call_deferred("show")
+	height=fall_height
+	$AnimationController.set_offset()
 	anim_controller.cutscene_anim="falling"
-	fall_anim=true
+	set_deferred("fall_anim",true)
 
 func _process(delta):
 	if !fall_anim:
 		return
-	if body_sprite.offset.y<body_sprite_y_offset:
-		dh+=gravity*60*delta
-		body_sprite.offset.y=move_toward(body_sprite.offset.y,body_sprite_y_offset,dh*delta)
+	if height>0:
+		dh=gravity*60*delta
+		height=move_toward(height,0,dh*delta*60)
 	else:
 		dh=0
+		height=0
 		fall_anim=false
 		anim_controller.cutscene_anim="land"
 		$Landed.emitting=true

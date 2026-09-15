@@ -33,7 +33,7 @@ func _ready():
 		spin_attack.ended_attack.connect(attack_ended)
 		hitstun.stunned.connect(attack_ended)
 	if start_high:
-		sprite.position.y=-96
+		height=96
 		sprite.hide()
 		hitbox.disable_hitbox()
 
@@ -82,8 +82,8 @@ func bounce(amt=0.0):
 	if amt==0:
 		amt=bounce_ds
 	dh=min(amt*velocity.length()/max_speed,amt)
-	if sprite and sprite.position.y!=0:
-		dh*=(64-min(abs(sprite.position.y),64))/64
+	if height!=0:
+		dh*=(64-min(abs(height),64))/64
 	
 func _physics_process(delta):
 	entity_physics_process(delta)
@@ -110,15 +110,15 @@ func _physics_process(delta):
 		velocity=Vector2.ZERO
 	move_and_slide()
 	if sprite:
-		sprite.position.y-=dh
-		if int(sprite.position.y)<0:
+		height+=dh
+		if int(height)>0:
 			dh-=gravity*delta
-		else:
+		elif on_floor:
 			dh=0
-			sprite.position.y=0
-		if sprite.position.y>-64 and !sprite.visible:
+			height=0
+		if height>64 and !sprite.visible:
 			sprite.show()
-		if sprite.position.y>=-4 and start_high:
+		if height>=4 and start_high:
 			start_high=false
 			hitbox.enable_hitbox()
 	trail.remove_point(1)

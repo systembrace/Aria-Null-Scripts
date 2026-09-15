@@ -16,24 +16,14 @@ func activate():
 	complete()
 
 func execute():
-	if show_actor:
-		if actor=="player":
-			main.player.show()
-			main.player.scarf.show()
-			main.inventory.hud.hpbar.show()
-			main.inventory.hud.portrait.show()
-			main.inventory.hud.scrapicon.show()
-		else:
-			main.npcs[actor].show()
+	if actor=="player":
+		main.player.visible=show_actor
+		main.player.scarf.visible=show_actor
+		main.inventory.hud.hpbar.visible=show_actor
+		main.inventory.hud.portrait.visible=show_actor
+		main.inventory.hud.scrapicon.visible=show_actor
 	else:
-		if actor=="player":
-			main.player.hide()
-			main.player.scarf.hide()
-			main.inventory.hud.hpbar.hide()
-			main.inventory.hud.portrait.hide()
-			main.inventory.hud.scrapicon.hide()
-		else:
-			main.npcs[actor].hide()
+		main.npcs[actor].visible=show_actor
 
 func skip(trueskip=false):
 	super.skip(trueskip)

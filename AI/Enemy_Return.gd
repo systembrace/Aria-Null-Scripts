@@ -12,13 +12,13 @@ func enter():
 	speed=body.max_speed
 	accel=body.accel
 
-func update():
+func update(_delta):
 	direction=navigator.next_direction(spawn)
 	if body.global_position.distance_to(spawn)<8:
 		transition.emit(self,"Wander")
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed,accel)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed,accel*60*delta)
 
 func exit():
 	pass

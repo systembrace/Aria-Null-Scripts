@@ -10,16 +10,20 @@ var push=0
 var combo_sets={}
 var current_combo=0
 signal parry
+signal just_parried
 signal started_ready
 signal started_attack
 signal ended_attack
 signal fully_charged
+signal hit_hurtbox(attack)
 
 func _ready():
 	for child in get_children():
 		if child is Attack:
 			attack_list[child.combo_index]=child
 			child.parry.connect(emit_parry)
+			child.just_parried.connect(just_parried.emit.bind(child))
+			child.hit_hurtbox.connect(hit_hurtbox.emit.bind(child))
 			child.started_ready.connect(emit_ready.bind(child))
 			child.started_attack.connect(emit_attack)
 			child.ended_attack.connect(emit_end.bind(child))

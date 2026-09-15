@@ -33,7 +33,7 @@ func get_speed(dist):
 	var sum=0
 	var vel=20
 	while sum<dist:
-		sum+=vel/60
+		sum+=vel/(60*Engine.time_scale)
 		vel+=accel/2
 	return vel
 
@@ -59,7 +59,7 @@ func enter():
 		$SFX.play()
 	avoidance=body.nav_agent.avoidance_enabled
 
-func update():
+func update(_delta):
 	if body.velocity.length()<=20:
 		if combo:
 			combo.enable_attack()
@@ -67,8 +67,8 @@ func update():
 			body.land()
 		transition.emit(self,go_to)
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(Vector2.ZERO,accel/2)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(Vector2.ZERO,accel/2*60*delta)
 
 func exit():
 	dashing=false

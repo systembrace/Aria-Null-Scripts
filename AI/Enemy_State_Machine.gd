@@ -27,7 +27,6 @@ func die():
 	dead=true
 	if !body.on_floor:
 		return
-	var main=get_tree().get_root().get_node("Main")
 	if main:
 		if explode_on_death:
 			var explosion:Explosion=load("res://Scenes/General/explosion.tscn").instantiate()

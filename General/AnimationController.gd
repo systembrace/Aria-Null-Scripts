@@ -88,19 +88,18 @@ func hitflash(dead=false):
 		flicker.start()
 
 func set_offset():
+	if body is Entity:
+		sprite.offset.y=y_offset-body.height
 	var new_offset=0
 	var set_offs=false
 	if parent_controller:
 		set_offs=true
 		z_index=parent_controller.z_index
-		new_offset=parent_controller.sprite.offset.y-parent_controller.y_offset
 	if floating>0.0:
 		set_offs=true
 		new_offset+=round(sin(float_step)*floating)
 	if set_offs:
-		sprite.offset.y=y_offset+new_offset
-		#if get_parent() is Sprite2D and get_parent().name=="Mask" and not body.control.paused:
-		#	get_parent().offset.y=-32+new_offset
+		sprite.offset.y+=new_offset
 
 func _process(delta):
 	var curr_anim_name=idlename
@@ -255,7 +254,7 @@ func _process(delta):
 	if footsteps_per_cycle>0:
 		if anim==runname or anim==walkname:
 			var cycle=sprite.sprite_frames.get_frame_count(sprite.animation)/footsteps_per_cycle
-			if sprite.frame%cycle==0 and sprite.frame!=footsteps and (not body is RolyPoly or body.sprite.position.y==0):
+			if sprite.frame%cycle==0 and sprite.frame!=footsteps and (not body is RolyPoly or body.height==0):
 				footsteps=sprite.frame
 				step.emit()
 		elif anim!=prevanim:

@@ -64,7 +64,7 @@ func death_throes():
 		hitstun.stun()
 
 func die():
-	var main=get_tree().get_root().get_node("Main")
+	main=get_tree().get_root().get_node("Main")
 	var die_sfx=$Die.duplicate()
 	main.add_child(die_sfx)
 	die_sfx.play()
@@ -104,7 +104,7 @@ func die():
 		Global.slow_down_to_zero=true
 
 func undo_dummy():
-	var main=get_tree().get_root().get_node("Main")
+	main=get_tree().get_root().get_node("Main")
 	inventory.dummy.create_player(body.tessa)
 	inventory.dummy=null
 	body.queue_free()
@@ -190,7 +190,7 @@ func _process(delta):
 		prevent_movement()
 		if Engine.time_scale>=0.1 or !Input.is_action_just_pressed("attack"):
 			return
-		var main=get_tree().get_root().get_node("Main")
+		main=get_tree().get_root().get_node("Main")
 		var active_enemies=main.waves[main.wave].get_children()
 		var to_mouse=body.to_local(body.target.global_position)
 		var facing=false
@@ -232,7 +232,7 @@ func _process(delta):
 			secondary_charge+=delta
 		else:
 			secondary_charge=0.0
-		if secondary_charge>=2:
+		if secondary_charge>=2 and (!dash or not dash.dashing) and not combo.is_charging() and body.on_floor:
 			inventory.use_secondary(true)
 			secondary_charge=0.0
 		
@@ -248,7 +248,7 @@ func _process(delta):
 		if (inventory.secondary is Gun or inventory.secondary is Shield) and inventory.secondary.cant_move and not combo.is_attacking():
 			prevent_movement()
 		
-		if not combo.is_charging() and (!dash or not dash.dashing) and Input.is_action_just_released("hologram"):
+		if not combo.is_charging() and (!dash or not dash.dashing) and (!inventory.secondary or (inventory.secondary is Shield and !inventory.secondary.active) or (!inventory.secondary is Shield and inventory.secondary.can_use())) and Input.is_action_just_released("hologram"):
 			if (!body.original_player and inventory.dummy) or (body.original_player and inventory.revival!="none"):# and inventory.ammo>=20):
 				var ray = RayCast2D.new()
 				body.add_child(ray)

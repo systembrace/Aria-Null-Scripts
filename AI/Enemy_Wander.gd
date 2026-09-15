@@ -41,7 +41,7 @@ func enter():
 	timer.wait_time=randf_range(min_wander,max_wander)
 	timer.start()
 
-func update():
+func update(_delta):
 	if not wait and body.global_position.distance_to(spawn)>=wander_radius*2:
 		transition.emit(self, "Return")
 		return
@@ -49,8 +49,8 @@ func update():
 		far=true
 		cycle()
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed/4,accel/2)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed/4,accel/2*60*delta)
 
 func exit():
 	body.nav_agent.avoidance_enabled=avoidance

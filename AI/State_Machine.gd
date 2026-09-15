@@ -82,7 +82,6 @@ func death_throes():
 	if hitstun:
 		hitstun.stun()
 		if find_child("Die"):
-			var main=get_tree().get_root().get_node("Main")
 			var die_sfx=$Die.duplicate()
 			main.add_child(die_sfx)
 			die_sfx.finished.connect(die_sfx.queue_free)
@@ -107,7 +106,7 @@ func recover():
 		combo.enable_attack()
 	stunned=false
 
-func _process(_delta):
+func _process(delta):
 	out_of_combat=false
 	if dead or paused:
 		return
@@ -141,7 +140,7 @@ func _process(_delta):
 				if body.to_local(body.jump_point.global_position).length()<16:
 					body.jump_point=null
 				return
-			current_state.update()
+			current_state.update(delta)
 	elif (stunned or dying) and combo:
 		combo.enable_attack()
 
@@ -184,7 +183,7 @@ func _physics_process(delta):
 					dash.go_to=current_state.name
 					force_transition("Dodge")
 					return
-		current_state.physics_update()
+		current_state.physics_update(delta)
 	body.nav_agent.set_velocity(body.velocity)
 
 func transition_state(old_state, new_state_name):

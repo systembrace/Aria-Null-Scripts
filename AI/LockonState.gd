@@ -93,7 +93,7 @@ func can_see_target():
 func update_targetdist():
 	targetdist=body.to_local(target.global_position).length()
 
-func update():
+func update(_delta):
 	#circle
 	dist_to_dest=body.to_local(destination).length()
 	if (targetdist>max_dist+16 or (stay_away and targetdist<min_dist*.75) or dist_to_dest>96) and can_see_target():

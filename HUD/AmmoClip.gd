@@ -26,7 +26,7 @@ func init_dividers():
 		dividers.append(divider)
 
 func _process(delta):
-	if not inventory:
+	if not inventory or get_parent().hidden:
 		return
 	if inventory.secondary:
 		show()

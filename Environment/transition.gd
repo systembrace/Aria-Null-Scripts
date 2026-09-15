@@ -58,7 +58,6 @@ func change_scene(body=null):
 	if !player or body!=player:
 		return
 	player.set_process_input(false)
-	player.set_collision_mask_value(19,false)
 	main.hide()
 	if "Cherry" in main.npcs and Global.get_flag("With_Cherry") and main.current_waypoint:
 		player.inventory.hud.dialogue("cherry","leave_room_"+str(randi_range(1,4)),true,false,true)

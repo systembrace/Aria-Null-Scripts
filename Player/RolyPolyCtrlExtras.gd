@@ -6,7 +6,7 @@ extends Node2D
 @export var charge: Attack
 @export var attack: Attack
 var dh=0
-var gravity=15
+var gravity=10
 var disabled_hurtbox=false
 var init_collision
 var charging=false
@@ -19,10 +19,8 @@ func _ready():
 	await body.ready
 	combo.started_attack.connect(disable_hurtbox)
 	combo.ended_attack.connect(enable_hurtbox)
-	attack.started_attack.connect(body.jump)
-	attack.started_ready.connect(jump_timer.start)
-	jump_timer.wait_time=.2
-	jump_timer.timeout.connect(body.land)
+	attack.started_attack.connect(jump)
+	jump_timer.timeout.connect(land)
 	init_collision=body.collision_mask
 	body.set_collision_mask_value(9,false)
 	hurtbox.hurtboxenabled.connect(set_collision)
@@ -31,7 +29,7 @@ func _ready():
 	charge.ended_attack.connect(charge_ended)
 
 func charge_started():
-	body.set_collision_mask_value(18,false)
+	jump(.25)
 	body.set_collision_mask_value(9,false)
 	charging=true
 	$Ring1.emitting=true
@@ -43,7 +41,6 @@ func charge_started():
 func charge_ended():
 	if !charging:
 		return
-	body.set_collision_mask_value(18,true)
 	body.set_collision_mask_value(9,true)
 	charging=false
 	$DustTimer.start()
@@ -65,7 +62,17 @@ func set_collision():
 	body.collision_mask=init_collision
 	hurtbox.hurtboxenabled.disconnect(set_collision)
 
-func bounce(coll):
+func jump(time=.45):
+	jump_timer.wait_time=time
+	body.jump()
+	jump_timer.start()
+
+func land():
+	if !body.on_floor:
+		body.set_collision_mask_value(19,true)
+	body.land()
+
+func bounce(coll:KinematicCollision2D):
 	if charging:
 		var new_vel=body.velocity.bounce(coll.get_normal())
 		body.set_deferred("velocity",new_vel)
@@ -75,9 +82,9 @@ func bounce(coll):
 		return
 	$Bounce.play()
 	body.set_deferred("velocity",body.velocity.bounce(coll.get_normal())/2)
-	dh=min(3*body.velocity.length()/body.max_speed,3)
-	if sprite.position.y!=0:
-		dh*=(24-min(abs(sprite.position.y),32))/32
+	dh=min(2*body.velocity.length()/body.max_speed,2)
+	if body.height!=0:
+		dh*=(24-min(abs(body.height),32))/32
 
 func _process(delta):
 	if bounces>=10 or (body.control.attackpush==2 and body.velocity.length()*delta<body.max_speed*1.5*delta):
@@ -91,9 +98,9 @@ func _process(delta):
 		$Dust.emitting=true
 
 func _physics_process(delta):
-	sprite.position.y-=dh
-	if int(sprite.position.y)<0:
-		dh-=gravity*delta
-	else:
+	body.height+=dh
+	if int(body.height)<=0 and ((combo.is_damaging() and !charge.damaging) or body.on_floor):
 		dh=0
-		sprite.position.y=0
+		body.height=0
+	else:
+		dh-=gravity*delta

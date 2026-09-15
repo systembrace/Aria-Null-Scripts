@@ -62,7 +62,7 @@ func die():
 	main.add_child(playercorpse)
 	if !main.inventory.can_revive:
 		main.player.control.die()
-	else:
+	elif !Global.endless:
 		main.combat_paused.connect(main.player.revive_corpse)
 		main.optionals_defeated.connect(main.player.revive_corpse)
 	main.inventory.dummy=null

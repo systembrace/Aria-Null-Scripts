@@ -16,7 +16,7 @@ var posture=base_posture
 var knockback=base_knockback
 var monitor=true
 signal got_parried
-signal hit_hurtbox
+signal hit_hurtbox(obj)
 signal hit_something
 @onready var hitbox=$CollisionShape2D
 

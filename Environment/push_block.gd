@@ -54,6 +54,8 @@ func hit(area:Hitbox):
 		Global.hitstop(.05)
 
 func stop():
+	if int(round(rotation_degrees))%90!=0:
+		45*turning.turn_occ
 	$Hit.play()
 	$Roll.stop()
 	velocity=Vector2.ZERO
@@ -67,16 +69,21 @@ func _process(delta):
 		$SpriteGroup/LockPosition/LeftOn.frame=2
 		$SpriteGroup/LockPosition/RightOn.frame=2
 		$SpriteGroup/LockPosition/DownOn.frame=2
+		$SpriteGroup/LockRotation/Check.show()
+		$SpriteGroup/LockRotation/Check.play("check")
 	elif velocity==Vector2.ZERO and occupying.plug_dir!=Vector2.ZERO:
 		$SpriteGroup/LockPosition/UpOn.frame=1
 		$SpriteGroup/LockPosition/LeftOn.frame=1
 		$SpriteGroup/LockPosition/RightOn.frame=1
 		$SpriteGroup/LockPosition/DownOn.frame=1
+		$SpriteGroup/LockRotation/Check.show()
+		$SpriteGroup/LockRotation/Check.play("x")
 	else:
 		$SpriteGroup/LockPosition/UpOn.frame=0
 		$SpriteGroup/LockPosition/LeftOn.frame=0
 		$SpriteGroup/LockPosition/RightOn.frame=0
 		$SpriteGroup/LockPosition/DownOn.frame=0
+		$SpriteGroup/LockRotation/Check.hide()
 	body_checker.global_position=global_position+dir*8
 	$RayCast2D.target_position=$RayCast2D.to_local(global_position+dir*12)
 	if body_checker.has_overlapping_bodies():
@@ -89,14 +96,14 @@ func _process(delta):
 	if !turning:
 		return
 	var near_center=to_local(turning.global_position).length()<=4
-	if abs(turning.rotate)==1 and near_center:
-		rotation_degrees+=45*turning.rotate
-		turning.rotate=sign(turning.rotate)*.5
-	elif abs(turning.rotate)==0.5 and !near_center:
-		rotation_degrees+=45*sign(turning.rotate)
-		turning.rotate=0
+	if abs(turning.turn_occ)==1 and near_center:
+		rotation_degrees+=45*turning.turn_occ
+		turning.turn_occ=sign(turning.turn_occ)*.5
+	elif abs(turning.turn_occ)==0.5 and !near_center:
+		rotation_degrees+=45*sign(turning.turn_occ)
+		turning.turn_occ=0
 		turning=null
-		if occupying.rotate!=0:
+		if occupying.turn_occ!=0:
 			turning=occupying
 
 func can_save():

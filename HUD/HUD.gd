@@ -23,6 +23,7 @@ var control: PlayerControl
 @onready var notice_label=$Notice/PanelContainer/MarginContainer/Label
 @onready var notice=$Notice
 
+var hidden=false
 var scrapframes=0
 
 func _ready():
@@ -36,6 +37,7 @@ func _ready():
 func hide_all():
 	for child in get_children():
 		child.hide()
+	hidden=true
 
 func show_save():
 	$SaveIcon.visible=true

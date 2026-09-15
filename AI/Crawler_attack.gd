@@ -19,7 +19,7 @@ func enter():
 	accel=body.accel
 	gun=body.gun
 
-func update():
+func update(_delta):
 	if !body.on_wall or !is_instance_valid(body.target):
 		transition.emit(self,"Wander")
 		return

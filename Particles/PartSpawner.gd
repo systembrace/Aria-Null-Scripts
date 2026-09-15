@@ -40,7 +40,7 @@ func spawn_spec(pname,pos=get_parent().global_position,parry=false,mod=1,blood_f
 			if pname=="rubble" and rubble_type!="none":
 				instance.type=rubble_type
 			if height!=0:
-				instance.h=height
+				instance.height=height
 		main.call_deferred("add_child",instance)
 
 func heal_corpse():

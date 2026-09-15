@@ -44,7 +44,7 @@ func settle():
 	if !is_node_ready():
 		call_deferred("settle")
 		return
-	sprite.position.y=0
+	sprite.offset.y=-4.5
 	settled=true
 	sprite.animation="settled"
 	sprite.play()
@@ -95,4 +95,4 @@ func _physics_process(delta):
 		var coll = move_and_collide(velocity*delta)
 		if coll:
 			velocity=velocity.bounce(coll.get_normal())/2
-		sprite.position.y=-h
+		sprite.offset.y=-4.5-h

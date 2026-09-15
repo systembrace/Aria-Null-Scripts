@@ -139,7 +139,7 @@ func shoot():
 func reload():
 	body.ammo=-recharge_time*5
 
-func update():
+func update(_delta):
 	if target!=body.target:
 		reset_target()
 	if !is_instance_valid(target) or target.control.health.hp<=0:
@@ -155,13 +155,13 @@ func update():
 	if (delay_time<=0 or delay.is_stopped()) and (!try_timer or try_timer.is_stopped()):
 		try_shoot()
 	
-	super.update()
+	super.update(_delta)
 	
 	if delay_time>0 and !delay.is_stopped():
 		direction=Vector2.ZERO
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed,accel)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed,accel*60*delta)
 
 func exit():
 	if !never_hide:

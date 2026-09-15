@@ -59,7 +59,7 @@ func enter():
 	move_to=body.to_local(body.target.global_position).normalized()
 	combo.enable_attack()
 
-func update():
+func update(_delta):
 	var targetdist=9999
 	if is_instance_valid(target):
 		targetdist=body.global_position.distance_to(target.global_position)
@@ -98,8 +98,8 @@ func update():
 	elif targetdist<combo.push/10.0:
 		direction+=(body.global_position-target.global_position).normalized()/targetdist
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed,accel)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed,accel*60*delta)
 	if not attackpush and combo.is_damaging():
 		attackpush=true
 		body.velocity=combo.attack_push()

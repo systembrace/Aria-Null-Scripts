@@ -14,10 +14,10 @@ var accel
 func enter():
 	speed=body.max_speed
 	accel=body.accel
-	wander_to=body.global_position
 	direction=Vector2.UP.rotated(randi_range(0,7)*PI/4)
+	wander_to=body.global_position+direction*8
 	
-func update():
+func update(_delta):
 	if navigator.nav_agent.is_navigation_finished():
 		wander_to+=body.velocity.normalized().rotated(randf_range(-turn_range,turn_range)*PI/4)*8
 		ray.global_position=body.global_position
@@ -32,5 +32,5 @@ func update():
 			wander_to=body.global_position-speed*dist_vec.normalized()/(max(dist_vec.length(),run_from_target/2)/run_from_target)*.5
 	direction=navigator.next_direction(wander_to)
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed,accel)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed,accel*60*delta)

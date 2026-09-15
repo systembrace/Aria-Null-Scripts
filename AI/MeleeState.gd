@@ -85,7 +85,7 @@ func try_attacking():
 		else:
 			combo.enable_attack()
 
-func update():
+func update(_delta):
 	if target!=body.target and combo.can_move():
 		target=body.target
 		if is_instance_valid(target):
@@ -96,10 +96,6 @@ func update():
 			transition.emit(self,"Wander")
 		try_timer.stop()
 		return
-	if combo.is_damaging() and combo.current_attack.transition_to!="":
-		trans_to_attack_state=true
-		transition.emit(self, combo.current_attack.transition_to)
-		return
 	if (!combo.is_done_attacking() or combo.is_readying()) and !trying_parry:
 		try_timer.stop()
 		if !combo.can_navigate() or combo.is_readying():
@@ -109,7 +105,7 @@ func update():
 			var temp_max=max_dist
 			min_dist=0
 			max_dist=combo.current_attack.push
-			super.update()
+			super.update(_delta)
 			min_dist=temp_min
 			max_dist=temp_max
 		must_attack=false
@@ -157,9 +153,9 @@ func update():
 		if combo.is_charging():
 			combo.release()
 	
-	super.update()
+	super.update(_delta)
 	
-func physics_update():
+func physics_update(delta):
 	var tempspeed=speed
 	var tempaccel=accel
 	if combo.is_done_attacking() and can_see_target():
@@ -174,7 +170,7 @@ func physics_update():
 		stay_away=true
 	if stay_away and targetdist<min_dist/2:
 		tempspeed*=2.0
-	body.velocity=body.velocity.move_toward(direction*tempspeed,tempaccel)
+	body.velocity=body.velocity.move_toward(direction*tempspeed,tempaccel*60*delta)
 	if not attackpush and combo.is_damaging() and not combo.can_navigate():
 		attackpush=true
 		body.nav_agent.avoidance_enabled=false
@@ -183,6 +179,9 @@ func physics_update():
 		attackpush=false
 		if combo.can_navigate():
 			body.nav_agent.avoidance_enabled=true
+	if combo.is_damaging() and combo.current_attack.transition_to!="":
+		trans_to_attack_state=true
+		transition.emit(self, combo.current_attack.transition_to)
 
 func exit():
 	must_attack=false

@@ -31,7 +31,7 @@ var turn_map={
 	Vector2.UP:0
 }
 var next_move: RailTile
-var rotate=0
+var turn_occ=0
 
 func _ready():
 	if stop:
@@ -115,8 +115,8 @@ func give_to_next(leftover=0):
 func receive(obj):
 	occ_by=obj
 	occ_by.occupying=self
-	rotate=turn_map[occ_by.dir]
-	if rotate!=0 and !occ_by.turning:
+	turn_occ=turn_map[occ_by.dir]
+	if turn_occ!=0 and !occ_by.turning:
 		occ_by.turning=self
 	if !stop:
 		next_move=backup

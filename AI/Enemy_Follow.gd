@@ -17,7 +17,7 @@ func enter():
 	if is_instance_valid(body.target):
 		target=body.target
 
-func update():
+func update(_delta):
 	if not is_instance_valid(body.target):
 		transition.emit(self,"Wander")
 		return
@@ -32,8 +32,8 @@ func update():
 	else:
 		direction=navigator.next_direction(target.global_position)
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(direction*speed*speed_scale,accel)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(direction*speed*speed_scale,accel*60*delta)
 
 func exit():
 	pass

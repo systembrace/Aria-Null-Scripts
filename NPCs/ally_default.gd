@@ -25,7 +25,7 @@ func enter():
 	if is_instance_valid(main.player) and !body.tessa:
 		player=main.player
 
-func update():
+func update(_delta):
 	if look_for_waypoints:
 		if main.current_waypoint and (main.current_waypoint.active or !main.current_waypoint.clear_current) and waypoint!=main.current_waypoint:
 			waypoint=main.current_waypoint
@@ -70,7 +70,7 @@ func update():
 		body.set_collision_mask_value(20,true)
 	direction=navigator.next_direction(player.global_position)
 
-func physics_update():
+func physics_update(delta):
 	#if dash and body.on_floor and dash.timer.is_stopped() and body.get_collision_mask_value(18):
 		#ray.position=Vector2.ZERO
 		#ray.target_position=direction.normalized()*8
@@ -96,7 +96,7 @@ func physics_update():
 	var tempspeed=speed
 	#if !waypoint and is_instance_valid(player) and body.global_position.distance_to(player.global_position)>128:
 	#	tempspeed*=2
-	body.velocity=body.velocity.move_toward(direction*tempspeed,accel)
+	body.velocity=body.velocity.move_toward(direction*tempspeed,accel*60*delta)
 
 func exit():
 	pass

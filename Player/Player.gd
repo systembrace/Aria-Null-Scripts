@@ -118,6 +118,8 @@ func _process(delta):
 			control.paused=false
 
 func revive_corpse():
+	if !inventory:
+		inventory=main.inventory
 	if !Global.endless and !original_player and inventory.can_revive and main.player_corpse:
 		create_tessa(false)
 		main.player_corpse.revive(tessa)

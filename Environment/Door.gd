@@ -27,6 +27,8 @@ func _ready():
 	if get_parent() is Main and get_parent().dark:
 		$PointLight2D.energy=1.5
 		$PointLight2D.color="ffe6bf"
+		if open_direction!="vertical":
+			$PointLight2D.energy=1.75
 		$PointLight2D.blend_mode=PointLight2D.BLEND_MODE_MIX
 	collision.shape.size.x=width
 	collision.shape.size.y=height
@@ -45,7 +47,9 @@ func _ready():
 		toggle_area.area_exited.connect(close)
 	
 	if open_direction!="vertical":
-		$PointLight2D.enabled=false
+		#$PointLight2D.enabled=false
+		$PointLight2D.texture=load("res://Assets/Art/environment/doorlight_2.png")
+		$PointLight2D.position.y-=4
 		collision.rotation=PI/2
 		clipping_check.rotation=PI/2
 		side1.texture=CanvasTexture.new()

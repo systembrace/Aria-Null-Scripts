@@ -18,14 +18,17 @@ func bounce():
 	bounces+=1
 	Global.screenshake(.05)
 
-func update():
+func update(_delta):
 	if !combo.is_attacking() or bounces>=10 or body.velocity.length()<body.max_speed*1.5:
 		if combo.is_damaging():
+			print(body.velocity.length())
+			print(body.max_speed*1.5)
+			print(combo.is_damaging())
 			combo.stop_attack()
 		transition.emit(self, "Follow")
 
-func physics_update():
-	body.velocity=body.velocity.move_toward(Vector2.ZERO,body.accel/2)
+func physics_update(delta):
+	body.velocity=body.velocity.move_toward(Vector2.ZERO,body.accel/2*60*delta)
 
 func exit():
 	in_state=false

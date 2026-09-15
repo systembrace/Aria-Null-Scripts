@@ -246,17 +246,19 @@ func _process(delta):
 				itemindex=int(itemindex+1)%items.size()
 				while !Global.get_flag(items[itemindex].name):
 					itemindex=int(itemindex+1)%items.size()
-				equip_item()
-				$EquipItem.play()
+				if item!=items[itemindex]:
+					equip_item()
+					$EquipItem.play()
 			if secondaryindex!=-1 and player.original_player and Input.is_action_just_pressed("next gun"):
 				secondaryindex=int(secondaryindex+1)%secondaries.size()
 				while !Global.get_flag(secondaries[secondaryindex].name):
 					secondaryindex=int(secondaryindex+1)%secondaries.size()
-				equip_secondary()
-				$EquipGun.play()
-				gunsprite.animation=secondary.name.to_lower()
-				gunsprite.visible=true
-				$CanvasLayer/Gun/Timer.start()
+				if secondary!=secondaries[secondaryindex]:
+					equip_secondary()
+					$EquipGun.play()
+					gunsprite.animation=secondary.name.to_lower()
+					gunsprite.visible=true
+					$CanvasLayer/Gun/Timer.start()
 		if player is PlayerGhost or player.control.paused or !item or item.num==0:
 			#if player is Player:
 				#just_unpaused=player.control.paused

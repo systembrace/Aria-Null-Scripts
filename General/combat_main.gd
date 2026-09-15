@@ -10,6 +10,7 @@ signal combat_over
 signal optionals_defeated
 var waves=[]
 var wave=-1
+var optionals_activated=false
 
 func _ready():
 	super._ready()
@@ -69,8 +70,12 @@ func _process(_delta):
 		if num_enemies(false,true,true)==0:
 			combat_paused.emit()
 		Global.in_combat=false
-	if optional_wave and num_enemies_in_wave(-1,false)==0:
-		optionals_defeated.emit()
+	if optional_wave:
+		if num_enemies_in_wave(-1,true)>0:
+			optionals_activated=true
+		if optionals_activated and num_enemies_in_wave(-1,true)==0:
+			optionals_defeated.emit()
+			optionals_activated=false
 	
 	if wave>=num_waves:
 		return

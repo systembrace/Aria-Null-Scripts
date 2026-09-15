@@ -5,7 +5,6 @@ class_name Blood
 @onready var trail=$Sprite/Trail
 @onready var timer=$Timer
 @onready var collect_area=$CollectArea
-var h=1
 var dh=0
 var gravity=.15
 var bounce=.5
@@ -35,7 +34,7 @@ func _ready():
 	trail.clear_points()
 	trail.add_point(Vector2.ZERO)
 	trail.add_point(Vector2.ZERO)
-	h=8
+	height=8
 	timer.wait_time=randf_range(8,15)
 	timer.timeout.connect(timerup)
 	if randi()%2:
@@ -48,7 +47,7 @@ func timerup():
 	collectable=true
 
 func _process(delta):
-	if h<=-96:
+	if height<=-96:
 		queue_free()
 	if parry:
 		if not is_instance_valid(player):
@@ -76,13 +75,13 @@ func _process(delta):
 		return
 	if !$CollectArea/CollisionShape2D.disabled:
 		$CollectArea/CollisionShape2D.disabled=true
-	if h>0 or !on_floor:
+	if height>0 or !on_floor:
 		dh-=gravity*60*delta
-		h+=dh*60*delta
-	elif not shrink and h<0 and on_floor and timer.is_stopped():
+		height+=dh*60*delta
+	elif not shrink and height<0 and on_floor and timer.is_stopped():
 		velocity=Vector2.ZERO
 		dh=0
-		h=0
+		height=0
 		sprite.frame=randi_range(1,3)
 		timer.start()
 		$CollisionShape2D.disabled=true
@@ -99,7 +98,7 @@ func _process(delta):
 	if sprite.scale.length()<=.1:
 		Global.num_particles-=1
 		queue_free()
-	if not falling and not on_floor and h<=0:
+	if not falling and not on_floor and height<=0:
 		fall()
 
 func _physics_process(delta):
@@ -107,7 +106,7 @@ func _physics_process(delta):
 	if velocity!=Vector2.ZERO:
 		var prev=trail.global_position
 		move_and_slide()
-		sprite.position.y=-h
+		sprite.position.y=-height
 		trail.points[1]=trail.to_local(prev)*4/(60*delta)
 	elif trail.points[1]!=trail.points[0]:
 		trail.points[1]=trail.points[0]

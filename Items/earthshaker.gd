@@ -23,6 +23,7 @@ var activations=0
 
 func _ready():
 	super._ready()
+	height=16
 	if charged:
 		hitbox.damage=0.5
 		if !main_charged:
@@ -76,20 +77,21 @@ func reset_particles():
 
 func _process(delta):
 	step+=1*60*delta
-	if not falling and not on_floor and sprite.position.y>=0:
+	if not falling and not on_floor and height<=0:
 		fall()
 
 func _physics_process(delta):
+	sprite.offset.y=-4-height
 	super._physics_process(delta)
 	move_and_slide()
 	if waiting:
 		return
 	if deploying:
-		dh+=gravity*delta
-		sprite.position.y+=dh
-		if sprite.position.y>=0 and on_floor:
+		dh-=gravity*delta
+		height+=dh
+		if height<=0 and on_floor:
 			global_position=global_position.round()
-			sprite.position.y=0
+			height=0
 			velocity=Vector2.ZERO
 			deploying=false
 			timer.start()

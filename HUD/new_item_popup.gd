@@ -10,10 +10,10 @@ var directions={
 	"shield":"(PRESS {secondary} TO USE)",
 }
 var descriptions={
-	"roly_poly":"Requires stored energy.\n
-	\"Looks like this'll help me out... I'll connect Tessa and I. Seems like it'll be more useful if she holds onto it.\"",
+	"roly_poly":"Activates a controllable hologram.\n
+	\"I'll have Tessa project it for me so it can go places I can't.\"",
 	
-	"shield":"Requires energy.\n
+	"shield":"Requires energy. Negates all damage.\n
 	\"Hey, looks like I won't have to deflect as much as I thought!\"",
 }
 
